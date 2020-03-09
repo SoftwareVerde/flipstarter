@@ -40,6 +40,12 @@ module.exports = function(app)
 
 		// Create the database schema.
 		app.sql.exec(databaseSchema);
+
+		// Load the database content.
+		const databaseInit = Filesystem.readFileSync('sql/database_init.sql', 'utf8').trim();
+
+		// Apply the database content.
+		app.sql.exec(databaseInit);
 	}
 
 	//
