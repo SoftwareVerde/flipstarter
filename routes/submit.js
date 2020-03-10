@@ -261,7 +261,7 @@ const submitContribution = async function(req, res)
 	catch(error)
 	{
 		// Send an ERROR signal back to the client.
-		res.status(500);
+		res.status(500).json({ error: error });
 
 		req.app.debug.errors('Failed to validate contribution.');
 		req.app.debug.object(error);
