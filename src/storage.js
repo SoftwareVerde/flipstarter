@@ -67,15 +67,15 @@ module.exports = function(app)
 		getCommitment:						app.sql.prepare(Filesystem.readFileSync('sql/get_commitment.sql', 'utf8').trim()),
 		getCommitmentByHashAndIndex:			app.sql.prepare(Filesystem.readFileSync('sql/get_commitment_by_hash_and_index.sql', 'utf8').trim()),
 		getContribution:					app.sql.prepare(Filesystem.readFileSync('sql/get_contribution.sql', 'utf8').trim()),
-
+		countCommitmentsByCampaign:			app.sql.prepare(Filesystem.readFileSync('sql/count_commitments_by_campaign.sql', 'utf8').trim()),
 		//
 		getContributionByCommitment:			app.sql.prepare(Filesystem.readFileSync('sql/get_contribution_by_commitment.sql', 'utf8').trim()),
 		listAllContributions:				app.sql.prepare(Filesystem.readFileSync('sql/list_all_contributions.sql', 'utf8').trim()),
 
 		// Campaign management.
 		getCampaign:						app.sql.prepare(Filesystem.readFileSync('sql/get_campaign.sql', 'utf8').trim()),
-		getCampaign_requested_satoshis:		app.sql.prepare(Filesystem.readFileSync('sql/get_campaign_requested_satoshis.sql', 'utf8').trim()),
-		getCampaign_committed_satoshis:		app.sql.prepare(Filesystem.readFileSync('sql/get_campaign_committed_satoshis.sql', 'utf8').trim()),
+		getCampaignRequestedSatoshis:			app.sql.prepare(Filesystem.readFileSync('sql/get_campaign_requested_satoshis.sql', 'utf8').trim()),
+		getCampaignCommittedSatoshis:			app.sql.prepare(Filesystem.readFileSync('sql/get_campaign_committed_satoshis.sql', 'utf8').trim()),
 		listCampaigns:						app.sql.prepare(Filesystem.readFileSync('sql/list_campaigns.sql', 'utf8').trim()),
 		listRecipientsByCampaign:			app.sql.prepare(Filesystem.readFileSync('sql/list_recipients_by_campaign.sql', 'utf8').trim()),
 		listContributionsByCampaign:			app.sql.prepare(Filesystem.readFileSync('sql/list_contributions_by_campaign.sql', 'utf8').trim()),

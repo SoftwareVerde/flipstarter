@@ -115,7 +115,7 @@ const setup = async function()
 			}
 
 			// Get a mutex lock ready.
-			const unlock = await app.checkForTransactionUpdatesLock.acquire();
+			const unlock = await app.handleRevocationsLock.acquire();
 
 			try
 			{
