@@ -78,6 +78,19 @@ const submitContribution = async function(req, res)
 			// Fetch the referenced transaction.
 			const inputTransaction = await req.app.electrum.request('blockchain.transaction.get', currentInput.previous_output_transaction_hash, true);
 
+			// Check if the transaction has error code 2 (missing UTXO).
+			if(inputTransaction.code == 2)
+			{
+					// Send an "NOT FOUND" signal back to the client.
+					res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
+
+					// Notify the admin about the event.
+					req.app.debug.server('Contribution rejection returned to ' + req.ip);
+
+					// Return false to indicate failure and stop processing.
+					return false;
+			}
+
 			// Store the inputs value.
 			const inputSatoshis = inputTransaction.vout[currentInput.previous_output_index].value * SATS_PER_BCH;
 
@@ -92,19 +105,6 @@ const submitContribution = async function(req, res)
 
 			// Locate the UTXO in the list of unspent transaction outputs.
 			const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash == currentInput.previous_output_transaction_hash);
-
-			// Validate the that referenced UTXO is unspent...
-			if(typeof inputUTXO === 'undefined')
-			{
-				// Send an OK signal back to the client.
-				res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
-
-				// Notify the admin about the event.
-				req.app.debug.server('Contribution rejection returned to ' + req.ip);
-
-				// Return false to indicate failure and stop processing.
-				return false;
-			}
 
 			//
 			const previousTransactionHash = Buffer.from(currentInput.previous_output_transaction_hash, 'hex');
