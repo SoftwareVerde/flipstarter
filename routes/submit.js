@@ -121,7 +121,7 @@ const submitContribution = async function(req, res)
 						res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
 
 						// Notify the admin about the event.
-						req.app.debug.server('Contribution rejection returned to ' + req.ip);
+						req.app.debug.server('Contribution rejection (Missing UTXO) returned to ' + req.ip);
 
 						// Return false to indicate failure and stop processing.
 						return false;
@@ -206,7 +206,7 @@ const submitContribution = async function(req, res)
 				res.status(409).json({ status: `The contribution amount ('${totalSatoshis}') does not match the provided intent (${contributionObject.data.amount}).` });
 
 				// Notify the admin about the event.
-				req.app.debug.server('Contribution rejection returned to ' + req.ip);
+				req.app.debug.server('Contribution rejection (intent amount mismatch) returned to ' + req.ip);
 
 				// Return false to indicate failure and stop processing.
 				return false;
@@ -222,7 +222,7 @@ const submitContribution = async function(req, res)
 				res.status(400).json({ status: `The contribution amount ('${totalSatoshis}') overcommits the contract by (${overCommitment}) satoshis.` });
 
 				// Notify the admin about the event.
-				req.app.debug.server('Contribution rejection returned to ' + req.ip);
+				req.app.debug.server('Contribution rejection (amount overcommitment) returned to ' + req.ip);
 
 				// Return false to indicate failure and stop processing.
 				return false;
