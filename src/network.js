@@ -6,8 +6,8 @@ module.exports = async function(app)
 	// Load the electrum library.
 	const ElectrumCluster = require('electrum-cash').Cluster;
 
-	// Initialize an electrum cluster where 1 out of 3 needs to be consistent, polled randomly with fail-over.
-	app.electrum = new ElectrumCluster('Flipstarter Backend', '1.4.1', 1, 3, ElectrumCluster.ORDER.RANDOM);
+	// Initialize an electrum cluster where 1 out of 1 needs to be consistent, polled randomly with fail-over.
+	app.electrum = new ElectrumCluster('Flipstarter Backend', '1.4.1', 1, 1, ElectrumCluster.ORDER.RANDOM);
 
 	//
 	app.debug.struct('Adding servers to cluster.');
