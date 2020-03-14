@@ -121,7 +121,7 @@ const submitContribution = async function(req, res)
 						res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
 
 						// Notify the admin about the event.
-						req.app.debug.server('Contribution rejection (Missing UTXO) returned to ' + req.ip);
+						req.app.debug.server('Contribution rejection (Missing transaction) returned to ' + req.ip);
 
 						// Return false to indicate failure and stop processing.
 						return false;
@@ -144,6 +144,19 @@ const submitContribution = async function(req, res)
 
 				// Locate the UTXO in the list of unspent transaction outputs.
 				const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash == currentInput.previous_output_transaction_hash);
+
+				// Verify that we can find the UTXO.
+				if(typeof inputUTXOs == 'undefined')
+				{
+						// Send an "NOT FOUND" signal back to the client.
+						res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
+
+						// Notify the admin about the event.
+						req.app.debug.server('Contribution rejection (Missing UTXO) returned to ' + req.ip);
+
+						// Return false to indicate failure and stop processing.
+						return false;
+				}
 
 				//
 				const previousTransactionHash = Buffer.from(currentInput.previous_output_transaction_hash, 'hex');
