@@ -467,7 +467,7 @@ class assuranceContract
 		const inputs = this.serializeCommitments();
 
 		// Create the output counter and output data buffer.
-		const outputCount = bitcoinCashUtilities.varInt(1);
+		const outputCount = bitcoinCashUtilities.varInt(Object.keys(this.outputs).length);
 		const outputs = this.serializeOutputs();
 
 		// Create a buffered disable locktime statement.
