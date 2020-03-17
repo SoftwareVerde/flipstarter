@@ -213,10 +213,10 @@ const submitContribution = async function(req, res)
 			}
 
 			// Verify that contributed amount matches stated intent.
-			if(contributionObject.data.amount != totalSatoshis)
+			if(contributionObject.data.amount != Math.round(totalSatoshis))
 			{
 				// Send an CONFLICT signal back to the client.
-				res.status(409).json({ status: `The contribution amount ('${totalSatoshis}') does not match the provided intent (${contributionObject.data.amount}).` });
+				res.status(409).json({ status: `The contribution amount ('${Math.round(totalSatoshis)}') does not match the provided intent (${contributionObject.data.amount}).` });
 
 				// Notify the admin about the event.
 				req.app.debug.server('Contribution rejection (intent amount mismatch) returned to ' + req.ip);
@@ -226,13 +226,13 @@ const submitContribution = async function(req, res)
 			}
 
 			// Calculate how far over (or under) committed this contribution makes the contract.
-			const overCommitment = (currentCommittedSatoshis + totalSatoshis) - (contract.totalContractOutputValue + currentMinerFee);
+			const overCommitment = Math.round((currentCommittedSatoshis + totalSatoshis) - (contract.totalContractOutputValue + currentMinerFee));
 
 			// Verify that the current contribution does not overcommit the contract.
 			if(overCommitment > 0)
 			{
 				// Send an BAD REQUEST signal back to the client.
-				res.status(400).json({ status: `The contribution amount ('${totalSatoshis}') overcommits the contract by (${overCommitment}) satoshis.` });
+				res.status(400).json({ status: `The contribution amount ('${Math.round(totalSatoshis)}') overcommits the contract by (${overCommitment}) satoshis.` });
 
 				// Notify the admin about the event.
 				req.app.debug.server('Contribution rejection (amount overcommitment) returned to ' + req.ip);
