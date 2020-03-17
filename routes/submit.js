@@ -305,31 +305,44 @@ const submitContribution = async function(req, res)
 			// Fullfill contract if possible.
 			if(contract.remainingCommitmentValue === 0)
 			{
-				// Assemble commitments into transaction
-				const rawTransaction = contract.assembleTransaction();
+				// Get a mutex lock for transaction updates ready.
+				// NOTE: This ensures that the broadcasted fullfillment gets stored in the database
+				//       before the revocations for it can be processed, avoidin invalid UI updates.
+				const unlock = await req.app.checkForTransactionUpdatesLock.acquire();
 
-				// Broadcast transaction
-				const broadcastResult = await req.app.electrum.request('blockchain.transaction.broadcast', rawTransaction.toString('hex'));
-
-				// If we successfully broadcasted the transaction..
-				if(broadcastResult)
+				try
 				{
-					// structure a fullfillment object.
-					const fullfillmentObject =
+					// Assemble commitments into transaction
+					const rawTransaction = contract.assembleTransaction();
+
+					// Broadcast transaction
+					const broadcastResult = await req.app.electrum.request('blockchain.transaction.broadcast', rawTransaction.toString('hex'));
+
+					// If we successfully broadcasted the transaction..
+					if(broadcastResult)
 					{
-						fullfillment_timestamp: moment().unix(),
-						fullfillment_transaction: broadcastResult,
-						campaign_id: req.params['campaign_id']
+						// structure a fullfillment object.
+						const fullfillmentObject =
+						{
+							fullfillment_timestamp: moment().unix(),
+							fullfillment_transaction: broadcastResult,
+							campaign_id: req.params['campaign_id']
+						}
+
+						// Store the fullfillment in the database.
+						req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
+
+						// Push the fullfillment to the SSE stream.
+						req.app.sse.send(fullfillmentObject);
+
+						// Notify the server admin that a campaign has been fullfilled.
+						req.app.debug.action(`Fullfilled campaign #${req.params['campaign_id']} with transaction ${broadcastResult}`);
 					}
-
-					// Store the fullfillment in the database.
-					req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
-
-					// Push the fullfillment to the SSE stream.
-					req.app.sse.send(fullfillmentObject);
-
-					// Notify the server admin that a campaign has been fullfilled.
-					req.app.debug.action(`Fullfilled campaign #${req.params['campaign_id']} with transaction ${broadcastResult}`);
+				}
+				finally
+				{
+					// Unlock the mutex so the next process can continue.
+					unlock();
 				}
 			}
 
