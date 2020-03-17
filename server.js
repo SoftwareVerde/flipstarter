@@ -120,7 +120,7 @@ const setup = async function()
 			try
 			{
 				// If this event has a changed scripthash status..
-				if(app.subscribedScriphashes[scriptHash] != scriptHashStatus)
+				if(app.subscribedScriphashes[scriptHash] !== scriptHashStatus)
 				{
 					// Update this scripthash status to prevent redundant work..
 					app.subscribedScriphashes[scriptHash] = scriptHashStatus;
@@ -132,7 +132,7 @@ const setup = async function()
 						const transactionHash = transactions[transactionIndex].tx_hash;
 
 						// Check the historic transaction to see if we need to update our revocation status.
-						app.checkForTransactionUpdates(Buffer.from(transactionHash, 'hex'))
+						app.checkForTransactionUpdates(Buffer.from(transactionHash, 'hex'));
 					}
 				}
 			}
@@ -142,7 +142,7 @@ const setup = async function()
 				unlock();
 			}
 		}
-	}
+	};
 
 	// initialize a transaction revocation check lock.
 	app.checkForTransactionUpdatesLock = new asyncMutex();
@@ -165,7 +165,7 @@ const setup = async function()
 			const commitment = app.queries.getCommitmentByHashAndIndex.get({ previous_transaction_hash: transactionHash, previous_transaction_index: outputIndex });
 
 			// If a commitment was found, and it has not already been revoked..
-			if(typeof commitment != 'undefined' && !commitment.revocation_id)
+			if(typeof commitment !== 'undefined' && !commitment.revocation_id)
 			{
 				// Get a mutex lock ready.
 				const unlock = await app.checkForTransactionUpdatesLock.acquire();
@@ -178,14 +178,11 @@ const setup = async function()
 					// Hash the inputs lockscript to use for requesting UTXOs (Why can't electrum take the UTXO directly and give me info about it???)
 					const inputLockScriptHash = bitbox.Crypto.sha256(inputLockScript);
 
-					// Derive an output address from the unlock script.
-					const outputAddress = bitbox.Address.fromOutputScript(inputLockScript);
-
 					// Get a list of unspent outputs for the input address.
 					const inputUTXOs = await app.electrum.request('blockchain.scripthash.listunspent', javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex'));
 
 					// Locate the UTXO in the list of unspent transaction outputs.
-					const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash == transactionHash.toString('hex'));
+					const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash === transactionHash.toString('hex'));
 
 					// Validate the that referenced transaction output is unspent...
 					if(typeof inputUTXO === 'undefined')
@@ -241,7 +238,7 @@ const setup = async function()
 				}
 			}
 		}
-	}
+	};
 
 	// Get a list of all contributions for all campaigns.
 	const unverifiedContributions = app.queries.listAllContributions.all();
@@ -279,7 +276,7 @@ const setup = async function()
 
 	// Notify user that the service is ready for incoming connections.
 	app.debug.status('Listening for incoming connections on port ' + app.config.server.port);
-}
+};
 
 // Initialize the server.
 setup();
