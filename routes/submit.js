@@ -389,7 +389,7 @@ const submitContribution = async function(req, res)
 							fullfillment_timestamp: moment().unix(),
 							fullfillment_transaction: broadcastResult,
 							campaign_id: req.params['campaign_id']
-						}
+						};
 
 						// Store the fullfillment in the database.
 						req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
