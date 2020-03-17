@@ -86,6 +86,61 @@ const submitContribution = async function(req, res)
 			// Parse contribution.
 			const contributionObject = req.body;
 
+			// Get the campaign information..
+			const campaign = req.app.queries.getCampaign.get({ campaign_id: req.params['campaign_id'] });
+
+			// If there is no matching campaign..
+			if(typeof campaign === 'undefined')
+			{
+				// Send an BAD REQUEST signal back to the client.
+				res.status(400).json({ error: `Campaign (${req.params['campaign_id']}) does not exist.` });
+
+				// Notify the admin about the event.
+				req.app.debug.server('Contribution rejection (Missing campaign) returned to ' + req.ip);
+
+				// Return false to indicate failure and stop processing.
+				return false;
+			}
+
+			// Check if the campaign has already been fullfilled.
+			if(campaign.fullfillment_id)
+			{
+				// Send an BAD REQUEST signal back to the client.
+				res.status(400).json({ error: `Campaign (${req.params['campaign_id']}) has already been fullfilled.` });
+
+				// Notify the admin about the event.
+				req.app.debug.server('Contribution rejection (Fullfilled campaign) returned to ' + req.ip);
+
+				// Return false to indicate failure and stop processing.
+				return false;
+			}
+
+			// Check if the campaign has already expired.
+			if(moment().unix() >= campaign.expires)
+			{
+				// Send an BAD REQUEST signal back to the client.
+				res.status(400).json({ error: `Campaign (${req.params['campaign_id']}) has expired.` });
+
+				// Notify the admin about the event.
+				req.app.debug.server('Contribution rejection (Expired campaign) returned to ' + req.ip);
+
+				// Return false to indicate failure and stop processing.
+				return false;
+			}
+
+			// Check if the campaign has not yet started.
+			if(moment().unix() < campaign.starts)
+			{
+				// Send an BAD REQUEST signal back to the client.
+				res.status(400).json({ error: `Campaign (${req.params['campaign_id']}) has not yet started.` });
+
+				// Notify the admin about the event.
+				req.app.debug.server('Contribution rejection (Pending campaign) returned to ' + req.ip);
+
+				// Return false to indicate failure and stop processing.
+				return false;
+			}
+
 			// TODO: do something about the storage stuffies.
 			let contract = new assuranceContract({});
 
