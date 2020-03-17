@@ -1,0 +1,14 @@
+image: node
+
+stages:
+    - lint
+
+cache:
+    paths:
+        - node_modules/
+
+linting:
+    stage: lint
+    script:
+        - npm install eslint
+        - node_modules/eslint/bin/eslint.js .
