@@ -202,8 +202,12 @@ const setup = async function()
 						// Get the currently added contribution.
 						const contributionData = app.queries.getContributionByCommitment.get({ commitment_id: commitment.commitment_id });
 
-						// Push the contribution to the SSE stream.
-						app.sse.send(contributionData);
+						// Check that the revocation isn't for a fullfilled campaign.
+						if(!contributionData.fullfillment_id)
+						{
+							// Push the contribution to the SSE stream.
+							app.sse.send(contributionData);
+						}
 
 						// If we are currently subscribed to changes for this script hash..
 						if(app.subscribedScriphashes[javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex')])
