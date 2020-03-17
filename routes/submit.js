@@ -65,7 +65,7 @@ const calculateMinerFee = function(RECIPIENT_COUNT, CONTRIBUTION_COUNT)
 
 	// Return the calculated miner fee.
 	return MINER_FEE;
-}
+};
 
 
 // Wrap the submission function in an async function.
@@ -115,16 +115,16 @@ const submitContribution = async function(req, res)
 				const inputTransaction = await req.app.electrum.request('blockchain.transaction.get', currentInput.previous_output_transaction_hash, true);
 
 				// Check if the transaction has error code 2 (missing UTXO).
-				if(inputTransaction.code == 2)
+				if(inputTransaction.code === 2)
 				{
-						// Send an "NOT FOUND" signal back to the client.
-						res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
+					// Send an "NOT FOUND" signal back to the client.
+					res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
 
-						// Notify the admin about the event.
-						req.app.debug.server('Contribution rejection (Missing transaction) returned to ' + req.ip);
+					// Notify the admin about the event.
+					req.app.debug.server('Contribution rejection (Missing transaction) returned to ' + req.ip);
 
-						// Return false to indicate failure and stop processing.
-						return false;
+					// Return false to indicate failure and stop processing.
+					return false;
 				}
 
 				// Store the inputs value.
@@ -143,26 +143,26 @@ const submitContribution = async function(req, res)
 				const inputUTXOs = await req.app.electrum.request('blockchain.scripthash.listunspent', javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex'));
 
 				// Locate the UTXO in the list of unspent transaction outputs.
-				const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash == currentInput.previous_output_transaction_hash);
+				const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash === currentInput.previous_output_transaction_hash);
 
 				// Verify that we can find the UTXO.
-				if(typeof inputUTXOs == 'undefined')
+				if(typeof inputUTXOs === 'undefined')
 				{
-						// Send an "NOT FOUND" signal back to the client.
-						res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
+					// Send an "NOT FOUND" signal back to the client.
+					res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
 
-						// Notify the admin about the event.
-						req.app.debug.server('Contribution rejection (Missing UTXO) returned to ' + req.ip);
+					// Notify the admin about the event.
+					req.app.debug.server('Contribution rejection (Missing UTXO) returned to ' + req.ip);
 
-						// Return false to indicate failure and stop processing.
-						return false;
+					// Return false to indicate failure and stop processing.
+					return false;
 				}
 
 				//
 				const previousTransactionHash = Buffer.from(currentInput.previous_output_transaction_hash, 'hex');
 
 				//
-				let previousTransactionOutputIndex = assuranceContract.encodeOutputIndex(currentInput.previous_output_index)
+				let previousTransactionOutputIndex = assuranceContract.encodeOutputIndex(currentInput.previous_output_index);
 
 				//
 				const previousTransactionOutputValue = assuranceContract.encodeOutputValue(inputUTXO.value);
@@ -213,7 +213,7 @@ const submitContribution = async function(req, res)
 			}
 
 			// Verify that contributed amount matches stated intent.
-			if(contributionObject.data.amount != Math.round(totalSatoshis))
+			if(contributionObject.data.amount !== Math.round(totalSatoshis))
 			{
 				// Send an CONFLICT signal back to the client.
 				res.status(409).json({ status: `The contribution amount ('${Math.round(totalSatoshis)}') does not match the provided intent (${contributionObject.data.amount}).` });
@@ -282,8 +282,15 @@ const submitContribution = async function(req, res)
 			// Push the contribution to the SSE stream.
 			req.app.sse.send(contributionData);
 
+			// Set up a filter function that..
+			const filterOnCampaign = function(contribution)
+			{
+				// Return true if the contribution has not been revoced AND is from the correct campaign.
+				return (!contribution.revocation_id && (contribution.campaign_id === req.params['campaign_id']));
+			};
+
 			// Filter out irrelevant contributions.
-			const relevantContributions = campaignContributions.filter((contribution) => { return (!contribution.revocation_id && (contribution.campaign_id == req.params['campaign_id'])); });
+			const relevantContributions = campaignContributions.filter(filterOnCampaign);
 
 			// Add relevant contributions to the contract..
 			for(const currentContribution in relevantContributions)

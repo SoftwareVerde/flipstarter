@@ -336,7 +336,7 @@ class assuranceContract
 		let lowValue = value.readUInt32LE(0);
 
 		// Return the decoded value.
-		return (highValue * Math.pow(2, 32) + lowValue);
+		return ((highValue * Math.pow(2, 32)) + lowValue);
 	}
 
 	/**
@@ -408,8 +408,9 @@ class assuranceContract
 
 	validateCommitment()
 	{
-		const sighashDigest = this.assembleSighashDigest();
-		const signatureStatus = this.validateSignature();
+		// TODO: Build this feature.
+		// const sighashDigest = this.assembleSighashDigest();
+		// const signatureStatus = this.validateSignature();
 
 		// Fetch commitment input value.
 		// Compare committed value to requested value.
@@ -531,7 +532,7 @@ class assuranceContract
 		let sequenceNumber = Buffer.from('ffffffff', 'hex');
 
 		//
-		return this.serializeInput(previousTransactionHash, previousTransactionOutputIndex, unlockScript, sequenceNumber)
+		return this.serializeInput(previousTransactionHash, previousTransactionOutputIndex, unlockScript, sequenceNumber);
 	}
 
 	/**
@@ -653,9 +654,6 @@ class assuranceContract
 		// Detect address type.
 		const type = bitbox.Address.detectAddressType(address);
 
-		// Declare a storage for the lockscript.
-		let lockscript;
-
 		// If the type is a public key hash..
 		if(type === 'p2pkh')
 		{
@@ -686,7 +684,6 @@ class assuranceContract
 		// Return the parsed unlock script.
 		return { publicKey: publicKey, signature: signature };
 	}
-
 }
 
 module.exports =

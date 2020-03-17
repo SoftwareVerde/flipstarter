@@ -1,0 +1,57 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es6": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "BigInt": "readonly",
+        "Buffer": "readonly",
+        "process": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "no-var": ["error"],
+        "no-eval": ["error"],
+        "no-new-func": ["error"],
+        "no-new-object": ["error"],
+        "no-array-constructor": ["error"],
+        "no-loop-func": ["error"],
+        "no-plusplus": ["error"],
+        "no-mixed-operators": ["error"],
+        "no-multi-assign": ["error"],
+        "prefer-rest-params": ["warn"],
+        "prefer-spread": ["error"],
+        "no-param-reassign": ["error"],
+        "no-duplicate-imports": ["error"],
+        "no-multiple-empty-lines": ["error"],
+        "no-unexpected-multiline": ["off"],
+        "no-trailing-spaces": ["error"],
+        "spaced-comment": ["error"],
+        "space-before-blocks": ["error"],
+        "space-infix-ops": "error",
+        "indent": ["error", "tab"],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "one-var": ["error", "never"],
+        "eqeqeq": ["error"],
+        "no-new-wrappers": ["error"],
+        "no-unneeded-ternary": ["error", { "defaultAssignment": false }],
+        "padded-blocks": ["error", "never"],
+        "space-in-parens": ["error", "never"],
+        "array-bracket-spacing": ["error", "always"],
+        "object-curly-spacing": ["error", "always"],
+        "block-spacing": ["error"],
+        "comma-spacing": ["error", { "before": false, "after": true }],
+        "computed-property-spacing": ["error", "never"],
+        "key-spacing": ["error", { "beforeColon": false, "mode": "minimum" }],
+        "comma-style": ["error", "last"],
+        "brace-style": ["error", "allman", { "allowSingleLine": false }]
+    }
+}
