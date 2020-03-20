@@ -87,7 +87,7 @@ const submitContribution = async function(req, res)
 			const contributionObject = req.body;
 
 			// Get the campaign information..
-			const campaign = req.app.queries.getCampaign.get({ campaign_id: req.params['campaign_id'] });
+			const campaign = req.app.queries.getCampaign.get({ campaign_id: Number(req.params['campaign_id']) });
 
 			// If there is no matching campaign..
 			if(typeof campaign === 'undefined')
@@ -145,7 +145,7 @@ const submitContribution = async function(req, res)
 			let contract = new assuranceContract({});
 
 			// Get a list of all recipients for the campaign.
-			const recipients = req.app.queries.listRecipientsByCampaign.all({ campaign_id: req.params['campaign_id'] });
+			const recipients = req.app.queries.listRecipientsByCampaign.all({ campaign_id: Number(req.params['campaign_id']) });
 
 			// Add each recipient as outputs.
 			for(const recipientIndex in recipients)
@@ -154,8 +154,8 @@ const submitContribution = async function(req, res)
 			}
 
 			// Get currently committed information.
-			const currentCommittedSatoshis = req.app.queries.getCampaignCommittedSatoshis.get({ campaign_id: req.params['campaign_id'] }).committed_satoshis;
-			const currentContributionCount = req.app.queries.countCommitmentsByCampaign.get({ campaign_id: req.params['campaign_id'] }).commitment_count;
+			const currentCommittedSatoshis = req.app.queries.getCampaignCommittedSatoshis.get({ campaign_id: Number(req.params['campaign_id']) }).committed_satoshis;
+			const currentContributionCount = req.app.queries.countCommitmentsByCampaign.get({ campaign_id: Number(req.params['campaign_id']) }).commitment_count;
 			const currentMinerFee = calculateMinerFee(recipients.length, currentContributionCount);
 
 			let newCommitments = [];
@@ -201,7 +201,7 @@ const submitContribution = async function(req, res)
 				const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash === currentInput.previous_output_transaction_hash);
 
 				// Verify that we can find the UTXO.
-				if(typeof inputUTXOs === 'undefined')
+				if(typeof inputUTXO === 'undefined')
 				{
 					// Send an "NOT FOUND" signal back to the client.
 					res.status(404).json({ status: `The UTXO ('${currentInput.previous_output_transaction_hash}') could not be verified as unspent.` });
@@ -313,7 +313,7 @@ const submitContribution = async function(req, res)
 			(
 				{
 					user_id:					storeUserResult.lastInsertRowid,
-					campaign_id:				req.params['campaign_id'],
+					campaign_id:				Number(req.params['campaign_id']),
 					contribution_comment:		contributionObject.data.comment,
 					contribution_timestamp:		moment().unix(),
 				}
@@ -341,7 +341,7 @@ const submitContribution = async function(req, res)
 			const filterOnCampaign = function(contribution)
 			{
 				// Return true if the contribution has not been revoced AND is from the correct campaign.
-				return (!contribution.revocation_id && (contribution.campaign_id === req.params['campaign_id']));
+				return (!contribution.revocation_id && (contribution.campaign_id === Number(req.params['campaign_id'])));
 			};
 
 			// Filter out irrelevant contributions.
@@ -388,7 +388,7 @@ const submitContribution = async function(req, res)
 						{
 							fullfillment_timestamp: moment().unix(),
 							fullfillment_transaction: broadcastResult,
-							campaign_id: req.params['campaign_id']
+							campaign_id: Number(req.params['campaign_id'])
 						};
 
 						// Store the fullfillment in the database.
