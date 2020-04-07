@@ -108,18 +108,12 @@ const setup = async function()
 			// Get a list of unspent outputs for the input address.
 			const transactions = await app.electrum.request('blockchain.scripthash.get_history', scriptHash);
 
-			// If this is the initial setup, store the scripthash status.
-			if(app.subscribedScriphashes[scriptHash] === true)
-			{
-				app.subscribedScriphashes[scriptHash] = scriptHashStatus;
-			}
-
 			// Get a mutex lock ready.
 			const unlock = await app.handleRevocationsLock.acquire();
 
 			try
 			{
-				// If this event has a changed scripthash status..
+				// If this event is new or has a changed scripthash status..
 				if(app.subscribedScriphashes[scriptHash] !== scriptHashStatus)
 				{
 					// Update this scripthash status to prevent redundant work..
