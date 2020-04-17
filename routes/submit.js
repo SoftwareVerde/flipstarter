@@ -280,6 +280,43 @@ const submitContribution = async function(req, res)
 				return false;
 			}
 
+			// Define a helper function we need to calculate the floor.
+			const inputPercentModifier = async function(inputPercent)
+			{
+				const commitmentsPerTransaction = 650;
+
+				// Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
+				const remainingValue = (currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis));
+
+				const currentTransactionSize = 42; // this.contract.assembleTransaction().byteLength;
+
+				const minPercent = 0 + (((remainingValue / (commitmentsPerTransaction - currentContributionCount)) + (546 / SATS_PER_BCH)) / remainingValue);
+				const maxPercent = 1 - (((currentTransactionSize + 1650 + 49) * 1.0) / (remainingValue * SATS_PER_BCH));
+
+				// ...
+				const minValue = Math.log(minPercent * 100);
+				const maxValue = Math.log(maxPercent * 100);
+
+				// Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
+				return (Math.exp(minValue + (inputPercent * (maxValue - minValue) / 100)) / 100);
+			};
+
+			// Calculate the current floor
+			const currentFloor = Math.ceil(((contract.totalContractOutputValue + currentMinerFee) - currentCommittedSatoshis) * await inputPercentModifier(1));
+
+			// Verify that the current contribution does not undercommit the contract floor.
+			if(totalSatoshis < currentFloor)
+			{
+				// Send an BAD REQUEST signal back to the client.
+				res.status(400).json({ status: `The contribution amount ('${Math.round(totalSatoshis)}') undercommits the current floor of (${currentFloor}) satoshis.` });
+
+				// Notify the admin about the event.
+				req.app.debug.server('Contribution rejection (amount undercommitment) returned to ' + req.ip);
+
+				// Return false to indicate failure and stop processing.
+				return false;
+			}
+
 			// Calculate how far over (or under) committed this contribution makes the contract.
 			const overCommitment = Math.round((currentCommittedSatoshis + totalSatoshis) - (contract.totalContractOutputValue + currentMinerFee));
 
