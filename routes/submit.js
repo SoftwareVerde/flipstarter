@@ -302,7 +302,7 @@ const submitContribution = async function(req, res)
 			};
 
 			// Calculate the current floor
-			const currentFloor = Math.ceil(((contract.totalContractOutputValue + currentMinerFee) - currentCommittedSatoshis) * await inputPercentModifier(1));
+			const currentFloor = Math.ceil(((contract.totalContractOutputValue + currentMinerFee) - currentCommittedSatoshis) * await inputPercentModifier(0.75));
 
 			// Verify that the current contribution does not undercommit the contract floor.
 			if(totalSatoshis < currentFloor)
