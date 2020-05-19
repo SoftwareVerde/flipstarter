@@ -87,6 +87,9 @@ const setup = async function()
 	app.use('/campaign', require('./routes/campaign.js'));
 	app.use('/', require('./routes/home.js'));
 
+	// Serve static files
+	app.use('/static', require('./routes/static.js'));
+
 	//
 	app.get('/events', app.sse.init);
 

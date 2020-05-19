@@ -1,0 +1,66 @@
+{
+  "siteIntro": "ビットコインキャッシュインフラストラクチャの資金調達は重要です、インフラストラクチャの多様性が、強いエコシステムを実現するからです。Flipstarterでプロジェクトの説明責任と公平性を開示し、プロジェクトがより多くの資金提供者を募る事が出来るようになります。",
+
+  "linkWhatIs": "Flipstarterとはなんですか？",
+  "linkHowTo": "Flipstarterはどのように使いますか？",
+  "linkFAQ": "よくある質問",
+
+  "pendingLabel": "開始",
+  "expiresLabel": "期限切れ",
+  "expiredLabel": "不成功",
+  "fullfilledLabel": "成功",
+  "recipientsLabel": "受取人",
+  "contributorsLabel": "協力者",
+  "contributorEmpty1": "まだ誰もプレッジしていません。.",
+  "contributorEmpty2": "あなたが最初かもしれません。",
+
+  "donateText": "プレッジ",
+  "fullfillText": "達成",
+
+  "usernameLabel": "名前 (オプション)",
+  "commentLabel": "コメント (オプション)",
+  "copyLabel": "1. 詳細をコピー",
+  "copyButton": "詳細をコピー",
+  "downloadText": "ダウンロード",
+  "instructionsLabel": "2. プレッジを準備する",
+  "instructions": "Electron-Cashデスクトップのプラグインをインストールし、フリップスタータータブを使用してプレッジを準備します。",
+  "instructionLink": "説明",
+  "commitLabel": "3. プレッジを貼り付け",
+  "commitButton": "プレッジを提出",
+  "PasteHere": "ここに貼り付け",
+
+  "statusContribution": "ご協力ありがとうございました。",
+  "statusPending": "キャンペーンはまだ始まっていません。",
+  "statusFullfilled": "キャンペーンが成功しました。",
+  "statusExpired": "キャンペーンは目標を達成しませんでした。",
+
+  "shareAction": "シェアする！",
+  "shareTitle": "Flipstarter",
+  "shareText": "お祝いの時間！",
+  "celebrateAction": "お祝いする！",
+
+  "changeLanguage": "言語選択",
+
+  "statusParsing": "プレッジをチェック中..",
+  "statusRetrying": "プレッジトランザクションを待っています...",
+  "statusFailedStructure": "アップロードされたデータの構造に問題があります、ページをリロードして、もう一度試してみてください。",
+  "statusFailedIntent": "オリジナルのプレッジデータと入力されたデータが一致しません。ページをリロードして、もう一度試してみてください。",
+  "statusFailedUnknown": "予期せぬエラーが発生しました。ページをリロードして、もう一度試してみてください。",
+
+  "footerLabel": "私たちについて",
+  "footerText": "私たちは、効果的で持続可能なボランティアによる資金調達方法を確立を目指すボランティアグループです。 Flipstarterは、ノンカストディアル、かつ最小限の信頼で資金を調達する方法です。",
+
+  "socialLabel": "ソーシャル",
+  "contactLabel": "コンタクト",
+  "codeLabel": "コード",
+
+  "twitter": "Twitter",
+  "read.cash": "Read.cash",
+  "email": "Eメール",
+  "security": "セキュリティ",
+  "source": "ソースコード",
+  "issues": "問題",
+
+  "copyright": "Copyright 2020, Flipstarter Contributors, ",
+  "license": "MIT license"
+}

@@ -1,0 +1,66 @@
+{
+  "siteIntro": "La financiación de la infraestructura de Bitcoin Cash es importante, y la diversidad de esa infraestructura crea un ecosistema resiliente. Flipstarter proporciona una vía para que cualquier proyecto se relacione con posibles contribuidores de una manera que fomente responsabilidad para los proyectos y ecuanimidad para los contribuidores.",
+
+  "linkWhatIs": "¿Qué es Flipstarter?",
+  "linkHowTo": "¿Cómo usar Flipstarter?",
+  "linkFAQ": "Preguntas frecuentes.",
+
+  "pendingLabel": "Comienza",
+  "expiresLabel": "Expira",
+  "expiredLabel": "Expirada",
+  "fullfilledLabel": "Finaciada",
+  "recipientsLabel": "destinatarios",
+  "contributorsLabel": "contribuidores",
+  "contributorEmpty1": "Nadie ha hecho una promesa todavía.",
+  "contributorEmpty2": "Puedes ser el primero.",
+
+  "donateText": "Promete",
+  "fullfillText": "Completa",
+
+  "usernameLabel": "Nombre (opcional)",
+  "commentLabel": "Commentario (opcional)",
+  "copyLabel": "1. Copiar detalles",
+  "copyButton": "Copiar detalles",
+  "downloadText": "Descargar",
+  "instructionsLabel": "2. Preparar promesa",
+  "instructions": "Instala el plugin para la cartera desktop Electron-Cash y usa la pestaña flipstarter para preparar tu promesa.",
+  "instructionLink": "Instrucciones",
+  "commitLabel": "3. Pegar promesa",
+  "commitButton": "Enviar promesa",
+  "PasteHere": "Pegar aquí",
+
+  "statusContribution": "Gracias por tu contribución.",
+  "statusPending": "La campaña no ha comenzado todavía.",
+  "statusFullfilled": "La campaña ha sido financiada.",
+  "statusExpired": "La campaña ha expirado sin ser financiada.",
+
+  "shareAction": "Compartir!",
+  "shareTitle": "Flipstarter",
+  "shareText": "Hora de celebrar!",
+  "celebrateAction": "Celebremos!",
+
+  "changeLanguage": "Cambiar idioma",
+
+  "statusParsing": "Verificando promesa...",
+  "statusRetrying": "Esperando por transacción de promesa...",
+  "statusFailedStructure": "Por favor actualiza la página e intenta nuevamente. Encontramos un problema en la estructura de los datos enviados y no pudimos resolverlo.",
+  "statusFailedIntent": "Por favor actualiza la página e intenta nuevamente. Tuvimos un problema comparando los datos de la promesa original con los datos enviados y no pudimos resolverlo.",
+  "statusFailedUnknown": "Por favor actualiza la página e intenta nuevamente. Tuvimos un problema inesperado:",
+
+  "footerLabel": "Nosotros",
+  "footerText": "Somos un grupo de voluntarios que creemos en la importancia de establecer métodos de financiación voluntaria efectivos y sostenibles. Flipstarter es un ejemplo de cómo recaudar fondos sin custodia y con mínima confianza involucrada.",
+
+  "socialLabel": "Social",
+  "contactLabel": "Contacto",
+  "codeLabel": "Código",
+
+  "twitter": "Twitter",
+  "read.cash": "Read.cash",
+  "email": "Email",
+  "security": "Securidad",
+  "source": "Codigo fuente",
+  "issues": "Problemas",
+
+  "copyright": "El sitio web y los activos cuentan con derechos de autor por los respectivos autores en 2020, con licenciados para uso público bajo la",
+  "license": "licencia MIT."
+}
