@@ -11,8 +11,7 @@ const home = async function(req, res)
     req.app.debug.server(`Home page requested from ` + req.ip);
 
     // Render HTML
-    renderer.view('header.html', {}, res);
-    renderer.view('footer.html', {}, res);
+    renderer.view('index.html', res);
     res.end();
 
     // Notify the server admin that a campaign has been requested.
