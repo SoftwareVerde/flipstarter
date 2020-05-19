@@ -85,10 +85,7 @@ const setup = async function()
 	// Create routes from separate files.
 	app.use('/submit', require('./routes/submit.js'));
 	app.use('/campaign', require('./routes/campaign.js'));
-
-	// TESTING DO NOT COMMIT
 	app.use('/', require('./routes/home.js'));
-	// END TESTING
 
 	//
 	app.get('/events', app.sse.init);
