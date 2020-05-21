@@ -1,11 +1,11 @@
 // Import filesystem module to read HTML files
-var fs = require('fs');
+var fs = require("fs");
 
 function view(templateName, res) {
   // Read from template file
-  var content = fs.readFileSync('./views/' + templateName);
+  var content = fs.readFileSync("./views/" + templateName);
 
   res.write(content);
-};
+}
 
 module.exports.view = view;
