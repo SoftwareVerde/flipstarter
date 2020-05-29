@@ -319,7 +319,7 @@ const setup = async function () {
   // app.use('/status', require('./routes/status.js'));
 
   // Listen to incoming connections on port X.
-  app.listen(app.config.server.port, "localhost");
+  app.listen(app.config.server.port, "0.0.0.0");
 
   // Notify user that the service is ready for incoming connections.
   app.debug.status(
