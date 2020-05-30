@@ -45,19 +45,7 @@ module.exports = function (app) {
 
     // Create the database schema.
     app.sql.exec(databaseSchema);
-
-    // Load the database content.
-    const databaseInit = Filesystem.readFileSync(
-      "sql/database_init.sql",
-      "utf8"
-    ).trim();
-
-    // Apply the database content.
-    app.sql.exec(databaseInit);
   }
-
-  //
-  app.debug.struct("Applied database table schema.");
 
   // Load the database queries.
   app.queries = {
@@ -179,6 +167,18 @@ module.exports = function (app) {
       ).trim()
     ),
   };
+
+  // Apply the database content.
+  const campaign = app.queries.getCampaign.get({ campaign_id: 1 });
+  console.log(campaign);
+  if (typeof campaign === "undefined") {
+    // No campaign was created
+    // Notify that this is a fresh install and needs a campaign
+    app.freshInstall = true;
+  }
+
+  //
+  app.debug.struct("Applied database table schema.");
 
   //
   app.debug.struct("Prepared database queries from disk.");
