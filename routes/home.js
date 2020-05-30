@@ -1,6 +1,7 @@
 // Enable support for Express apps.
 const express = require("express");
 const router = express.Router();
+const freshInstall = require("../server.js");
 
 var renderer = require("../src/renderer.js");
 
@@ -8,6 +9,11 @@ var renderer = require("../src/renderer.js");
 const home = async function (req, res) {
   // Notify the server admin that a campaign has been requested.
   req.app.debug.server(`Home page requested from ` + req.ip);
+
+  // Redirect to campaign creation page if no campaign was created
+  if (freshInstall) {
+    return res.redirect("/create");
+  }
 
   // Render HTML
   renderer.view("index.html", res);

@@ -69,6 +69,8 @@ const setup = async function () {
   await require("./src/storage.js")(app);
   await require("./src/network.js")(app);
 
+  module.exports = app.freshInstall;
+
   //
   app.debug.struct("Configuring services.");
 

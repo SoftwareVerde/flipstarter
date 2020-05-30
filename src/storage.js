@@ -170,7 +170,6 @@ module.exports = function (app) {
 
   // Apply the database content.
   const campaign = app.queries.getCampaign.get({ campaign_id: 1 });
-  console.log(campaign);
   if (typeof campaign === "undefined") {
     // No campaign was created
     // Notify that this is a fresh install and needs a campaign
