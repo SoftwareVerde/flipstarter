@@ -22,7 +22,18 @@ const initCapampaign = async function (req, res) {
   req.app.debug.server(`Init campaign from ` + req.ip);
 
   // Actually initialize the campaign with the POST data
-  // app.queries.addCampaign();
+  app.queries.addCampaign.run({
+    starts: Number(req.body.start),
+    expires: Number(req.body.end),
+  });
+  app.queries.addUser.run({
+    user_url: req.body.project_url,
+    user_image: req.body.image_url,
+    user_alias: req.body.recipient_name,
+    user_address: req.body.bch_address,
+    data_signature: null
+  });
+  // Handle description
 
   // Render a success message
   renderer.view("initCampaign.html", res);
