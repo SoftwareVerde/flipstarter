@@ -109,6 +109,9 @@ module.exports = function (app) {
     getCampaign: app.sql.prepare(
       Filesystem.readFileSync("sql/get_campaign.sql", "utf8").trim()
     ),
+    addCampaign: app.sql.prepare(
+      Filesystem.readFileSync("sql/add_campaign.sql", "utf8").trim()
+    ),
     getCampaignRequestedSatoshis: app.sql.prepare(
       Filesystem.readFileSync(
         "sql/get_campaign_requested_satoshis.sql",

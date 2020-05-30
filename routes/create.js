@@ -1,6 +1,7 @@
 // Enable support for Express apps.
 const express = require("express");
 const router = express.Router();
+const app = require("../server.js");
 
 var renderer = require("../src/renderer.js");
 
@@ -21,7 +22,7 @@ const initCapampaign = async function (req, res) {
   req.app.debug.server(`Init campaign from ` + req.ip);
 
   // Actually initialize the campaign with the POST data
-  console.log(req.body);
+  // app.queries.addCampaign();
 
   // Render a success message
   renderer.view("initCampaign.html", res);
