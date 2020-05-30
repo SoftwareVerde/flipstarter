@@ -10,6 +10,10 @@ const create = async function (req, res) {
   // Notify the server admin that a campaign has been requested.
   req.app.debug.server(`Create page requested from ` + req.ip);
 
+  if (!app.freshInstall) {
+    return res.redirect("/");
+  }
+
   // Render HTML
   renderer.view("create.html", res);
   res.end();
@@ -19,6 +23,10 @@ const create = async function (req, res) {
 };
 
 const initCapampaign = async function (req, res) {
+  if (!app.freshInstall) {
+    return res.redirect("/");
+  }
+
   req.app.debug.server(`Init campaign from ` + req.ip);
 
   // Actually initialize the campaign with the POST data
@@ -34,6 +42,10 @@ const initCapampaign = async function (req, res) {
     data_signature: null
   });
   // Handle description
+
+  // IMPORTANT: do not let the user access this page again
+  // and redirect to home if they try
+  app.freshInstall = false;
 
   // Render a success message
   renderer.view("initCampaign.html", res);
