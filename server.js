@@ -48,6 +48,7 @@ const cors = require("cors");
 
 // Add support for parsing POST bodies.
 const bodyParser = require("body-parser");
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 // Wrap application setup in order to allow async/await.
 const setup = async function () {
@@ -88,7 +89,7 @@ const setup = async function () {
   app.use("/submit", require("./routes/submit.js"));
   app.use("/campaign", require("./routes/campaign.js"));
   app.use("/", require("./routes/home.js"));
-  app.use("/create", require("./routes/create.js"));
+  app.use("/create", urlencodedParser, require("./routes/create.js"));
 
   // Serve static files
   app.use("/static", require("./routes/static.js"));

@@ -21,6 +21,7 @@ const initCapampaign = async function (req, res) {
   req.app.debug.server(`Init campaign from ` + req.ip);
 
   // Actually initialize the campaign with the POST data
+  console.log(req.body);
 
   // Render a success message
   renderer.view("initCampaign.html", res);
