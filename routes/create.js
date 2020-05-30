@@ -17,7 +17,21 @@ const create = async function (req, res) {
   req.app.debug.server(`Create page delivered to ` + req.ip);
 };
 
+const initCapampaign = async function (req, res) {
+  req.app.debug.server(`Init campaign from ` + req.ip);
+
+  // Actually initialize the campaign with the POST data
+
+  // Render a success message
+  renderer.view("initCampaign.html", res);
+  res.end();
+
+  req.app.debug.server(`Campaign created`);
+};
+
 // Call create when this route is requested.
 router.get("/", create);
+// Init when the form is submitted
+router.post("/", initCapampaign);
 
 module.exports = router;
