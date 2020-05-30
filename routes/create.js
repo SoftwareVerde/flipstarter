@@ -41,6 +41,11 @@ const initCapampaign = async function (req, res) {
     user_address: req.body.bch_address,
     data_signature: null
   });
+  app.queries.addRecipientToCampaign.run({
+    user_id: 1,
+    campaign_id: 1,
+    recipient_satoshis: Number(req.body.amount) * 100000000
+  });
   // Handle description
 
   // IMPORTANT: do not let the user access this page again
