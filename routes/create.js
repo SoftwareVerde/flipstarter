@@ -53,7 +53,7 @@ const initCapampaign = async function (req, res) {
   app.freshInstall = false;
 
   // Render a success message
-  renderer.view("initCampaign.html", res);
+  return res.redirect("/");
   res.end();
 
   req.app.debug.server(`Campaign created`);
