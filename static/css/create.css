@@ -1,0 +1,7 @@
+/* Create.css */
+.clouds {
+  background-color: white;
+  background-image: url(../img/clouds.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+}

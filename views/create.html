@@ -8,54 +8,64 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/create.css">
+
   <title>Create a campaign</title>
 </head>
 
-<body>
+<body class="clouds">
 
-  <div class="container my-5">
-    <h1>Create a campaign</h1>
+  <section class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col col-lg-10 card card-body shadow-sm">
+        <div class="text-center">
+          <img src="/static/img/logo.png" alt="Logo" height="60">
+          <h1 class="my-3">Create a campaign</h1>
+        </div>
 
-    <form method="POST" action="">
-      <div class="form-group">
-        <label for="title">Campaign title</label>
-        <input required="" type="text" class="form-control" id="title" name="title">
+        <form method="POST" action="">
+          <div class="form-group">
+            <label for="title">Campaign title</label>
+            <input required="" type="text" class="form-control" id="title" name="title">
+          </div>
+          <div class="form-group">
+            <label for="start">Start Date</label>
+            <input required="" type="number" class="form-control" id="start" name="start">
+          </div>
+          <div class="form-group">
+            <label for="end">Expiry Date</label>
+            <input required="" type="number" class="form-control" id="end" name="end">
+          </div>
+          <div class="form-group">
+            <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
+            <input required="" type="text" class="form-control" id="amount" name="amount">
+          </div>
+          <div class="form-group">
+            <label for="project_url">Project Website</label>
+            <input required="" type="text" class="form-control" id="project_url" name="project_url">
+          </div>
+          <div class="form-group">
+            <label for="image_url">Image URL</label>
+            <input required="" type="text" class="form-control" id="image_url" name="image_url">
+          </div>
+          <div class="form-group">
+            <label for="recipient_name">Recipient Name</label>
+            <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
+          </div>
+          <div class="form-group">
+            <label for="bch_address">Bitcoin Cash Address</label>
+            <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
+          </div>
+          <div class="form-group">
+            <label for="description">Project Description <small>(Markdown Format Supported)</small></label>
+            <textarea class="form-control" id="description" name="description" rows="6"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg">Create</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label for="start">Start date</label>
-        <input required="" type="number" class="form-control" id="start" name="start">
-      </div>
-      <div class="form-group">
-        <label for="end">Expiry date</label>
-        <input required="" type="number" class="form-control" id="end" name="end">
-      </div>
-      <div class="form-group">
-        <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
-        <input required="" type="text" class="form-control" id="amount" name="amount">
-      </div>
-      <div class="form-group">
-        <label for="project_url">Project Website</label>
-        <input required="" type="text" class="form-control" id="project_url" name="project_url">
-      </div>
-      <div class="form-group">
-        <label for="image_url">Image URL</label>
-        <input required="" type="text" class="form-control" id="image_url" name="image_url">
-      </div>
-      <div class="form-group">
-        <label for="recipient_name">Recipient Name</label>
-        <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
-      </div>
-      <div class="form-group">
-        <label for="bch_address">Bitcoin Cash Address</label>
-        <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
-      </div>
-      <div class="form-group">
-        <label for="description">Project Description <small>(Markdown Format Supported)</small></label>
-        <textarea class="form-control" id="description" name="description" rows="6"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary btn-lg">Create</button>
-    </form>
-  </div>
+    </div>
+  </section>
 
 </body>
 </html>
