@@ -23,42 +23,99 @@
           <img src="/static/img/logo.png" alt="Logo" height="60">
           <h1 class="my-3">Create a campaign</h1>
         </div>
-
+        <!-- Form -->
         <form method="POST" action="">
+          <!-- Title -->
           <div class="form-group">
-            <label for="title">Campaign title</label>
+            <label for="title" class="lead">Campaign Title</label>
             <input required="" type="text" class="form-control" id="title" name="title">
           </div>
-          <div class="form-group">
-            <label for="start">Start Date</label>
-            <input required="" type="number" class="form-control" id="start" name="start">
+          <!-- /Title -->
+          <hr>
+          <!-- Start Date -->
+          <p class="lead">Start Date</p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="start_year">Year</label>
+              <input type="text" class="form-control" id="start_year" name="start_year">
+            </div>
+            <div class="form-group col-4">
+              <label for="start_month">Month</label>
+              <select class="form-control" id="start_month" name="start_month">
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="start_day">Day</label>
+              <input type="text" class="form-control" id="start_day" name="start_day">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="end">Expiry Date</label>
-            <input required="" type="number" class="form-control" id="end" name="end">
+          <!-- /Start Date -->
+          <hr>
+          <!-- End Date -->
+          <p class="lead">End Date</p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="end_year">Year</label>
+              <input type="text" class="form-control" id="end_year" name="end_year">
+            </div>
+            <div class="form-group col-4">
+              <label for="end_month">Month</label>
+              <select class="form-control" id="end_month" name="end_month">
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="end_day">Day</label>
+              <input type="text" class="form-control" id="end_day" name="end_day">
+            </div>
           </div>
+          <!-- /End Date -->
+          <hr>
           <div class="form-group">
-            <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
+            <label class="lead" for="amount">Funding Goal <small>(amount in BCH)</small></label>
             <input required="" type="text" class="form-control" id="amount" name="amount">
           </div>
           <div class="form-group">
-            <label for="project_url">Project Website</label>
+            <label class="lead" for="project_url">Project Website</label>
             <input required="" type="text" class="form-control" id="project_url" name="project_url">
           </div>
           <div class="form-group">
-            <label for="image_url">Image URL</label>
+            <label class="lead" for="image_url">Image URL</label>
             <input required="" type="text" class="form-control" id="image_url" name="image_url">
           </div>
           <div class="form-group">
-            <label for="recipient_name">Recipient Name</label>
+            <label class="lead" for="recipient_name">Recipient Name</label>
             <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
           </div>
           <div class="form-group">
-            <label for="bch_address">Bitcoin Cash Address</label>
+            <label class="lead" for="bch_address">Bitcoin Cash Address</label>
             <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
           </div>
           <div class="form-group">
-            <label for="description">Project Description <small>(Markdown Format Supported)</small></label>
+            <label class="lead" for="description">Project Description <small>(Markdown Format Supported)</small></label>
             <textarea class="form-control" id="description" name="description" rows="6"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-lg">Create</button>

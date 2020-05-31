@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const app = require("../server.js");
+const moment = require("moment");
 
 var renderer = require("../src/renderer.js");
 
@@ -29,10 +30,24 @@ const initCapampaign = async function (req, res) {
 
   req.app.debug.server(`Init campaign from ` + req.ip);
 
+  // Convert date to EPOCH
+  const start_year = req.body.start_year;
+  const start_month = req.body.start_month;
+  const start_day = req.body.start_day;
+  var start_date = moment(start_year + '-' + start_month + '-' +  start_day);
+  start_date = start_date.unix();
+
+
+  const end_year = req.body.end_year;
+  const end_month = req.body.end_month;
+  const end_day = req.body.end_day;
+  var end_date = moment(end_year + '-' + end_month + '-' + end_day);
+  end_date = end_date.unix();
+
   // Actually initialize the campaign with the POST data
   app.queries.addCampaign.run({
-    starts: Number(req.body.start),
-    expires: Number(req.body.end),
+    starts: Number(start_date),
+    expires: Number(end_date),
   });
   app.queries.addUser.run({
     user_url: req.body.project_url,
