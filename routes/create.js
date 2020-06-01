@@ -64,8 +64,11 @@ const initCapampaign = async function (req, res) {
     recipient_satoshis: Number(req.body.amount) * 100000000
   });
 
-  // Handle description
-  fs.writeFile("./static/campaigns/1/en/abstract.md", req.body.description,
+  // Handle descripion
+  fs.writeFile("./static/campaigns/1/en/abstract.md", req.body.abstract,
+    function(err) { if(err) { return console.log(err); } }
+  );
+  fs.writeFile("./static/campaigns/1/en/proposal.md", req.body.proposal,
     function(err) { if(err) { return console.log(err); } }
   );
 
