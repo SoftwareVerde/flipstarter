@@ -5,3 +5,18 @@
   background-size: contain;
   background-repeat: no-repeat;
 }
+
+.nav-link {
+  color: #000;
+}
+
+.btn-primary, .nav-pills .nav-link.active {
+  color: #fff;
+  background-color: #2EACAB;
+  border-color: #2EACAB;
+}
+
+.btn-primary:hover {
+  background-color: #1F7F7D;
+  border-color: #1F7F7D;
+}

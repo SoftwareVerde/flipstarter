@@ -94,39 +94,103 @@
           </div>
           <!-- /End Date -->
           <hr>
-          <div class="form-group">
-            <label class="lead" for="amount">Funding Goal <small>(amount in BCH)</small></label>
-            <input required="" type="text" class="form-control" id="amount" name="amount">
+          <div class="form-row">
+            <div class="form-group col-lg-4">
+              <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
+              <input required="" type="text" class="form-control" id="amount" name="amount">
+            </div>
+            <div class="form-group col-lg-4">
+              <label for="project_url">Project Website</label>
+              <input required="" type="text" class="form-control" id="project_url" name="project_url">
+            </div>
+            <div class="form-group col-lg-4">
+              <label for="image_url">Image URL</label>
+              <input required="" type="text" class="form-control" id="image_url" name="image_url">
+            </div>
           </div>
+          <hr>
+          <p class="lead">About the Project</p>
           <div class="form-group">
-            <label class="lead" for="project_url">Project Website</label>
-            <input required="" type="text" class="form-control" id="project_url" name="project_url">
-          </div>
-          <div class="form-group">
-            <label class="lead" for="image_url">Image URL</label>
-            <input required="" type="text" class="form-control" id="image_url" name="image_url">
-          </div>
-          <div class="form-group">
-            <label class="lead" for="recipient_name">Recipient Name</label>
+            <label for="recipient_name">Recipient Name</label>
             <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
           </div>
           <div class="form-group">
-            <label class="lead" for="bch_address">Bitcoin Cash Address</label>
+            <label for="bch_address">Bitcoin Cash Address</label>
             <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
           </div>
-          <div class="form-group">
-            <label class="lead" for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
-            <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+          <hr>
+          <!-- Markdown files -->
+          <p class="lead">Description</p>
+          <div class="row">
+            <nav class="col-md-3 mt-md-5 text-center">
+              <div class="nav flex-column nav-pills border rounded" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="english-tab" data-toggle="tab" href="#english" role="tab" aria-controls="english" aria-selected="true">English 🇬🇧</a>
+                <a class="nav-item nav-link" id="chinese-tab" data-toggle="tab" href="#chinese" role="tab" aria-controls="chinese" aria-selected="false">Chinese 🇨🇳</a>
+                <a class="nav-item nav-link" id="spanish-tab" data-toggle="tab" href="#spanish" role="tab" aria-controls="spanish" aria-selected="false">Spanish 🇪🇸</a>
+                <a class="nav-item nav-link" id="japanese-tab" data-toggle="tab" href="#japanese" role="tab" aria-controls="japanese" aria-selected="false">Japanese 🇯🇵</a>
+              </div>
+            </nav>
+            <div class="col tab-content">
+              <!-- English -->
+              <div class="tab-pane fade show active" id="english" role="tabpanel" aria-labelledby="english-tab">
+                <div class="form-group">
+                  <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="abstract">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Chinese -->
+              <div class="tab-pane fade" id="chinese" role="tabpanel" aria-labelledby="chinese-tab">
+                <div class="form-group">
+                  <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="abstract">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Spanish -->
+              <div class="tab-pane fade" id="spanish" role="tabpanel" aria-labelledby="spanish-tab">
+                <div class="form-group">
+                  <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="abstract">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Japanese -->
+              <div class="tab-pane fade" id="japanese" role="tabpanel" aria-labelledby="japanese-tab">
+                <div class="form-group">
+                  <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="abstract">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- / -->
+            </div>
           </div>
-          <div class="form-group">
-            <label class="lead" for="abstract">Project Proposal <small>(Markdown Format Supported)</small></label>
-            <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-lg">Create</button>
+          <hr>
+          <p>Please check that everything is correct, you will not be able to edit your campaign later on.</p>
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
         </form>
       </div>
     </div>
   </section>
+
+  <!-- JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
 </body>
 </html>
