@@ -85,313 +85,275 @@
         <h1 class="cols s12 m12 l12">
           <span>My Campaign</span>
         </h1>
-        <ul
-        class="col s10 m10 l10 push-s1 push-m1 push-l1"
-        style="display: flex; justify-content: center; text-align: left;"
+      </header>
+
+      <!-- Site content -->
+      <main class="container row z-depth-2">
+        <!-- Campaign -->
+        <article
+        id="campaign"
+        class="col s12 m12 l8"
+        style="margin-bottom: 0.75rem;"
         >
-        <li class="col">
-          <a
-          class="valign-wrapper"
-          target="_blank"
-          href="https://read.cash/@flipstarter/introducing-flipstarter-31ce86f3"
+        <h1 style="display: none;">Campaign</h1>
+
+        <!-- Campaign overview -->
+        <section id="overview">
+          <h2 style="display: none;">Campaign overview</h2>
+          <div style="float: left;">
+            <span class="valign-wrapper" style="float: left;">
+              <i class="icon-access_time"></i>
+              <span id="timerLabel" data-string="expiresLabel"></span>
+              <b id="campaignExpiration">...</b>
+            </span>
+          </div>
+          <div style="float: right;">
+            <span class="valign-wrapper" style="float: left;">
+              <i class="icon-bookmark_border"></i>
+              <span id="compaignContributionAmount">0.00</span>
+              <i>/</i>
+              <span id="campaignRequestAmount">-.--</span>
+              <b>BCH</b>
+            </span>
+          </div>
+          <div class="progress">
+            <div class="determinate" id="campaignProgressBar"></div>
+            <div class="determinate" id="campaignContributionBar"></div>
+          </div>
+        </section>
+
+        <!-- Campaign heading -->
+        <header id="campaignAbstract"></header>
+
+        <!-- Campaign donation form -->
+        <fieldset id="donateField" class="row">
+          <div
+          id="donateStatus"
+          class="col s12 m12 l12 hidden"
+          style="text-align: center;"
+          ></div>
+
+          <div id="donateForm" class="col s12 m12 l12 hidden">
+            <div class="input-field col s1 m1 l1" style="padding: 0;">
+              <i
+              style="
+              display: inline-block;
+              width: 3rem;
+              height: 3rem;
+              text-align: center;
+              opacity: 0.5;
+              font-size: 2.25rem;
+              line-height: 3.25rem;
+              "
+              class="icon-attach_money"
+              ></i>
+            </div>
+            <div
+            class="input-field col s11 m5 l6"
+            style="padding: 0; text-align: center;"
+            >
+            <input
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.20"
+            class="slider"
+            id="donationSlider"
+            style="
+            height: 3rem;
+            padding: 0;
+            width: calc(100% - 2rem);
+            margin: 0rem;
+            "
+            >
+          </div>
+          <div
+          class="input-field col s12 m6 l5"
+          style="padding: 0 0.75rem; margin: 0.75rem 0rem;"
           >
-          <i class="icon-info"></i>
-          &nbsp;
-          <span data-string="linkWhatIs"></span>
-        </a>
-      </li>
-      <li class="col">
-        <a
-        class="valign-wrapper"
-        target="_blank"
-        href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
-        >
-        <i class="icon-info"></i>
-        &nbsp;
-        <span data-string="linkHowTo"></span>
-      </a>
-    </li>
-    <li class="col">
-      <a
-      class="valign-wrapper"
-      target="_blank"
-      href="https://read.cash/@flipstarter/flipstarter-faq-66c56b03"
-      >
-      <i class="icon-info"></i>
-      &nbsp;
-      <span data-string="linkFAQ"></span>
-    </a>
-  </li>
-</ul>
-</header>
-
-<!-- Site content -->
-<main class="container row z-depth-2">
-  <!-- Campaign -->
-  <article
-  id="campaign"
-  class="col s12 m12 l8"
-  style="margin-bottom: 0.75rem;"
-  >
-  <h1 style="display: none;">Campaign</h1>
-
-  <!-- Campaign overview -->
-  <section id="overview">
-    <h2 style="display: none;">Campaign overview</h2>
-    <div style="float: left;">
-      <span class="valign-wrapper" style="float: left;">
-        <i class="icon-access_time"></i>
-        <span id="timerLabel" data-string="expiresLabel"></span>
-        <b id="campaignExpiration">...</b>
-      </span>
-    </div>
-    <div style="float: right;">
-      <span class="valign-wrapper" style="float: left;">
-        <i class="icon-bookmark_border"></i>
-        <span id="compaignContributionAmount">0.00</span>
-        <i>/</i>
-        <span id="campaignRequestAmount">-.--</span>
-        <b>BCH</b>
-      </span>
-    </div>
-    <div class="progress">
-      <div class="determinate" id="campaignProgressBar"></div>
-      <div class="determinate" id="campaignContributionBar"></div>
-    </div>
-  </section>
-
-  <!-- Campaign heading -->
-  <header id="campaignAbstract"></header>
-
-  <!-- Campaign donation form -->
-  <fieldset id="donateField" class="row">
-    <div
-    id="donateStatus"
-    class="col s12 m12 l12 hidden"
-    style="text-align: center;"
-    ></div>
-
-    <div id="donateForm" class="col s12 m12 l12 hidden">
-      <div class="input-field col s1 m1 l1" style="padding: 0;">
-        <i
-        style="
-        display: inline-block;
-        width: 3rem;
-        height: 3rem;
-        text-align: center;
-        opacity: 0.5;
-        font-size: 2.25rem;
-        line-height: 3.25rem;
-        "
-        class="icon-attach_money"
-        ></i>
+          <button
+          id="donateButton"
+          class="btn waves-effect waves-light green"
+          style="width: 100%; padding: 0; margin: 0rem;"
+          disabled="disabled"
+          >
+          <span id="donateText" data-string="donateText"></span>
+          <span id="donationAmount"></span>
+        </button>
       </div>
+    </div>
+
+    <div id="donateSection" class="col s12 m12 hidden">
       <div
-      class="input-field col s11 m5 l6"
-      style="padding: 0; text-align: center;"
-      >
-      <input
-      type="range"
-      min="0"
-      max="100"
-      value="0"
-      step="0.20"
-      class="slider"
-      id="donationSlider"
+      class="col"
       style="
-      height: 3rem;
-      padding: 0;
-      width: calc(100% - 2rem);
-      margin: 0rem;
+      background-color: white;
+      border-radius: 0.25rem;
+      border: 1px solid rgba(0, 0, 0, 0.31);
+      padding-bottom: 1.5rem;
+      padding-top: 0.75rem;
       "
       >
-    </div>
-    <div
-    class="input-field col s12 m6 l5"
-    style="padding: 0 0.75rem; margin: 0.75rem 0rem;"
-    >
-    <button
-    id="donateButton"
-    class="btn waves-effect waves-light green"
-    style="width: 100%; padding: 0; margin: 0rem;"
-    disabled="disabled"
-    >
-    <span id="donateText" data-string="donateText"></span>
-    <span id="donationAmount"></span>
-  </button>
-</div>
-</div>
+      <div class="col s12 m12 l12" style="margin-top: 0.75rem;">
+        <div
+        class="row"
+        style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 10.5rem;
+        padding: 1rem;
+        margin: 0rem;
+        margin-top: 0.5rem;
+        border: 1px solid rgb(169, 169, 169);
+        box-shadow: inset 0rem 0.1rem 0.25rem
+        rgba(0, 0, 0, 0.13);
+        "
+        >
+        <div class="input-field col s12 m12 l12" style="">
+          <i
+          style="
+          opacity: 0.5;
+          font-size: 2.25rem;
+          line-height: 2.25rem;
+          "
+          class="icon-person_outline prefix"
+          ></i>
+          <input
+          id="contributionName"
+          type="text"
+          maxlength="24"
+          >
+          <label
+          for="contributionName"
+          data-string="usernameLabel"
+          ></label>
+        </div>
 
-<div id="donateSection" class="col s12 m12 hidden">
-  <div
-  class="col"
-  style="
-  background-color: white;
-  border-radius: 0.25rem;
-  border: 1px solid rgba(0, 0, 0, 0.31);
-  padding-bottom: 1.5rem;
-  padding-top: 0.75rem;
-  "
-  >
-  <div class="col s12 m12 l12" style="margin-top: 0.75rem;">
-    <div
-    class="row"
+        <div class="input-field col s12 m12 l12" style="">
+          <i
+          style="
+          opacity: 0.5;
+          font-size: 2rem;
+          line-height: 2.5rem;
+          "
+          class="icon-chat_bubble_outline prefix"
+          ></i>
+          <input
+          id="contributionComment"
+          type="text"
+          maxlength="120"
+          >
+          <label
+          for="contributionComment"
+          data-string="commentLabel"
+          ></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col s12 m12 l3" style="margin-top: 0.75rem;">
+      <small
+      style="
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      "
+      data-string="copyLabel"
+      ></small>
+      <textarea
+      rows="5"
+      id="template"
+      name="template"
+      style="
+      height: 7rem;
+      font-family: monospace;
+      font-size: small;
+      margin: 0;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background-color: white;
+      "
+      ></textarea>
+      <button
+      id="copyTemplateButton"
+      class="btn waves-effect waves-light green"
+      style="width: 100%;"
+      data-string="copyButton"
+      ></button>
+    </div>
+    <div class="col s12 m12 l6" style="margin-top: 0.75rem;">
+      <small
+      style="
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      "
+      data-string="instructionsLabel"
+      ></small>
+      <p
+      id="instructions"
+      style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: small;
+      height: 7rem;
+      padding: 1rem;
+      margin-bottom: 7px;
+      margin-top: 0.5rem;
+      border: 1px solid rgb(169, 169, 169);
+      "
+      data-string="instructions"
+      ></p>
+      <div
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      "
+      >
+      <a
+      id="downloadButton"
+      class="btn"
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background-color: transparent;
+      color: black;
+      box-shadow: none;
+      "
+      href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/a34641f9863164e82a6ab72314a02311/flipstarter-1.2.zip"
+      >
+      <i class="icon-download"></i>
+      <span
+      style="margin-left: 0.25rem;"
+      data-string="downloadText"
+      ></span>
+    </a>
+    <a
+    id="linkInstructionsButton"
+    class="btn"
+    target="_blank"
     style="
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 10.5rem;
-    padding: 1rem;
-    margin: 0rem;
-    margin-top: 0.5rem;
-    border: 1px solid rgb(169, 169, 169);
-    box-shadow: inset 0rem 0.1rem 0.25rem
-    rgba(0, 0, 0, 0.13);
+    align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+    color: black;
+    box-shadow: none;
     "
+    href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
     >
-    <div class="input-field col s12 m12 l12" style="">
-      <i
-      style="
-      opacity: 0.5;
-      font-size: 2.25rem;
-      line-height: 2.25rem;
-      "
-      class="icon-person_outline prefix"
-      ></i>
-      <input
-      id="contributionName"
-      type="text"
-      maxlength="24"
-      >
-      <label
-      for="contributionName"
-      data-string="usernameLabel"
-      ></label>
-    </div>
-
-    <div class="input-field col s12 m12 l12" style="">
-      <i
-      style="
-      opacity: 0.5;
-      font-size: 2rem;
-      line-height: 2.5rem;
-      "
-      class="icon-chat_bubble_outline prefix"
-      ></i>
-      <input
-      id="contributionComment"
-      type="text"
-      maxlength="120"
-      >
-      <label
-      for="contributionComment"
-      data-string="commentLabel"
-      ></label>
-    </div>
-  </div>
-</div>
-
-<div class="col s12 m12 l3" style="margin-top: 0.75rem;">
-  <small
-  style="
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  "
-  data-string="copyLabel"
-  ></small>
-  <textarea
-  rows="5"
-  id="template"
-  name="template"
-  style="
-  height: 7rem;
-  font-family: monospace;
-  font-size: small;
-  margin: 0;
-  margin-top: 0.5rem;
-  padding: 1rem;
-  background-color: white;
-  "
-  ></textarea>
-  <button
-  id="copyTemplateButton"
-  class="btn waves-effect waves-light green"
-  style="width: 100%;"
-  data-string="copyButton"
-  ></button>
-</div>
-<div class="col s12 m12 l6" style="margin-top: 0.75rem;">
-  <small
-  style="
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  "
-  data-string="instructionsLabel"
-  ></small>
-  <p
-  id="instructions"
-  style="
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-size: small;
-  height: 7rem;
-  padding: 1rem;
-  margin-bottom: 7px;
-  margin-top: 0.5rem;
-  border: 1px solid rgb(169, 169, 169);
-  "
-  data-string="instructions"
-  ></p>
-  <div
-  style="
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  "
-  >
-  <a
-  id="downloadButton"
-  class="btn"
-  style="
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  background-color: transparent;
-  color: black;
-  box-shadow: none;
-  "
-  href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/a34641f9863164e82a6ab72314a02311/flipstarter-1.2.zip"
-  >
-  <i class="icon-download"></i>
-  <span
-  style="margin-left: 0.25rem;"
-  data-string="downloadText"
-  ></span>
-</a>
-<a
-id="linkInstructionsButton"
-class="btn"
-target="_blank"
-style="
-display: flex;
-align-items: center;
-justify-content: flex-start;
-background-color: transparent;
-color: black;
-box-shadow: none;
-"
-href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
->
-<i class="icon-info"></i>
-<span
-style="margin-left: 0.25rem;"
-data-string="instructionLink"
-></span>
-</a>
+    <i class="icon-info"></i>
+    <span
+    style="margin-left: 0.25rem;"
+    data-string="instructionLink"
+    ></span>
+  </a>
 </div>
 </div>
 <div class="col s12 m12 l3" style="margin-top: 0.75rem;">
@@ -477,7 +439,39 @@ data-string="instructionLink"
   </ul>
 </section>
 </aside>
+<ul
+class="col s10 m10 l10 push-s1 push-m1 push-l1"
+style="display: flex; justify-content: center; text-align: left;"
+>
+<li class="col">
+  <a
+  class="valign-wrapper"
+  target="_blank"
+  href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
+  >
+  <i class="icon-info"></i>
+  &nbsp;
+  <span data-string="linkHowTo"></span>
+</a>
+</li>
+<li class="col">
+  <a
+  class="valign-wrapper"
+  target="_blank"
+  href="https://read.cash/@flipstarter/flipstarter-faq-66c56b03"
+  >
+  <i class="icon-info"></i>
+  &nbsp;
+  <span data-string="linkFAQ"></span>
+</a>
+</li>
+</ul>
 </main>
+
+<footer class="center">
+  <p>Powered by <a href="https://flipstarter.cash" target="_blank">Flipstarter</a></p>
+</footer>
+
 </div>
 </div>
 
