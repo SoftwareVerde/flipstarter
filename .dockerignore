@@ -1,6 +1,5 @@
-# Libraries
 node_modules/
-
+database.db
 .dockerignore
 
 # Git
