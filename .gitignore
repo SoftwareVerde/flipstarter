@@ -5,6 +5,9 @@
 database.db
 database.db-journal
 
+# Campaign descriptions
+static/campaigns/**/*.md
+
 # Dependency directories
 node_modules/
 jspm_packages/

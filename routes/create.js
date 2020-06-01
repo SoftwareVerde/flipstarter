@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const app = require("../server.js");
 const moment = require("moment");
+const fs = require("fs");
 
 var renderer = require("../src/renderer.js");
 
@@ -62,7 +63,12 @@ const initCapampaign = async function (req, res) {
     campaign_id: 1,
     recipient_satoshis: Number(req.body.amount) * 100000000
   });
+
   // Handle description
+  fs.writeFile("./static/campaigns/1/en/abstract.md", req.body.description,
+    function(err) { if(err) { return console.log(err); } }
+  );
+
 
   // IMPORTANT: do not let the user access this page again
   // and redirect to home if they try
