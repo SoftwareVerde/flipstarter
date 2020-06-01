@@ -46,6 +46,7 @@ const initCapampaign = async function (req, res) {
 
   // Actually initialize the campaign with the POST data
   app.queries.addCampaign.run({
+    title: req.body.title,
     starts: Number(start_date),
     expires: Number(end_date),
   });
