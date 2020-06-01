@@ -24,6 +24,16 @@ const create = async function (req, res) {
   req.app.debug.server(`Create page delivered to ` + req.ip);
 };
 
+const writeDescription = function (languageCode, abstract, proposal) {
+  // Handle descripion
+  fs.writeFile("./static/campaigns/1/" + languageCode + "/abstract.md", abstract,
+    function(err) { if(err) { return console.log(err); } }
+  );
+  fs.writeFile("./static/campaigns/1/" + languageCode + "/proposal.md", proposal,
+    function(err) { if(err) { return console.log(err); } }
+  );
+};
+
 const initCapampaign = async function (req, res) {
   if (!app.freshInstall) {
     return res.redirect("/");
@@ -64,13 +74,11 @@ const initCapampaign = async function (req, res) {
     recipient_satoshis: Number(req.body.amount) * 100000000
   });
 
-  // Handle descripion
-  fs.writeFile("./static/campaigns/1/en/abstract.md", req.body.abstract,
-    function(err) { if(err) { return console.log(err); } }
-  );
-  fs.writeFile("./static/campaigns/1/en/proposal.md", req.body.proposal,
-    function(err) { if(err) { return console.log(err); } }
-  );
+  // Write in /static/campaigns
+  writeDescription("en", req.body.abstract, req.body.proposal);
+  writeDescription("zh", req.body.abstractZH, req.body.proposalZH);
+  writeDescription("es", req.body.abstractES, req.body.proposalES);
+  writeDescription("ja", req.body.abstractJA, req.body.proposalJA);
 
 
   // IMPORTANT: do not let the user access this page again
