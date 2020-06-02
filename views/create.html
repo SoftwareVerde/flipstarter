@@ -93,31 +93,33 @@
             </div>
           </div>
           <!-- /End Date -->
-          <hr>
+          <!-- Recipients -->
+          <p class="lead">Recipients</p>
           <div class="form-row">
             <div class="form-group col-lg-4">
               <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
               <input required="" type="text" class="form-control" id="amount" name="amount">
             </div>
             <div class="form-group col-lg-4">
-              <label for="project_url">Project Website</label>
-              <input required="" type="text" class="form-control" id="project_url" name="project_url">
-            </div>
-            <div class="form-group col-lg-4">
               <label for="image_url">Image URL</label>
               <input required="" type="text" class="form-control" id="image_url" name="image_url">
             </div>
+            <div class="form-group col-lg-4">
+              <label for="recipient_name">Recipient Name</label>
+              <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
+            </div>
           </div>
-          <hr>
-          <p class="lead">About the Project</p>
-          <div class="form-group">
-            <label for="recipient_name">Recipient Name</label>
-            <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="bch_address">Bitcoin Cash Address</label>
+              <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="project_url">Recipient Website</label>
+              <input required="" type="text" class="form-control" id="project_url" name="project_url">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="bch_address">Bitcoin Cash Address</label>
-            <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
-          </div>
+          <!-- /Recipients -->
           <hr>
           <!-- Markdown files -->
           <p class="lead">Description</p>
