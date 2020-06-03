@@ -61,18 +61,23 @@ const initCapampaign = async function (req, res) {
     starts: Number(start_date),
     expires: Number(end_date),
   });
-  app.queries.addUser.run({
-    user_url: req.body.project_url,
-    user_image: req.body.image_url,
-    user_alias: req.body.recipient_name,
-    user_address: req.body.bch_address,
-    data_signature: null
-  });
-  app.queries.addRecipientToCampaign.run({
-    user_id: 1,
-    campaign_id: 1,
-    recipient_satoshis: Number(req.body.amount) * 100000000
-  });
+  // Add all Users + Recipients
+  users = req.body.recipient_name;
+
+  for (i in users) {
+    app.queries.addUser.run({
+      user_url: req.body.project_url[i],
+      user_image: req.body.image_url[i],
+      user_alias: req.body.recipient_name[i],
+      user_address: req.body.bch_address[i],
+      data_signature: null
+    });
+    app.queries.addRecipientToCampaign.run({
+      user_id: Number(i) + 1,
+      campaign_id: 1,
+      recipient_satoshis: Number(req.body.amount[i]) * 100000000  // to satoshis
+    });
+  }
 
   // Write in /static/campaigns
   writeDescription("en", req.body.abstract, req.body.proposal);
