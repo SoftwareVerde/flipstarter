@@ -38,9 +38,11 @@ docker pull flipstarter/flipstarter
 # create a volume to store the database
 docker volume create flipstarter
 
-# run the container on port 443
-docker run -d --name flipstarter -v flipstarter:/app -p 443:3000 flipstarter/flipstarter
+# run the container on ports 443 and 80
+docker run -d --name flipstarter -v flipstarter:/app -p 443:3000 -p 80:3000 flipstarter/flipstarter
 ```
+
+You can start and stop the container with `docker [start/stop] flipstarter`.
 
 ## Contribute
 
