@@ -5,7 +5,9 @@ function addRecipient() {
 
   if(index < maxRecipients) {
     $("#recipients").append(
-      `<p>Recipient ${ index + 1 }</p>
+      `<div>
+      <p class="d-inline">Recipient ${ index + 1 }</p>
+      <div class="remove btn btn-link text-danger d-inline float-right">Remove</div>
       <div class="form-row text-muted">
         <div class="form-group col-lg-4">
           <label for="amount[${ index }]">Funding Goal <small>(amount in BCH)</small></label>
@@ -29,6 +31,7 @@ function addRecipient() {
           <label for="project_url[${ index }]">Recipient Website</label>
           <input required="" type="text" class="form-control" id="project_url[${ index }]" name="project_url[${ index }]">
         </div>
+      </div>
       </div>`
     );
     index++;
@@ -36,3 +39,8 @@ function addRecipient() {
     $("#addRecipient").hide();
   }
 };
+
+$("#recipients").on("click", ".remove", function() {
+  $(this).parent("div").remove();
+  index--;
+})
