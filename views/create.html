@@ -27,13 +27,13 @@
         <form method="POST" action="">
           <!-- Title -->
           <div class="form-group">
-            <label for="title" class="lead">Campaign Title</label>
+            <label for="title" class="h4">Campaign Title</label>
             <input required="" type="text" class="form-control" id="title" name="title">
           </div>
           <!-- /Title -->
           <hr>
           <!-- Start Date -->
-          <p class="lead">Start Date</p>
+          <p class="h4">Start Date</p>
           <div class="form-row">
             <div class="form-group col-4">
               <label for="start_year">Year</label>
@@ -64,7 +64,7 @@
           <!-- /Start Date -->
           <hr>
           <!-- End Date -->
-          <p class="lead">End Date</p>
+          <p class="h4">End Date</p>
           <div class="form-row">
             <div class="form-group col-4">
               <label for="end_year">Year</label>
@@ -94,35 +94,39 @@
           </div>
           <!-- /End Date -->
           <!-- Recipients -->
-          <p class="lead">Recipients</p>
-          <div class="form-row">
-            <div class="form-group col-lg-4">
-              <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
-              <input required="" type="text" class="form-control" id="amount" name="amount">
+          <div id="recipients">
+            <p class="h4">Recipients</p>
+            <p>Recipient 1</p>
+            <div class="form-row text-muted">
+              <div class="form-group col-lg-4">
+                <label for="amount">Funding Goal <small>(amount in BCH)</small></label>
+                <input required="" type="text" class="form-control" id="amount" name="amount">
+              </div>
+              <div class="form-group col-lg-4">
+                <label for="image_url">Image URL</label>
+                <input required="" type="text" class="form-control" id="image_url" name="image_url">
+              </div>
+              <div class="form-group col-lg-4">
+                <label for="recipient_name">Recipient Name</label>
+                <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
+              </div>
             </div>
-            <div class="form-group col-lg-4">
-              <label for="image_url">Image URL</label>
-              <input required="" type="text" class="form-control" id="image_url" name="image_url">
-            </div>
-            <div class="form-group col-lg-4">
-              <label for="recipient_name">Recipient Name</label>
-              <input required="" type="text" class="form-control" id="recipient_name" name="recipient_name">
+            <div class="form-row text-muted">
+              <div class="form-group col-md-6">
+                <label for="bch_address">Bitcoin Cash Address</label>
+                <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="project_url">Recipient Website</label>
+                <input required="" type="text" class="form-control" id="project_url" name="project_url">
+              </div>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="bch_address">Bitcoin Cash Address</label>
-              <input required="" type="text" class="form-control" id="bch_address" name="bch_address">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="project_url">Recipient Website</label>
-              <input required="" type="text" class="form-control" id="project_url" name="project_url">
-            </div>
-          </div>
+          <div class="btn btn-link" onclick="addRecipient()" id="addRecipient">Add a recipient</div>
           <!-- /Recipients -->
           <hr>
           <!-- Markdown files -->
-          <p class="lead">Description</p>
+          <p class="h4">Description</p>
           <div class="row">
             <nav class="col-md-3 mt-md-5 text-center">
               <div class="nav flex-column nav-pills border rounded" id="nav-tab" role="tablist">
@@ -193,6 +197,8 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+  <script src="/static/js/create.js"></script>
 
 </body>
 </html>

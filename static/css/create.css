@@ -20,3 +20,11 @@
   background-color: #1F7F7D;
   border-color: #1F7F7D;
 }
+
+a, .btn-link {
+  color: #2EACAB;
+}
+
+a:hover, .btn-link:hover {
+  color: #1F7F7D;
+}
