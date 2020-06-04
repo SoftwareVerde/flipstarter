@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Compiled readme
+README.html
+
 # Database (SQLite)
 database.db
 database.db-journal

@@ -1,6 +1,13 @@
-# Flipstarter
+<div align="center">
+  <img src="./static/img/logo-border.svg" height="80">
+  <h1>Flipstarter</h1>
+</div>
 
-## Run the development server
+Flipstarter provides a way for any project to engage with potential funders in a way that encourages accountability for projects and fairness for funders.
+
+## Development
+
+### Run the NodeJS development server
 
 You need [NodeJS](https://nodejs.org/en/) installed on your machine, then run:
 
@@ -11,17 +18,37 @@ npm start
 
 And open up [localhost:3000](http://localhost:3000) in your browser.
 
-## Run the Docker container
+### Run the Docker container
 
 You need [Docker](https://www.docker.com) installed on your machine, then run:
 
 ```shell
 docker build -t flipstarter .
 docker volume create flipstarter
-docker run --name flipstarter -v flipstarter:/app -p 3000:3000 flipstarter
+docker run -v flipstarter:/app -p 3000:3000 flipstarter
 ```
 
 And open up [localhost:3000](http://localhost:3000) in your browser.
+
+### Contribute
+
+Submit pull requests at https://gitlab.com/flipstarter/backend
+
+#### Edit front-end
+
+##### HTML
+
+HTML files are located in `/views/`.
+
+##### CSS/images/fonts
+
+These are located in `/static/`, in their respective folder.
+
+##### JavaScript (front-end)
+
+To edit the main application script, edit `/source.js` and run `/webpack.sh` to process it.
+
+⚠️ Do NOT edit `application.js` directly ⚠️
 
 ## Deploy to production
 
@@ -43,7 +70,3 @@ docker run -d --name flipstarter -v flipstarter:/app -p 443:3000 -p 80:3000 flip
 ```
 
 You can start and stop the container with `docker [start/stop] flipstarter`.
-
-## Contribute
-
-Submit pull requests at https://gitlab.com/flipstarter/backend
