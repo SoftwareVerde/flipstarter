@@ -24,7 +24,7 @@ function addRecipient() {
       </div>
       <div class="form-row text-muted">
         <div class="form-group col-md-6">
-          <label for="bch_address[${ index }]">Bitcoin Cash Address</label>
+          <label for="bch_address[${ index }]">Bitcoin Cash Address <small>(include bitcoincash: prefix)</small></label>
           <input required="" type="text" class="form-control" id="bch_address[${ index }]" name="bch_address[${ index }]">
         </div>
         <div class="form-group col-md-6">
@@ -44,3 +44,10 @@ $("#recipients").on("click", ".remove", function() {
   $(this).parent("div").remove();
   index--;
 })
+
+// Prevent letters in date inputs
+$(".date-input").on("keypress", function(evt) {
+  if (evt.which < 48 || evt.which > 57) {
+    evt.preventDefault();
+  }
+});
