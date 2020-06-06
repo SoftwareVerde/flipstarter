@@ -157,9 +157,7 @@ class flipstarter {
     this.applyTranslation(language);
 
     // Fetch the campaign information from the backend.
-    let response = await fetch(
-      `/campaign/${CAMPAIGN_ID}`
-    );
+    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
     let fundraiser = await response.json();
 
     this.campaign = fundraiser.campaign;
@@ -307,9 +305,7 @@ class flipstarter {
     };
 
     //
-    this.eventSource = new EventSource(
-      "/events/"
-    );
+    this.eventSource = new EventSource("/events/");
     this.eventSource.addEventListener(
       "message",
       parseContributionEvents.bind(this)
@@ -330,7 +326,7 @@ class flipstarter {
     // Add interactive content to the status message.
     let sharingActions = "";
     sharingActions +=
-      '<div id="sharingActions" style="font-size: 1rem; opacity: 0.66;">';
+      "<div id=\"sharingActions\" style=\"font-size: 1rem; opacity: 0.66;\">";
     if (typeof navigator.share === "function") {
       sharingActions += `<a id='shareAction' data-string='shareAction'><i class="icon-share"></i>${this.translation["shareAction"]}</a>`;
     }
@@ -570,9 +566,7 @@ class flipstarter {
 
     // Initiate all requests in parallell.
     this.translationContentPromises = {
-      interfaceResponse: fetch(
-        `/static/ui/${languageCode}/interface.json`
-      ),
+      interfaceResponse: fetch(`/static/ui/${languageCode}/interface.json`),
       introResponse: fetch(
         `/static/campaigns/${CAMPAIGN_ID}/${languageCode}/abstract.md`
       ),

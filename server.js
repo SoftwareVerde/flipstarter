@@ -48,7 +48,7 @@ const cors = require("cors");
 
 // Add support for parsing POST bodies.
 const bodyParser = require("body-parser");
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // Wrap application setup in order to allow async/await.
 const setup = async function () {
