@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "debug": "DEBUG='flipstarter:*' node --use-strict server.js",
     "verbose": "DEBUG='flipstarter:*, -flipstarter:object' node --use-strict server.js",
-    "start": "DEBUG='flipstarter:status, flipstarter:server' node --use-strict server.js"
+    "start": "bash webpack.sh && DEBUG='flipstarter:status, flipstarter:server' node --use-strict server.js"
   },
   "author": "Jonathan Silverblood",
   "license": "MIT",

@@ -1,8 +1,9 @@
 # macOS
 .DS_Store
 
-# Compiled readme
+# Compiled files
 README.html
+static/js/application.js
 
 # Database (SQLite)
 database.db
