@@ -5,6 +5,12 @@
 
 Flipstarter provides a way for any project to engage with potential funders in a way that encourages accountability for projects and fairness for funders.
 
+*The Flipstarter team has created these tools for anyone to use.
+Although we have worked hard to make Flipstarter easy to deploy and reliable to operate, the tools are offered as-is with no expectation of support.
+If you are not confident about your ability to deploy and manage a Flipstarter-based campaign, we recommend you work with a web developer who can manage everything for you.*
+
+*Corentin Mercier offers a service [here](https://merc1er.com/flipstarter).*
+
 ## Development
 
 ### Run the NodeJS development server
