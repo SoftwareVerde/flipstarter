@@ -182,7 +182,7 @@ class flipstarter {
       document.getElementById(
         "recipientList"
       ).innerHTML += `<li class='col s6 m6 l12'>
-				<a href='${recipientURL}'>
+				<a href='${recipientURL}' target="_blank">
 					<img src='${fundraiser.recipients[recipientIndex].user_image}' alt='${recipientName}' />
 					<span>
 						<b>${recipientName}</b>
