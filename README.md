@@ -72,7 +72,7 @@ docker pull flipstarter/flipstarter
 docker volume create flipstarter
 
 # run the container on ports 443 and 80
-docker run -d --name flipstarter -v flipstarter:/app -p 443:3000 -p 80:3000 flipstarter/flipstarter
+docker run -d --restart always --name flipstarter -v flipstarter:/app -p 443:3000 -p 80:3000 flipstarter/flipstarter
 ```
 
 You can start and stop the container with `docker [start/stop] flipstarter`.
