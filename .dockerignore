@@ -1,0 +1,10 @@
+node_modules/
+database.db
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Campaign descriptions
+static/campaigns/**/*.md

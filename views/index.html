@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload assets -->
+  <link rel="preload" href="/static/js/application.js" as="script">
+  <link rel="preload" href="/static/img/logo.png" as="image">
+  <link rel="preload" href="/static/img/clouds.png" as="image">
+  <link rel="preload" href="/static/img/grass.png" as="image">
+  <link rel="preload" href="/static/img/water.png" as="image">
+  <link
+  rel="preload"
+  href="/static/fonts/cairo.woff2"
+  as="font"
+  crossorigin
+  >
+  <link
+  rel="preload"
+  href="/static/fonts/icons.woff"
+  as="font"
+  crossorigin
+  >
+
+  <!-- preload fonts -->
+  <style>
+    /** Fonts **/
+    @font-face {
+      font-display: swap;
+      font-family: "Cairo";
+      font-style: normal;
+      font-weight: 400;
+      src: local("Cairo"), local("Cairo-Regular"),
+      url("/static/fonts/cairo.woff2")
+      format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+      U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
+      U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    @font-face {
+      font-display: swap;
+      font-family: "icons";
+      font-weight: normal;
+      font-style: normal;
+      font-display: block;
+      src: url("/static/fonts/icons.woff")
+      format("woff");
+    }
+  </style>
+
+  <!-- -->
+  <link rel="icon" href="/static/img/logo.png">
+  <link href="/static/css/materialize.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+
+  <!-- Website metadata -->
+  <title>Flipstarter</title>
+  <meta property="og:title" content="Flipstarter">
+  <meta
+  property="og:description"
+  content="Fundraiser for Bitcon Cash infrastructure utilizing assurance contracts to ensure fairness."
+  >
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.flipstarter.cash/">
+  <meta
+  property="og:image"
+  content="https://flipstarter.bitcoincashnode.org/img/logo.png"
+  >
+  <meta property="og:image:alt" content="Flipstarter logo image.">
+  <meta property="og:article:section" content="Technology">
+  <meta property="og:article:tag" content="Bitcoin">
+  <meta property="og:article:tag" content="Bitcoin Cash">
+  <meta property="og:article:tag" content="BCH">
+  <meta property="og:article:tag" content="Cryptocurrencies">
+  <meta property="og:article:tag" content="Fundraising">
+  <meta property="og:article:tag" content="Infrastructure">
+</head>
+<body class="clouds">
+  <div class="grass">
+    <div class="background">
+      <!-- Site header -->
+      <header class="container row center">
+        <h1 class="cols s12 m12 l12">
+          <span id="campaignTitle"></span>
+        </h1>
+      </header>
+
+      <!-- Site content -->
+      <main class="container row z-depth-2">
+        <!-- Campaign -->
+        <article
+        id="campaign"
+        class="col s12 m12 l8"
+        style="margin-bottom: 0.75rem;"
+        >
+        <h1 style="display: none;">Campaign</h1>
+
+        <!-- Campaign overview -->
+        <section id="overview">
+          <h2 style="display: none;">Campaign overview</h2>
+          <div style="float: left;">
+            <span class="valign-wrapper" style="float: left;">
+              <i class="icon-access_time"></i>
+              <span id="timerLabel" data-string="expiresLabel"></span>
+              <b id="campaignExpiration">...</b>
+            </span>
+          </div>
+          <div style="float: right;">
+            <span class="valign-wrapper" style="float: left;">
+              <i class="icon-bookmark_border"></i>
+              <span id="compaignContributionAmount">0.00</span>
+              <i>/</i>
+              <span id="campaignRequestAmount">-.--</span>
+              <b>BCH</b>
+            </span>
+          </div>
+          <div class="progress">
+            <div class="determinate" id="campaignProgressBar"></div>
+            <div class="determinate" id="campaignContributionBar"></div>
+          </div>
+        </section>
+
+        <!-- Campaign heading -->
+        <header id="campaignAbstract"></header>
+
+        <!-- Campaign donation form -->
+        <fieldset id="donateField" class="row">
+          <div
+          id="donateStatus"
+          class="col s12 m12 l12 hidden"
+          style="text-align: center;"
+          ></div>
+
+          <div id="donateForm" class="col s12 m12 l12 hidden">
+            <div class="input-field col s1 m1 l1" style="padding: 0;">
+              <i
+              style="
+              display: inline-block;
+              width: 3rem;
+              height: 3rem;
+              text-align: center;
+              opacity: 0.5;
+              font-size: 2.25rem;
+              line-height: 3.25rem;
+              "
+              class="icon-attach_money"
+              ></i>
+            </div>
+            <div
+            class="input-field col s11 m5 l6"
+            style="padding: 0; text-align: center;"
+            >
+            <input
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.20"
+            class="slider"
+            id="donationSlider"
+            style="
+            height: 3rem;
+            padding: 0;
+            width: calc(100% - 2rem);
+            margin: 0rem;
+            "
+            >
+          </div>
+          <div
+          class="input-field col s12 m6 l5"
+          style="padding: 0 0.75rem; margin: 0.75rem 0rem;"
+          >
+          <button
+          id="donateButton"
+          class="btn waves-effect waves-light green"
+          style="width: 100%; padding: 0; margin: 0rem;"
+          disabled="disabled"
+          >
+          <span id="donateText" data-string="donateText"></span>
+          <span id="donationAmount"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="donateSection" class="col s12 m12 hidden">
+      <div
+      class="col"
+      style="
+      background-color: white;
+      border-radius: 0.25rem;
+      border: 1px solid rgba(0, 0, 0, 0.31);
+      padding-bottom: 1.5rem;
+      padding-top: 0.75rem;
+      "
+      >
+      <div class="col s12 m12 l12" style="margin-top: 0.75rem;">
+        <div
+        class="row"
+        style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 10.5rem;
+        padding: 1rem;
+        margin: 0rem;
+        margin-top: 0.5rem;
+        border: 1px solid rgb(169, 169, 169);
+        box-shadow: inset 0rem 0.1rem 0.25rem
+        rgba(0, 0, 0, 0.13);
+        "
+        >
+        <div class="input-field col s12 m12 l12" style="">
+          <i
+          style="
+          opacity: 0.5;
+          font-size: 2.25rem;
+          line-height: 2.25rem;
+          "
+          class="icon-person_outline prefix"
+          ></i>
+          <input
+          id="contributionName"
+          type="text"
+          maxlength="24"
+          >
+          <label
+          for="contributionName"
+          data-string="usernameLabel"
+          ></label>
+        </div>
+
+        <div class="input-field col s12 m12 l12" style="">
+          <i
+          style="
+          opacity: 0.5;
+          font-size: 2rem;
+          line-height: 2.5rem;
+          "
+          class="icon-chat_bubble_outline prefix"
+          ></i>
+          <input
+          id="contributionComment"
+          type="text"
+          maxlength="120"
+          >
+          <label
+          for="contributionComment"
+          data-string="commentLabel"
+          ></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col s12 m12 l3" style="margin-top: 0.75rem;">
+      <small
+      style="
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      "
+      data-string="copyLabel"
+      ></small>
+      <textarea
+      rows="5"
+      id="template"
+      name="template"
+      style="
+      height: 7rem;
+      font-family: monospace;
+      font-size: small;
+      margin: 0;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background-color: white;
+      "
+      ></textarea>
+      <button
+      id="copyTemplateButton"
+      class="btn waves-effect waves-light green"
+      style="width: 100%;"
+      data-string="copyButton"
+      ></button>
+    </div>
+    <div class="col s12 m12 l6" style="margin-top: 0.75rem;">
+      <small
+      style="
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      "
+      data-string="instructionsLabel"
+      ></small>
+      <p
+      id="instructions"
+      style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: small;
+      height: 7rem;
+      padding: 1rem;
+      margin-bottom: 7px;
+      margin-top: 0.5rem;
+      border: 1px solid rgb(169, 169, 169);
+      "
+      data-string="instructions"
+      ></p>
+      <div
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      "
+      >
+      <a
+      id="downloadButton"
+      class="btn"
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background-color: transparent;
+      color: black;
+      box-shadow: none;
+      "
+      href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/a34641f9863164e82a6ab72314a02311/flipstarter-1.2.zip"
+      >
+      <i class="icon-download"></i>
+      <span
+      style="margin-left: 0.25rem;"
+      data-string="downloadText"
+      ></span>
+    </a>
+    <a
+    id="linkInstructionsButton"
+    class="btn"
+    target="_blank"
+    style="
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+    color: black;
+    box-shadow: none;
+    "
+    href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
+    >
+    <i class="icon-info"></i>
+    <span
+    style="margin-left: 0.25rem;"
+    data-string="instructionLink"
+    ></span>
+  </a>
+</div>
+</div>
+<div class="col s12 m12 l3" style="margin-top: 0.75rem;">
+  <small
+  style="
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  "
+  data-string="commitLabel"
+  ></small>
+  <textarea
+  rows="5"
+  id="commitment"
+  name="commitment"
+  data-placeholder="PasteHere"
+  style="
+  height: 7rem;
+  font-family: monospace;
+  font-size: small;
+  margin: 0;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+  "
+  ></textarea>
+  <button
+  id="commitTransaction"
+  class="btn waves-effect waves-light green"
+  style="width: 100%;"
+  disabled="disabled"
+  data-string="commitButton"
+  ></button>
+</div>
+</div>
+</div>
+</fieldset>
+
+<!-- Campaign details. -->
+<section id="campaignDetails" class="row"></section>
+</article>
+
+<!-- Campaign sidebar -->
+<aside class="col s12 m12 l4">
+  <section>
+    <h3 style="float: left;">
+      <span class="valign-wrapper" style="float: left;">
+        <i class="icon-face"></i>
+        <b id="campaignRecipientCount">0</b>
+        <span data-string="recipientsLabel"></span>
+      </span>
+    </h3>
+    <hr>
+    <ul
+    id="recipientList"
+    class="row"
+    style="margin-bottom: 2rem;"
+    ></ul>
+  </section>
+
+  <section>
+    <h3 style="float: left;">
+      <span class="valign-wrapper" style="float: left;">
+        <i class="icon-favorite_border"></i>
+        <b id="campaignContributorCount">0</b>
+        <span data-string="contributorsLabel"></span>
+      </span>
+    </h3>
+    <hr>
+    <ul id="contributionList">
+      <li
+      style="
+      display: block;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.5);
+      padding: 2rem;
+      "
+      >
+      <i data-string="contributorEmpty1"></i>
+      <br>
+      <i data-string="contributorEmpty2"></i>
+    </li>
+  </ul>
+</section>
+</aside>
+<ul
+class="col s10 m10 l10 push-s1 push-m1 push-l1"
+style="display: flex; justify-content: center; text-align: left;"
+>
+<li class="col">
+  <a
+  class="valign-wrapper"
+  target="_blank"
+  href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
+  >
+  <i class="icon-info"></i>
+  &nbsp;
+  <span data-string="linkHowTo"></span>
+</a>
+</li>
+<li class="col">
+  <a
+  class="valign-wrapper"
+  target="_blank"
+  href="https://read.cash/@flipstarter/flipstarter-faq-66c56b03"
+  >
+  <i class="icon-info"></i>
+  &nbsp;
+  <span data-string="linkFAQ"></span>
+</a>
+</li>
+</ul>
+</main>
+
+<footer class="center">
+  <p>Powered by <a href="https://flipstarter.cash" target="_blank">Flipstarter</a></p>
+</footer>
+
+</div>
+</div>
+
+<div id="languageSelector" class="fixed-action-btn">
+  <b id="currentLanguage" data-string="changeLanguage"></b>
+  <a class="btn-floating btn-large green"
+  ><i class="large icon-translate"></i
+    ></a>
+    <ul style="float: right; text-align: right; margin-right: 0.5rem;">
+      <li>
+        <a
+        class="btn-floating purple darken-2"
+        style="text-align: center;"
+        id="translateEnglish"
+        >En</a
+        >
+      </li>
+      <li>
+        <a
+        class="btn-floating pink darken-2"
+        style="text-align: center;"
+        id="translateChinese"
+        >Cn</a
+        >
+      </li>
+      <li>
+        <a
+        class="btn-floating red darken-1"
+        style="text-align: center;"
+        id="translateJapanese"
+        >Ja</a
+        >
+      </li>
+      <li>
+        <a
+        class="btn-floating orange darken-2"
+        style="text-align: center;"
+        id="translateSpanish"
+        >Es</a
+        >
+      </li>
+    </ul>
+  </div>
+
+  <!-- -->
+  <template id="recipientTemplate">
+    <li class="col s6 m6 l12">
+      <a>
+        <img>
+        <span>
+          <b></b>
+          <i></i>
+        </span>
+      </a>
+    </li>
+  </template>
+  <template id="contributionTemplate">
+    <li>
+      <div>
+        <div class="contributionWaves"></div>
+        <div class="contributionDisplay"></div>
+        <span class="contributionPercent"></span>
+      </div>
+      <span>
+        <span>
+          <b class="contributionAlias"></b>
+          <small class="contributionAmount"></small>
+        </span>
+        <q class="contributionComment"></q>
+      </span>
+    </li>
+  </template>
+  <template id="emptyContributionMessage">
+    <li
+    style="
+    display: block;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    "
+    >
+    <i data-string="contributorEmpty1"></i>
+    <br>
+    <i data-string="contributorEmpty2"></i>
+  </li>
+</template>
+
+<!-- Load the javascript as the last step to ensure fastest load time. -->
+<script src="/static/js/application.js"></script>
+
+<!-- -->
+<audio src="https://backend.flipstarter.cash/snd/applause.mp3" id="applause"></audio>
+</body>
+</html>

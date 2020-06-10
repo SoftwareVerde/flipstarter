@@ -1,0 +1,66 @@
+{
+  "siteIntro": "Funding of Bitcoin Cash infrastructure is important, and infrastructure diversity creates a resilient ecosystem. Flipstarter provides a way for any project to engage with potential funders in a way that encourages accountability for projects and fairness for funders.",
+
+  "linkWhatIs": "What is Flipstarter",
+  "linkHowTo": "How to contribute to this campaign",
+  "linkFAQ": "Common questions",
+
+  "pendingLabel": "Starts",
+  "expiresLabel": "Expires",
+  "expiredLabel": "Expired",
+  "fullfilledLabel": "Funded",
+  "recipientsLabel": "recipients",
+  "contributorsLabel": "contributors",
+  "contributorEmpty1": "No one has made a pledge yet.",
+  "contributorEmpty2": "You could be the first.",
+
+  "donateText": "Pledge",
+  "fullfillText": "Complete",
+
+  "usernameLabel": "Name (optional)",
+  "commentLabel": "Comment (optional)",
+  "copyLabel": "1. Copy details",
+  "copyButton": "Copy details",
+  "downloadText": "Download",
+  "instructionsLabel": "2. Prepare pledge",
+  "instructions": "Install the plugin for the Electron-Cash desktop wallet and use the flipstarter tab to prepare your pledge.",
+  "instructionLink": "Instructions",
+  "commitLabel": "3. Paste pledge",
+  "commitButton": "Submit pledge",
+  "PasteHere": "Paste here",
+
+  "statusContribution": "Thank you for your contribution.",
+  "statusPending": "The campaign has not yet started.",
+  "statusFullfilled": "The campaign has been funded.",
+  "statusExpired": "The campaign expired without being funded.",
+
+  "shareAction": "Share!",
+  "shareTitle": "Flipstarter",
+  "shareText": "Time to celebrate!",
+  "celebrateAction": "Celebrate!",
+
+  "changeLanguage": "Change language",
+
+  "statusParsing": "Checking pledge...",
+  "statusRetrying": "Waiting for pledge transaction...",
+  "statusFailedStructure": "Please reload the page and try again. Sorry we found a problem with the structure of the submitted data and were unable to resolve it.",
+  "statusFailedIntent": "Please reload the page and try again. Sorry we had a problem matching the original pledge data with the submitted data, and were unable to resolve it.",
+  "statusFailedUnknown": "Please reload the page and try again. Sorry we had an unexpected error:",
+
+  "footerLabel": "About us",
+  "footerText": "We are a group of volunteers who think that it is important to establish effective and sustainable methods for voluntary funding. Flipstarter is an example of how to raise funds non-custodially with minimal trust.",
+
+  "socialLabel": "Social",
+  "contactLabel": "Contact",
+  "codeLabel": "Code",
+
+  "twitter": "Twitter",
+  "read.cash": "Read.cash",
+  "email": "Email",
+  "security": "Security",
+  "source": "Source code",
+  "issues": "Issues",
+
+  "copyright": "Website and assets are copyrighted in 2020 by the respective authors, licensed for public use under the",
+  "license": "MIT license."
+}

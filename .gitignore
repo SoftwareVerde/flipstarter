@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Compiled files
+README.html
+static/js/application.js
+
+# Database (SQLite)
+database.db
+database.db-journal
+
+# Campaign descriptions
+static/campaigns/**/*.md
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*

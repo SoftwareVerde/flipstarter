@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/create.css">
+
+  <title>Create a campaign</title>
+</head>
+
+<body class="clouds">
+
+  <section class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col col-lg-10 card card-body shadow-sm">
+        <div class="text-center">
+          <img src="/static/img/logo.png" alt="Logo" height="60">
+          <h1 class="my-3">Create a campaign</h1>
+        </div>
+        <!-- Form -->
+        <form method="POST" action="">
+          <!-- Title -->
+          <div class="form-group">
+            <label for="title" class="h4">Campaign Title</label>
+            <input required="" type="text" class="form-control" id="title" name="title">
+          </div>
+          <!-- /Title -->
+          <hr>
+          <!-- Start Date -->
+          <p class="h4">Start Date <small>(UTC±00:00)</small></p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="start_year">Year</label>
+              <input type="number" class="form-control date-input" id="start_year" name="start_year">
+            </div>
+            <div class="form-group col-4">
+              <label for="start_month">Month</label>
+              <select class="form-control" id="start_month" name="start_month">
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="start_day">Day</label>
+              <input type="number" class="form-control date-input" id="start_day" name="start_day">
+            </div>
+          </div>
+          <!-- /Start Date -->
+          <hr>
+          <!-- End Date -->
+          <p class="h4">End Date <small>(UTC±00:00)</small></p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="end_year">Year</label>
+              <input type="number" class="form-control date-input" id="end_year" name="end_year">
+            </div>
+            <div class="form-group col-4">
+              <label for="end_month">Month</label>
+              <select class="form-control" id="end_month" name="end_month">
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="end_day">Day</label>
+              <input type="number" class="form-control date-input" id="end_day" name="end_day">
+            </div>
+          </div>
+          <!-- /End Date -->
+          <!-- Recipients -->
+          <div id="recipients">
+            <p class="h4">Recipients</p>
+            <p>Recipient 1</p>
+            <div class="form-row text-muted">
+              <div class="form-group col-lg-4">
+                <label for="amount[0]">Funding Goal <small>(amount in BCH)</small></label>
+                <input required="" type="number" class="form-control" id="amount[0]" name="amount[0]" step="0.00000001">
+              </div>
+              <div class="form-group col-lg-4">
+                <label for="image_url[0]">Image URL</label>
+                <input required="" type="text" class="form-control" id="image_url[0]" name="image_url[0]">
+              </div>
+              <div class="form-group col-lg-4">
+                <label for="recipient_name[0]">Recipient Name</label>
+                <input required="" type="text" class="form-control" id="recipient_name[0]" name="recipient_name[0]">
+              </div>
+            </div>
+            <div class="form-row text-muted">
+              <div class="form-group col-md-6">
+                <label for="bch_address[0]">Bitcoin Cash Address <small>(include bitcoincash: prefix)</small></label>
+                <input required="" type="text" class="form-control" id="bch_address[0]" name="bch_address[0]">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="project_url[0]">Recipient Website</label>
+                <input required="" type="text" class="form-control" id="project_url[0]" name="project_url[0]">
+              </div>
+            </div>
+          </div>
+          <div class="btn btn-link" onclick="addRecipient()" id="addRecipient">Add a recipient</div>
+          <!-- /Recipients -->
+          <hr>
+          <!-- Markdown files -->
+          <p class="h4">Description</p>
+          <div class="row">
+            <nav class="col-md-3 mt-md-5 text-center">
+              <div class="nav flex-column nav-pills border rounded" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="english-tab" data-toggle="tab" href="#english" role="tab" aria-controls="english" aria-selected="true">English 🇬🇧</a>
+                <a class="nav-item nav-link" id="chinese-tab" data-toggle="tab" href="#chinese" role="tab" aria-controls="chinese" aria-selected="false">Chinese 🇨🇳</a>
+                <a class="nav-item nav-link" id="spanish-tab" data-toggle="tab" href="#spanish" role="tab" aria-controls="spanish" aria-selected="false">Spanish 🇪🇸</a>
+                <a class="nav-item nav-link" id="japanese-tab" data-toggle="tab" href="#japanese" role="tab" aria-controls="japanese" aria-selected="false">Japanese 🇯🇵</a>
+              </div>
+            </nav>
+            <div class="col tab-content">
+              <!-- English -->
+              <div class="tab-pane fade show active" id="english" role="tabpanel" aria-labelledby="english-tab">
+                <div class="form-group">
+                  <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="proposal">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposal" name="proposal" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Chinese -->
+              <div class="tab-pane fade" id="chinese" role="tabpanel" aria-labelledby="chinese-tab">
+                <div class="form-group">
+                  <label for="abstractZH">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstractZH" name="abstractZH" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="proposalZH">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposalZH" name="proposalZH" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Spanish -->
+              <div class="tab-pane fade" id="spanish" role="tabpanel" aria-labelledby="spanish-tab">
+                <div class="form-group">
+                  <label for="abstractES">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstractES" name="abstractES" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="proposalES">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposalES" name="proposalES" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- Japanese -->
+              <div class="tab-pane fade" id="japanese" role="tabpanel" aria-labelledby="japanese-tab">
+                <div class="form-group">
+                  <label for="abstractJA">Project Abstract <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="abstractJA" name="abstractJA" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="proposalJA">Project Proposal <small>(Markdown Format Supported)</small></label>
+                  <textarea class="form-control" id="proposalJA" name="proposalJA" rows="4"></textarea>
+                </div>
+              </div>
+              <!-- / -->
+            </div>
+          </div>
+          <hr>
+          <p>Please check that everything is correct, you will not be able to edit your campaign later on.</p>
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+  <script src="/static/js/create.js"></script>
+
+</body>
+</html>

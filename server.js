@@ -1,275 +1,334 @@
 // Enable support for time management.
-const moment = require('moment');
+const moment = require("moment");
 
 // Load the bitbox library.
-const bitboxSDK = require('bitbox-sdk');
+const bitboxSDK = require("bitbox-sdk");
 const bitbox = new bitboxSDK.BITBOX();
 
-class javascriptUtilities
-{
-	/**
-	* Reverses a Buffers content
-	*
-	* @param source   the Buffer to reverse
-	*
-	* @returns a new Buffer with the contents reversed.
-	*/
-	static reverseBuf(source)
-	{
-		// Allocate space for the reversed buffer.
-		let reversed = Buffer.allocUnsafe(source.length);
+class javascriptUtilities {
+  /**
+   * Reverses a Buffers content
+   *
+   * @param source   the Buffer to reverse
+   *
+   * @returns a new Buffer with the contents reversed.
+   */
+  static reverseBuf(source) {
+    // Allocate space for the reversed buffer.
+    let reversed = Buffer.allocUnsafe(source.length);
 
-		// Iterate over half of the buffers length, rounded up..
-		for(let lowIndex = 0, highIndex = source.length - 1; lowIndex <= highIndex; lowIndex += 1, highIndex -= 1)
-		{
-			// .. and swap each position from the beggining to the end.
-			reversed[lowIndex] = source[highIndex];
-			reversed[highIndex] = source[lowIndex];
-		}
+    // Iterate over half of the buffers length, rounded up..
+    for (
+      let lowIndex = 0, highIndex = source.length - 1;
+      lowIndex <= highIndex;
+      lowIndex += 1, highIndex -= 1
+    ) {
+      // .. and swap each position from the beggining to the end.
+      reversed[lowIndex] = source[highIndex];
+      reversed[highIndex] = source[lowIndex];
+    }
 
-		// Return the reversed buffer.
-		return reversed;
-	}
+    // Return the reversed buffer.
+    return reversed;
+  }
 }
 
 // Initialize mutex locking library.
-const asyncMutex = require('async-mutex').Mutex;
+const asyncMutex = require("async-mutex").Mutex;
 
 // Include support for express applications.
-const express = require('express');
-const SSE = require('express-sse');
+const express = require("express");
+const SSE = require("express-sse");
 
 // Create an instance of an express application.
 const app = express();
 
 // Add support for Cross-Origin settings.
-const cors = require('cors');
+const cors = require("cors");
 
 // Add support for parsing POST bodies.
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // Wrap application setup in order to allow async/await.
-const setup = async function()
-{
-	// Enable parsing of both JSON and URL-encoded bodies.
-	app.use(bodyParser.urlencoded({ extended: true }));
-	app.use(bodyParser.json());
+const setup = async function () {
+  // Enable parsing of both JSON and URL-encoded bodies.
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
 
-	// Create a server-sent event stream.
-	app.sse = new SSE();
+  // Create a server-sent event stream.
+  app.sse = new SSE();
 
-	// Load the configuration file.
-	app.config = require('./config.js');
+  // Load the configuration file.
+  app.config = require("./config.js");
 
-	// Read the package information file.
-	app.software = require('./package.json');
+  // Read the package information file.
+  app.software = require("./package.json");
 
-	// Load application modules.
-	await require('./src/logging.js')(app);
-	await require('./src/storage.js')(app);
-	await require('./src/network.js')(app);
+  // Load application modules.
+  await require("./src/logging.js")(app);
+  await require("./src/storage.js")(app);
+  await require("./src/network.js")(app);
 
-	//
-	app.debug.struct('Configuring services.');
+  module.exports = app;
 
-	// Configure CORS an Express settings.
-	app.use(cors());
-	app.use(express.json());
+  //
+  app.debug.struct("Configuring services.");
 
-	// Ask express to parse proxy headers.
-	app.enable('trust proxy');
+  // Configure CORS an Express settings.
+  app.use(cors());
+  app.use(express.json());
 
-	// Configure express to prettify json.
-	app.set('json spaces', 2);
+  // Ask express to parse proxy headers.
+  app.enable("trust proxy");
 
-	// Create routes from separate files.
-	app.use('/submit', require('./routes/submit.js'));
-	app.use('/campaign', require('./routes/campaign.js'));
+  // Configure express to prettify json.
+  app.set("json spaces", 2);
 
-	//
-	app.get('/events', app.sse.init);
+  // Create routes from separate files.
+  app.use("/submit", require("./routes/submit.js"));
+  app.use("/campaign", require("./routes/campaign.js"));
+  app.use("/", require("./routes/home.js"));
+  app.use("/create", urlencodedParser, require("./routes/create.js"));
 
-	// Initialize an empty set of scripthashes that we are subscribed to.
-	app.subscribedScriphashes = {};
+  // Serve static files
+  app.use("/static", require("./routes/static.js"));
 
-	// initialize a revocation event check lock.
-	app.handleRevocationsLock = new asyncMutex();
+  //
+  app.get("/events", app.sse.init);
 
-	//
-	app.handleRevocations = async function(data)
-	{
-		// Check if the notification is a status update.
-		if(Array.isArray(data))
-		{
-			// Get the script hash.
-			const scriptHash = data[0];
-			const scriptHashStatus = data[1];
+  // Initialize an empty set of scripthashes that we are subscribed to.
+  app.subscribedScriphashes = {};
 
-			// Get a list of unspent outputs for the input address.
-			const transactions = await app.electrum.request('blockchain.scripthash.get_history', scriptHash);
+  // initialize a revocation event check lock.
+  app.handleRevocationsLock = new asyncMutex();
 
-			// Get a mutex lock ready.
-			const unlock = await app.handleRevocationsLock.acquire();
+  //
+  app.handleRevocations = async function (data) {
+    // Check if the notification is a status update.
+    if (Array.isArray(data)) {
+      // Get the script hash.
+      const scriptHash = data[0];
+      const scriptHashStatus = data[1];
 
-			try
-			{
-				// If this event is new or has a changed scripthash status..
-				if(app.subscribedScriphashes[scriptHash] !== scriptHashStatus)
-				{
-					// Update this scripthash status to prevent redundant work..
-					app.subscribedScriphashes[scriptHash] = scriptHashStatus;
+      // Get a list of unspent outputs for the input address.
+      const transactions = await app.electrum.request(
+        "blockchain.scripthash.get_history",
+        scriptHash
+      );
 
-					// For each transaction for this scripthash..
-					for(const transactionIndex in transactions)
-					{
-						// get the transaction hash for this historic transaction.
-						const transactionHash = transactions[transactionIndex].tx_hash;
+      // Get a mutex lock ready.
+      const unlock = await app.handleRevocationsLock.acquire();
 
-						// Check the historic transaction to see if we need to update our revocation status.
-						app.checkForTransactionUpdates(Buffer.from(transactionHash, 'hex'));
-					}
-				}
-			}
-			finally
-			{
-				// Unlock the mutex so the next process can continue.
-				unlock();
-			}
-		}
-	};
+      try {
+        // If this event is new or has a changed scripthash status..
+        if (app.subscribedScriphashes[scriptHash] !== scriptHashStatus) {
+          // Update this scripthash status to prevent redundant work..
+          app.subscribedScriphashes[scriptHash] = scriptHashStatus;
 
-	// initialize a transaction revocation check lock.
-	app.checkForTransactionUpdatesLock = new asyncMutex();
+          // For each transaction for this scripthash..
+          for (const transactionIndex in transactions) {
+            // get the transaction hash for this historic transaction.
+            const transactionHash = transactions[transactionIndex].tx_hash;
 
-	//
-	app.checkForTransactionUpdates = async function(transactionHash)
-	{
-		if(!transactionHash)
-		{
-			return false;
-		}
+            // Check the historic transaction to see if we need to update our revocation status.
+            app.checkForTransactionUpdates(Buffer.from(transactionHash, "hex"));
+          }
+        }
+      } finally {
+        // Unlock the mutex so the next process can continue.
+        unlock();
+      }
+    }
+  };
 
-		// Fetch the referenced transaction.
-		const currentTransaction = await app.electrum.request('blockchain.transaction.get', transactionHash.toString('hex'), true);
+  // initialize a transaction revocation check lock.
+  app.checkForTransactionUpdatesLock = new asyncMutex();
 
-		// For each of the transactions ouputs..
-		for(const outputIndex in currentTransaction.vout)
-		{
-			// Try to find a commitment in the database.
-			const commitment = app.queries.getCommitmentByHashAndIndex.get({ previous_transaction_hash: transactionHash, previous_transaction_index: outputIndex });
+  //
+  app.checkForTransactionUpdates = async function (transactionHash) {
+    if (!transactionHash) {
+      return false;
+    }
 
-			// If a commitment was found, and it has not already been revoked..
-			if(typeof commitment !== 'undefined' && !commitment.revocation_id)
-			{
-				// Get a mutex lock ready.
-				const unlock = await app.checkForTransactionUpdatesLock.acquire();
+    // Fetch the referenced transaction.
+    const currentTransaction = await app.electrum.request(
+      "blockchain.transaction.get",
+      transactionHash.toString("hex"),
+      true
+    );
 
-				try
-				{
-					// Store the inputs lockscript.
-					const inputLockScript = Buffer.from(currentTransaction.vout[outputIndex].scriptPubKey.hex, 'hex');
+    // For each of the transactions ouputs..
+    for (const outputIndex in currentTransaction.vout) {
+      // Try to find a commitment in the database.
+      const commitment = app.queries.getCommitmentByHashAndIndex.get({
+        previous_transaction_hash: transactionHash,
+        previous_transaction_index: outputIndex,
+      });
 
-					// Hash the inputs lockscript to use for requesting UTXOs (Why can't electrum take the UTXO directly and give me info about it???)
-					const inputLockScriptHash = bitbox.Crypto.sha256(inputLockScript);
+      // If a commitment was found, and it has not already been revoked..
+      if (typeof commitment !== "undefined" && !commitment.revocation_id) {
+        // Get a mutex lock ready.
+        const unlock = await app.checkForTransactionUpdatesLock.acquire();
 
-					// Get a list of unspent outputs for the input address.
-					const inputUTXOs = await app.electrum.request('blockchain.scripthash.listunspent', javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex'));
+        try {
+          // Store the inputs lockscript.
+          const inputLockScript = Buffer.from(
+            currentTransaction.vout[outputIndex].scriptPubKey.hex,
+            "hex"
+          );
 
-					// Locate the UTXO in the list of unspent transaction outputs.
-					const inputUTXO = inputUTXOs.find(utxo => utxo.tx_hash === transactionHash.toString('hex'));
+          // Hash the inputs lockscript to use for requesting UTXOs (Why can't electrum take the UTXO directly and give me info about it???)
+          const inputLockScriptHash = bitbox.Crypto.sha256(inputLockScript);
 
-					// Validate the that referenced transaction output is unspent...
-					if(typeof inputUTXO === 'undefined')
-					{
-						// Mark the commitment as revoked.
-						app.queries.addContributionRevocation.run({ revocation_timestamp: moment().unix(), revocation_transaction: transactionHash.toString('hex'), commitment_id: commitment.commitment_id });
+          // Get a list of unspent outputs for the input address.
+          const inputUTXOs = await app.electrum.request(
+            "blockchain.scripthash.listunspent",
+            javascriptUtilities.reverseBuf(inputLockScriptHash).toString("hex")
+          );
 
-						// Get an updates list of contributions.
-						const campaignContributions = app.queries.listAllContributions.all();
+          // Locate the UTXO in the list of unspent transaction outputs.
+          const inputUTXO = inputUTXOs.find(
+            (utxo) => utxo.tx_hash === transactionHash.toString("hex")
+          );
 
-						// Update the initial push for the SSE stream.
-						app.sse.updateInit(campaignContributions);
+          // Validate the that referenced transaction output is unspent...
+          if (typeof inputUTXO === "undefined") {
+            // Mark the commitment as revoked.
+            app.queries.addContributionRevocation.run({
+              revocation_timestamp: moment().unix(),
+              revocation_transaction: transactionHash.toString("hex"),
+              commitment_id: commitment.commitment_id,
+            });
 
-						// Get the currently added contribution.
-						const contributionData = app.queries.getContributionByCommitment.get({ commitment_id: commitment.commitment_id });
+            // Get an updates list of contributions.
+            const campaignContributions = app.queries.listAllContributions.all();
 
-						// Check that the revocation isn't for a fullfilled campaign, if it was found.
-						if(typeof contributionData !== 'undefined' && !contributionData.fullfillment_id)
-						{
-							// Push the contribution to the SSE stream.
-							app.sse.send(contributionData);
-						}
+            // Update the initial push for the SSE stream.
+            app.sse.updateInit(campaignContributions);
 
-						// If we are currently subscribed to changes for this script hash..
-						if(app.subscribedScriphashes[javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex')])
-						{
-							// Mark this scripthash as no longer subscribed to.
-							app.subscribedScriphashes[javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex')] = false;
+            // Get the currently added contribution.
+            const contributionData = app.queries.getContributionByCommitment.get(
+              { commitment_id: commitment.commitment_id }
+            );
 
-							// Unsubscribe to changes for this output.
-							app.electrum.request('blockchain.scripthash.unsubscribe', javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex'));
-						}
+            // Check that the revocation isn't for a fullfilled campaign, if it was found.
+            if (
+              typeof contributionData !== "undefined" &&
+              !contributionData.fullfillment_id
+            ) {
+              // Push the contribution to the SSE stream.
+              app.sse.send(contributionData);
+            }
 
-						// Notify user that the service is ready for incoming connections.
-						app.debug.action(`Marked spent commitment '${commitment.commitment_id}' as revoked.`);
-					}
-					else if(!app.subscribedScriphashes[javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex')])
-					{
-						// Mark this scripthash as subscribed to.
-						app.subscribedScriphashes[javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex')] = true;
+            // If we are currently subscribed to changes for this script hash..
+            if (
+              app.subscribedScriphashes[
+                javascriptUtilities
+                  .reverseBuf(inputLockScriptHash)
+                  .toString("hex")
+              ]
+            ) {
+              // Mark this scripthash as no longer subscribed to.
+              app.subscribedScriphashes[
+                javascriptUtilities
+                  .reverseBuf(inputLockScriptHash)
+                  .toString("hex")
+              ] = false;
 
-						// Subscribe to changes for this output.
-						await app.electrum.subscribe(app.handleRevocations, 'blockchain.scripthash.subscribe', javascriptUtilities.reverseBuf(inputLockScriptHash).toString('hex'));
+              // Unsubscribe to changes for this output.
+              app.electrum.request(
+                "blockchain.scripthash.unsubscribe",
+                javascriptUtilities
+                  .reverseBuf(inputLockScriptHash)
+                  .toString("hex")
+              );
+            }
 
-						// Notify user that the service is ready for incoming connections.
-						app.debug.struct(`Subscribed to changes for commitment '${commitment.commitment_id}'.`);
-					}
-				}
-				finally
-				{
-					// Unlock the mutex so the next process can continue.
-					unlock();
-				}
-			}
-		}
-	};
+            // Notify user that the service is ready for incoming connections.
+            app.debug.action(
+              `Marked spent commitment '${commitment.commitment_id}' as revoked.`
+            );
+          } else if (
+            !app.subscribedScriphashes[
+              javascriptUtilities
+                .reverseBuf(inputLockScriptHash)
+                .toString("hex")
+            ]
+          ) {
+            // Mark this scripthash as subscribed to.
+            app.subscribedScriphashes[
+              javascriptUtilities
+                .reverseBuf(inputLockScriptHash)
+                .toString("hex")
+            ] = true;
 
-	// Get a list of all contributions for all campaigns.
-	const unverifiedContributions = app.queries.listAllContributions.all();
+            // Subscribe to changes for this output.
+            await app.electrum.subscribe(
+              app.handleRevocations,
+              "blockchain.scripthash.subscribe",
+              javascriptUtilities
+                .reverseBuf(inputLockScriptHash)
+                .toString("hex")
+            );
 
-	// Notify user that the service is ready for incoming connections.
-	app.debug.struct(`Verifying a total of '${Object.keys(unverifiedContributions).length}' existing contributions.`);
+            // Notify user that the service is ready for incoming connections.
+            app.debug.struct(
+              `Subscribed to changes for commitment '${commitment.commitment_id}'.`
+            );
+          }
+        } finally {
+          // Unlock the mutex so the next process can continue.
+          unlock();
+        }
+      }
+    }
+  };
 
-	// Store verification promises to allow parallellization.
-	let verificationPromises = [];
+  // Get a list of all contributions for all campaigns.
+  const unverifiedContributions = app.queries.listAllContributions.all();
 
-	// Check each contributions commitment..
-	for(const contributionIndex in unverifiedContributions)
-	{
-		if(!unverifiedContributions[contributionIndex].revocation_id)
-		{
-			console.log('CI', contributionIndex);
-			verificationPromises.push(app.checkForTransactionUpdates(unverifiedContributions[contributionIndex].previous_transaction_hash));
-		}
-	}
+  // Notify user that the service is ready for incoming connections.
+  app.debug.struct(
+    `Verifying a total of '${
+      Object.keys(unverifiedContributions).length
+    }' existing contributions.`
+  );
 
-	// Wait for all verifications to complete.
-	await Promise.all(verificationPromises);
+  // Store verification promises to allow parallellization.
+  let verificationPromises = [];
 
-	// Get a list of all contributions for all campaigns.
-	const verifiedContributions = app.queries.listAllContributions.all();
+  // Check each contributions commitment..
+  for (const contributionIndex in unverifiedContributions) {
+    if (!unverifiedContributions[contributionIndex].revocation_id) {
+      console.log("CI", contributionIndex);
+      verificationPromises.push(
+        app.checkForTransactionUpdates(
+          unverifiedContributions[contributionIndex].previous_transaction_hash
+        )
+      );
+    }
+  }
 
-	// Update the initial SSE stream with the contributions.
-	app.sse.updateInit(verifiedContributions);
+  // Wait for all verifications to complete.
+  await Promise.all(verificationPromises);
 
-	//
-	// app.use('/status', require('./routes/status.js'));
+  // Get a list of all contributions for all campaigns.
+  const verifiedContributions = app.queries.listAllContributions.all();
 
-	// Listen to incoming connections on port X.
-	app.listen(app.config.server.port, 'localhost');
+  // Update the initial SSE stream with the contributions.
+  app.sse.updateInit(verifiedContributions);
 
-	// Notify user that the service is ready for incoming connections.
-	app.debug.status('Listening for incoming connections on port ' + app.config.server.port);
+  //
+  // app.use('/status', require('./routes/status.js'));
+
+  // Listen to incoming connections on port X.
+  app.listen(app.config.server.port, "0.0.0.0");
+
+  // Notify user that the service is ready for incoming connections.
+  app.debug.status(
+    "Listening for incoming connections on port " + app.config.server.port
+  );
 };
 
 // Initialize the server.

@@ -1,0 +1,66 @@
+{
+  "siteIntro": "比特币现金的基础设施融资非常重要，基础设施的多样化能让生态更稳定。Flipstarter提供了一种新的项目融资方式，既能激励项目提高可信度，又能公平地对待捐赠人。",
+
+  "linkWhatIs": "什么是Flipstarter?",
+  "linkHowTo": "怎么用Flipstarter?",
+  "linkFAQ": "常见问题。",
+
+  "pendingLabel": "开始",
+  "expiresLabel": "到期",
+  "expiredLabel": "结束",
+  "fullfilledLabel": "募资",
+  "recipientsLabel": "受益人",
+  "contributorsLabel": "捐款人",
+  "contributorEmpty1": "还没有人捐款。",
+  "contributorEmpty2": "成为第一个捐款人。",
+
+  "donateText": "捐款",
+  "fullfillText": "结束",
+
+  "usernameLabel": "姓名(非必选项)",
+  "commentLabel": "留言 (非必选项)",
+  "copyLabel": "1. 复制细节",
+  "copyButton": "复制细节",
+  "downloadText": "下载",
+  "instructionsLabel": "2. 准备捐款",
+  "instructions": "请在Electron-Cash桌面钱包安装我们的插件，然后在钱包中Flipstarter标签准备款项。",
+  "instructionLink": "指示",
+  "commitLabel": "3. 粘贴捐款",
+  "commitButton": "提交捐款",
+  "PasteHere": "于此粘贴",
+
+  "statusContribution": "谢谢您出资。",
+  "statusPending": "活动尚未开始。",
+  "statusFullfilled": "本活动已进行募资。",
+  "statusExpired": "活动已结束，未完成募资。",
+
+  "shareAction": "分享!",
+  "shareTitle": "Flipstarter",
+  "shareText": "开始庆祝吧!",
+  "celebrateAction": "庆祝!",
+
+  "changeLanguage": "语言",
+
+  "statusParsing": "检查捐款...",
+  "statusRetrying": "等待捐款交易...",
+  "statusFailedStructure": "请重载当前页面，再试一次。抱歉，提交的数据结构存在问题，未能解决该问题。",
+  "statusFailedIntent": "请重载当前页面，再试一次。初始捐款数据与提交的数据不符，未能解决该问题。",
+  "statusFailedUnknown": "请重载当前页面，再试一次。抱歉，发生了未知错误：",
+
+  "footerLabel": "关于我们",
+  "footerText": "我们是来自社区的志愿者。我们认为有必要建立起高效且可持续的自愿捐赠机制。Flipstarter创建了一种无需托管的、无需高信任的募资方式。",
+
+  "socialLabel": "社交平台",
+  "contactLabel": "联系我们",
+  "codeLabel": "代码",
+
+  "twitter": "推特",
+  "read.cash": "Read.cash",
+  "email": "邮箱",
+  "security": "安全",
+  "source": "源代码",
+  "issues": "问题",
+
+  "copyright": "版权所有（2020），供公共使用",
+  "license": "MIT许可。"
+}

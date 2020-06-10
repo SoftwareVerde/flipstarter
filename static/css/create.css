@@ -1,0 +1,30 @@
+/* Create.css */
+.clouds {
+  background-color: white;
+  background-image: url(../img/clouds.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.nav-link {
+  color: #000;
+}
+
+.btn-primary, .nav-pills .nav-link.active {
+  color: #fff;
+  background-color: #2EACAB;
+  border-color: #2EACAB;
+}
+
+.btn-primary:hover {
+  background-color: #1F7F7D;
+  border-color: #1F7F7D;
+}
+
+a, .btn-link {
+  color: #2EACAB;
+}
+
+a:hover, .btn-link:hover {
+  color: #1F7F7D;
+}
