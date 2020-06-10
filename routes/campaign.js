@@ -10,8 +10,6 @@ const campaignInformation = async function (req, res) {
   );
   req.app.debug.object(req.params);
 
-  req.app.sse.send("CAMPAIGN REQUESTED");
-
   // Fetch the campaign data.
   const campaign = req.app.queries.getCampaign.get({
     campaign_id: req.params["campaign_id"],
