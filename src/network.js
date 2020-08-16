@@ -3,16 +3,10 @@ module.exports = async function (app) {
   app.debug.struct("Initializing network module.");
 
   // Load the electrum library.
-  const ElectrumCluster = require("electrum-cash").Cluster;
+  const { ElectrumCluster } = require("electrum-cash");
 
-  // Initialize an electrum cluster where 1 out of 1 needs to be consistent, polled randomly with fail-over.
-  app.electrum = new ElectrumCluster(
-    "Flipstarter Backend",
-    "1.4.1",
-    1,
-    1,
-    ElectrumCluster.ORDER.RANDOM
-  );
+  // Initialize an electrum cluster with default settings.
+  app.electrum = new ElectrumCluster("Flipstarter Backend", "1.4.1");
 
   //
   app.debug.struct("Adding servers to cluster.");
