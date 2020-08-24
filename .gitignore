@@ -5,12 +5,8 @@
 README.html
 static/js/application.js
 
-# Database (SQLite)
-database.db
-database.db-journal
-
 # Campaign descriptions
-static/campaigns/**/*.md
+static/campaigns/
 
 # Dependency directories
 node_modules/

@@ -363,7 +363,7 @@ const submitContribution = async function (req, res) {
         // Notify the admin about the event.
         req.app.debug.server(
           "Contribution rejection (intent amount mismatch) returned to " +
-            req.ip
+          req.ip
         );
 
         // Return false to indicate failure and stop processing.
@@ -386,11 +386,11 @@ const submitContribution = async function (req, res) {
           (remainingValue /
             (commitmentsPerTransaction - currentContributionCount) +
             546 / SATS_PER_BCH) /
-            remainingValue;
+          remainingValue;
         const maxPercent =
           1 -
           ((currentTransactionSize + 1650 + 49) * 1.0) /
-            (remainingValue * SATS_PER_BCH);
+          (remainingValue * SATS_PER_BCH);
 
         // ...
         const minValue = Math.log(minPercent * 100);
@@ -408,7 +408,7 @@ const submitContribution = async function (req, res) {
         (contract.totalContractOutputValue +
           currentMinerFee -
           currentCommittedSatoshis) *
-          (await inputPercentModifier(0.75))
+        (await inputPercentModifier(0.75))
       );
 
       // Verify that the current contribution does not undercommit the contract floor.
@@ -423,7 +423,7 @@ const submitContribution = async function (req, res) {
         // Notify the admin about the event.
         req.app.debug.server(
           "Contribution rejection (amount undercommitment) returned to " +
-            req.ip
+          req.ip
         );
 
         // Return false to indicate failure and stop processing.
@@ -433,8 +433,8 @@ const submitContribution = async function (req, res) {
       // Calculate how far over (or under) committed this contribution makes the contract.
       const overCommitment = Math.round(
         currentCommittedSatoshis +
-          totalSatoshis -
-          (contract.totalContractOutputValue + currentMinerFee)
+        totalSatoshis -
+        (contract.totalContractOutputValue + currentMinerFee)
       );
 
       // Verify that the current contribution does not overcommit the contract.
