@@ -31,7 +31,7 @@ You need [Docker](https://www.docker.com) installed on your machine, then run:
 ```shell
 docker build -t flipstarter .
 docker volume create flipstarter
-docker run -v flipstarter:/app -p 3000:3000 flipstarter
+docker run -v flipstarter:/app/static/campaigns -p 3000:3000 flipstarter
 ```
 
 And open up [localhost:3000](http://localhost:3000) in your browser.
@@ -72,7 +72,7 @@ docker pull flipstarter/flipstarter
 docker volume create flipstarter
 
 # run the container on ports 443 and 80
-docker run -d --restart always --name flipstarter -v flipstarter:/app -p 443:3000 -p 80:3000 flipstarter/flipstarter
+docker run -d --restart always --name flipstarter -v flipstarter:/app/static/campaigns -p 443:3000 -p 80:3000 flipstarter/flipstarter
 ```
 
 You can start and stop the container with `docker [start/stop] flipstarter`.

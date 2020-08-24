@@ -5,6 +5,6 @@ module.exports = {
     port: process.env.PORT || 3000,
 
     // Where to store the servers database file(s).
-    database: "./database.db",
+    database: "./static/campaigns/database.db",
   },
 };

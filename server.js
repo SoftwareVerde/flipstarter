@@ -92,9 +92,9 @@ const setup = async function () {
   app.use("/create", urlencodedParser, require("./routes/create.js"));
 
   // Serve static files
-  app.use("/static", require("./routes/static.js"));
+  app.use("/static", express.static("static"));
 
-  //
+  // Event handling
   app.get("/events", app.sse.init);
 
   // Initialize an empty set of scripthashes that we are subscribed to.
