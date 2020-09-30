@@ -2,6 +2,7 @@ image: node
 
 stages:
     - lint
+    - build
 
 cache:
     paths:
@@ -12,3 +13,17 @@ linting:
     script:
         - npm install eslint
         - node_modules/eslint/bin/eslint.js .
+
+docker-build:
+  stage: build
+  image: docker:latest
+  services:  # required by GitLab CI
+    - docker:dind
+  before_script:  # log into Docker hub
+    - echo $DOCKER_TOKEN | docker login -u "$DOCKER_USER" --password-stdin
+  script:
+    - docker build -t flipstarter .
+    - docker tag flipstarter flipstarter/flipstarter:latest
+    - docker push flipstarter/flipstarter
+  only:
+    - master
