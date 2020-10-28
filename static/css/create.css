@@ -28,3 +28,9 @@ a, .btn-link {
 a:hover, .btn-link:hover {
   color: #1F7F7D;
 }
+
+@media (min-width: 992px) {
+  .modal-lg, .modal-xl {
+    max-width: 922px;
+  }
+}
