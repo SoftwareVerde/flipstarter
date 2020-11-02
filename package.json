@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "debug": "DEBUG='flipstarter:*' node --use-strict server.js",
     "verbose": "DEBUG='flipstarter:*, -flipstarter:object' node --use-strict server.js",
-    "start": "npx webpack -o static/js/application.js && DEBUG='flipstarter:status, flipstarter:server' node --use-strict server.js"
+    "start": "npx webpack -o static/js/application.js && DEBUG='flipstarter:status, flipstarter:server' node --use-strict server.js",
+    "start-no-debug": "npx webpack -o static/js/application.js && node --use-strict server.js"
   },
   "author": "Jonathan Silverblood",
   "license": "MIT",

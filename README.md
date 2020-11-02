@@ -20,6 +20,9 @@ You need [NodeJS](https://nodejs.org/en/) installed on your machine, then run:
 ```shell
 npm install
 npm start
+
+# or on windows:
+npm run start-no-debug
 ```
 
 And open up [localhost:3000](http://localhost:3000) in your browser.

@@ -24,11 +24,11 @@
           <h1 class="my-3">Create a campaign</h1>
         </div>
         <!-- Form -->
-        <form method="POST" action="">
+        <form method="POST" action="" id="form">
           <!-- Title -->
           <div class="form-group">
             <label for="title" class="h4">Campaign Title</label>
-            <input required="" type="text" class="form-control" id="title" name="title">
+            <input type="text" class="form-control" id="title" name="title" required>
           </div>
           <!-- /Title -->
           <hr>
@@ -37,7 +37,7 @@
           <div class="form-row">
             <div class="form-group col-4">
               <label for="start_year">Year</label>
-              <input type="number" class="form-control date-input" id="start_year" name="start_year">
+              <input type="number" class="form-control date-input" id="start_year" name="start_year" required>
             </div>
             <div class="form-group col-4">
               <label for="start_month">Month</label>
@@ -58,7 +58,7 @@
             </div>
             <div class="form-group col-4">
               <label for="start_day">Day</label>
-              <input type="number" class="form-control date-input" id="start_day" name="start_day">
+              <input type="number" class="form-control date-input" id="start_day" name="start_day" required>
             </div>
           </div>
           <!-- /Start Date -->
@@ -68,11 +68,11 @@
           <div class="form-row">
             <div class="form-group col-4">
               <label for="end_year">Year</label>
-              <input type="number" class="form-control date-input" id="end_year" name="end_year">
+              <input type="number" class="form-control date-input" id="end_year" name="end_year" required>
             </div>
             <div class="form-group col-4">
               <label for="end_month">Month</label>
-              <select class="form-control" id="end_month" name="end_month">
+              <select class="form-control" id="end_month" name="end_month" required>
                 <option value="1">1 - January</option>
                 <option value="2">2 - February</option>
                 <option value="3">3 - March</option>
@@ -89,7 +89,7 @@
             </div>
             <div class="form-group col-4">
               <label for="end_day">Day</label>
-              <input type="number" class="form-control date-input" id="end_day" name="end_day">
+              <input type="number" class="form-control date-input" id="end_day" name="end_day" required>
             </div>
           </div>
           <!-- /End Date -->
@@ -100,29 +100,29 @@
             <div class="form-row text-muted">
               <div class="form-group col-lg-4">
                 <label for="amount[0]">Funding Goal <small>(amount in BCH)</small></label>
-                <input required="" type="number" class="form-control" id="amount[0]" name="amount[0]" step="0.00000001">
+                <input type="number" class="form-control goal-input" id="amount[0]" name="amount[0]" step="0.00000001" required>
               </div>
               <div class="form-group col-lg-4">
                 <label for="image_url[0]">Image URL</label>
-                <input required="" type="text" class="form-control" id="image_url[0]" name="image_url[0]">
+                <input type="text" class="form-control check-url" id="image_url[0]" name="image_url[0]" required>
               </div>
               <div class="form-group col-lg-4">
                 <label for="recipient_name[0]">Recipient Name</label>
-                <input required="" type="text" class="form-control" id="recipient_name[0]" name="recipient_name[0]">
+                <input type="text" class="form-control" id="recipient_name[0]" name="recipient_name[0]" required>
               </div>
             </div>
             <div class="form-row text-muted">
               <div class="form-group col-md-6">
                 <label for="bch_address[0]">Bitcoin Cash Address <small>(include bitcoincash: prefix)</small></label>
-                <input required="" type="text" class="form-control" id="bch_address[0]" name="bch_address[0]">
+                <input type="text" class="form-control check-bch-address" id="bch_address[0]" name="bch_address[0]" required>
               </div>
               <div class="form-group col-md-6">
                 <label for="project_url[0]">Recipient Website</label>
-                <input required="" type="text" class="form-control" id="project_url[0]" name="project_url[0]">
+                <input type="text" class="form-control check-url" id="project_url[0]" name="project_url[0]" required>
               </div>
             </div>
           </div>
-          <div class="btn btn-link" onclick="addRecipient()" id="addRecipient">Add a recipient</div>
+          <button class="btn btn-link js-add-recipient" onclick="addRecipient()" type="button">Add a recipient</button>
           <!-- /Recipients -->
           <hr>
           <!-- Markdown files -->
@@ -161,7 +161,7 @@
               <div class="tab-pane fade show active" id="english" role="tabpanel" aria-labelledby="english-tab">
                 <div class="form-group">
                   <label for="abstract">Project Abstract <small>(Markdown Format Supported)</small></label>
-                  <textarea class="form-control" id="abstract" name="abstract" rows="4"></textarea>
+                  <textarea class="form-control" id="abstract" name="abstract" rows="4" required></textarea>
                 </div>
                 <div class="form-group">
                   <label for="proposal">Project Proposal <small>(Markdown Format Supported)</small></label>
@@ -206,8 +206,10 @@
           </div>
           <hr>
           <p>Please check that everything is correct, you will not be able to edit your campaign later on.</p>
+          <!-- Error message -->
+          <p class="alert alert-danger d-none" id="error">Some fields are incorrect.</p>
           <!-- Submit button -->
-          <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
+          <button class="btn btn-primary btn-lg btn-block" onclick="validateForm()" type="button">Create</button>
         </form>
       </div>
     </div>
@@ -217,7 +219,7 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-
+  <script src="https://unpkg.com/bchaddrjs@0.4.9/dist/bchaddrjs-0.4.9.min.js" crossorigin="anonymous"></script>
   <script src="/static/js/create.js"></script>
 
 </body>
