@@ -11,6 +11,10 @@ If you are not confident about your ability to deploy and manage a Flipstarter-b
 
 *Corentin Mercier offers a service [here](https://merc1er.com/flipstarter).*
 
+Note: Although this repository is called "backend", it currently contains both the backend and frontend code.
+The code for the Electron Cash plugin is [here](https://gitlab.com/flipstarter/flipstarter-electron-cash).
+
+
 ## Development
 
 ### Run the NodeJS development server
@@ -41,7 +45,33 @@ And open up [localhost:3000](http://localhost:3000) in your browser.
 
 ### Contribute
 
-Submit pull requests at https://gitlab.com/flipstarter/backend
+The Flipstarter team is a group of volunteers, and we welcome contributions.
+
+General guidelines:
+
+- Submit merge requests for the campaign backend and frontend [here](https://gitlab.com/flipstarter/backend/-/merge_requests).
+- Submit merge requests for the Electron Cash plugin [here](https://gitlab.com/flipstarter/flipstarter-electron-cash/-/merge_requests).
+- Keep each change minimal and self-contained. Note that "minimal" does not always mean small, but usually it does.
+- Avoid mixing moving stuff around with changing stuff. Do changes with renames on their own.
+- Code review is an important part of the development process. Contributors and maintainers should expect constructive communication from each other.
+- In some cases, merge requests are rejected. It is up to the MR author to convince the reviewers that the changes warrant the review effort.
+
+Suggested workflow:
+
+1. Find or create an issue describing a need or problem that needs to be solved.
+1. [Optional if you are interested in a bounty]
+   1. Create an MR with zero commits. Gitlab allows creation of a conveniently linked MR directly from the issue.
+   1. Include a reference to the source issue.
+   1. Propose a problem to be solved, a solution and a bounty.
+      - Bounties are only paid in Bitcoin Cash.
+      - Bounties are typically denominated in USD.
+      - BCH conversion rates are determined at the time of transfer, typically by the Electron Cash wallet's price source.
+   1. Review and revise the proposal with the maintainers.
+   1. Flipstarter team pays the bounty from public donations after a successful review, revision and merge process.
+1. Create an MR with the proposed changes.
+1. Work with maintainers to review and revise the proposed changes.
+1. Maintainers merge changes if/when they meet Flipstarter needs.
+
 
 #### Edit front-end
 
