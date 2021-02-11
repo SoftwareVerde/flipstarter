@@ -59,14 +59,14 @@ General guidelines:
 Suggested workflow:
 
 1. Find or create an issue describing a need or problem that needs to be solved.
-1. [Optional] If you are interested in a bounty, please follow this guideline. Generally speaking, there should be no expectation of a bounty until the maintainers agree on the details and content.
+1. [Optional] If you are interested in a bounty, please follow this guideline. Please note that although maintainers try to be realistic about bounty expectations, sometimes MRs are not accepted, and final payout of a bounty depends only on approval and merge of changes.
     1. Create a thread on the issue to discuss your proposal and bounty.
     1. Propose a problem to be solved (any clarification to the issue), the outline of a solution and a bounty.
         - Bounties are only paid in Bitcoin Cash.
         - Bounties are typically denominated in USD.
         - BCH conversion rates are determined at the time of transfer, typically by the Electron Cash wallet's price source.
     1. Review and revise the proposal with the maintainers.
-    1. Flipstarter team pays the bounty from public donations after a successful review, revision and merge process.
+    1. Flipstarter team pays the bounty from public donations only after a successful review, revision and merge process.
 1. Create a Merge/Pull Request with the proposed changes.
 1. Work with maintainers to review and revise the proposed changes.
 1. Maintainers merge changes if/when they meet Flipstarter needs.
