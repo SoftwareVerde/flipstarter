@@ -1,0 +1,66 @@
+{
+  "siteIntro": "تمويل البنية التحتية لبيتكوين كاش أمر مهم، وتنوع البنى يزيد صلابة المنظومة. يقدم Flipstarter طريقة لأي مشروع للوصول إلى الداعمين المتوقعين بطريقة تشجع على المسؤولية بالنسبة للمشاريع وتنصف الداعمين.",
+
+  "linkWhatIs": "ماهو فليب ستارتر",
+  "linkHowTo": "كيف أساهم في هذه الحملة",
+  "linkFAQ": "أسئلة شائعة",
+
+  "pendingLabel": "يبدأ",
+  "expiresLabel": "ينتهي",
+  "expiredLabel": "فات",
+  "fullfilledLabel": "أنجز",
+  "recipientsLabel": "المتلقون",
+  "contributorsLabel": "المساهمون",
+  "contributorEmpty1": "لم يتعهد أحد بعد.",
+  "contributorEmpty2": "يمكنك أن تكون الأول.",
+
+  "donateText": "تعهد",
+  "fullfillText": "تمّ",
+
+  "usernameLabel": "الاسم (اختياري)",
+  "commentLabel": "تعليق (اختياري)",
+  "copyLabel": "1. نسخ التفاصيل",
+  "copyButton": "انسخ التفاصيل",
+  "downloadText": "نزّل",
+  "instructionsLabel": "2. أعدًّّ تعهدا",
+  "instructions": "ثبت إضافة محفظة الكترون كاش واستخدم لسان فليب ستارتر لإعداد تعهدك.",
+  "instructionLink": "تعليمات",
+  "commitLabel": "3. لصق تعهد",
+  "commitButton": "قدّم تعهداً",
+  "PasteHere": "ألصق هنا",
+
+  "statusContribution": "شكرا على مساهمتك.",
+  "statusPending": "لم تبدأ الحملة بعد.",
+  "statusFullfilled": "الحملة قد موّلت.",
+  "statusExpired": "انقضى وقت الحملة بلا تمويل.",
+
+  "shareAction": "شارك!",
+  "shareTitle": "فليب ستارتر",
+  "shareText": "وقت الاحتفال!",
+  "celebrateAction": "احتفل!",
+
+  "changeLanguage": "اختر لغة",
+
+  "statusParsing": "التحقق من التعهد...",
+  "statusRetrying": "بانتظار معاملة التعهد...",
+  "statusFailedStructure": "رجاء أعد تحميل الصفحة وحاول مجدداً. عثرنا على مشكلة في بنية البيانات المقدمة وتعذر علينا معالجتها.",
+  "statusFailedIntent": "رجاء أعد تحميل الصفحة وحاول مجدداً. عذرا واجهتنا مشكلة في مطابقة بيانات التعهد الأصلية مع البيانات المقدمة، ولم يمكننا معالجتها.",
+  "statusFailedUnknown": "رجاء أعد تحميل الصفحة وحاول مجدداً. عذرا لقد واجهنا خطأ غير متوقع:",
+
+  "footerLabel": "من نحن",
+  "footerText": "نحن مجموعة من المتطوعين نعتقد بأنه من المهم إنشاء وسيلة ذات استمرارية للتمويل التطوعي. فليب ستاتر هو مثال لكيفية جمع تمويل دون وصاية بأقل درجة من التوكل.",
+
+  "socialLabel": "اجتماعي",
+  "contactLabel": "تواصل",
+  "codeLabel": "النص البرمجي",
+
+  "twitter": "تويتر",
+  "read.cash": "Read.cash",
+  "email": "بريد",
+  "security": "الأمن",
+  "source": "النص البرمجي",
+  "issues": "علل",
+
+  "copyright": "حقوق الموقع والأصول محفوظة للمؤلفين في 2020، رُخص باستخدامه للعامة تحت",
+  "license": "رخصة MIT."
+}

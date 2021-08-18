@@ -6,6 +6,7 @@ require("moment/locale/en-gb.js");
 require("moment/locale/zh-cn.js");
 require("moment/locale/ja.js");
 require("moment/locale/es.js");
+require("moment/locale/ar.js");
 
 // Load the marked library to parse markdown text,
 const marked = require("marked");
@@ -142,6 +143,12 @@ class flipstarter {
       .addEventListener(
         "click",
         this.updateTranslation.bind(this, "es", "Spanish")
+      );
+    document
+      .getElementById("translateArabic")
+      .addEventListener(
+        "click",
+        this.updateTranslation.bind(this, "ar", "Arabic")
       );
 
     // Get the main language from the browser.
@@ -592,6 +599,7 @@ class flipstarter {
       zh: "Chinese",
       ja: "Japanese",
       es: "Spanish",
+      ar: "Arabic",
     };
 
     // Make a list of moment locales to use for each language.
@@ -600,6 +608,7 @@ class flipstarter {
       zh: "zh-cn",
       ja: "ja",
       es: "es",
+      ar: "ar",
     };
 
     // Make a list of currencies to use for each language.
