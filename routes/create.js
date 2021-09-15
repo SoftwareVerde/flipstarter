@@ -96,6 +96,7 @@ const initCapampaign = async function (req, res) {
   writeDescription("zh", req.body.abstractZH, req.body.proposalZH);
   writeDescription("es", req.body.abstractES, req.body.proposalES);
   writeDescription("ja", req.body.abstractJA, req.body.proposalJA);
+  writeDescription("ar", req.body.abstractAR, req.body.proposalAR);
 
   // IMPORTANT: do not let the user access this page again
   // and redirect to home if they try

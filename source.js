@@ -563,6 +563,7 @@ class flipstarter {
       zh: true,
       ja: true,
       es: true,
+      ar: true
     };
 
     // If the requested language has a translation..
@@ -617,6 +618,7 @@ class flipstarter {
       zh: "CNY",
       ja: "JPY",
       es: "EUR",
+      ar: "USD"
     };
 
     // If the requested language has a translation..
