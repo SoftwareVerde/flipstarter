@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "async-mutex": "^0.1.4",
-    "better-sqlite3": "^5.4.3",
+    "better-sqlite3": "^7.4.3",
     "bitbox-sdk": "^8.11.2",
     "canvas-confetti": "^1.2.0",
     "cors": "^2.8.5",

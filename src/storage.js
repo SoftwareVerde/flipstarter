@@ -10,7 +10,6 @@ module.exports = function (app) {
 
   // Open the database in read-write mode.
   app.sql = new Database(app.config.server.database, {
-    memory: false,
     readonly: false,
   });
 
