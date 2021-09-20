@@ -1,13 +1,12 @@
 // Load the moment library to better manage time.
 const moment = require("moment");
 
+// Load languages.json
+const languages = require("./static/ui/languages.json");
 // Load the locales we will use.
-require("moment/locale/en-gb.js");
-require("moment/locale/zh-cn.js");
-require("moment/locale/ja.js");
-require("moment/locale/es.js");
-require("moment/locale/ar.js");
-
+for(let lang in languages) {
+  require("moment/locale/" + languages[lang].momentLocales + ".js");
+}
 // Load the marked library to parse markdown text,
 const marked = require("marked");
 
@@ -68,6 +67,9 @@ const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
 //
 class flipstarter {
   constructor() {
+    // Set languages in this class
+    this.languages = languages;
+
     // Get the main language from the browser.
     const language = window.navigator.language.slice(0, 2);
 
@@ -119,37 +121,31 @@ class flipstarter {
       .getElementById("commitment")
       .addEventListener("keyup", this.updateCommitButton.bind(this));
 
-    //
-    document
-      .getElementById("translateEnglish")
-      .addEventListener(
-        "click",
-        this.updateTranslation.bind(this, "en", "English")
-      );
-    document
-      .getElementById("translateChinese")
-      .addEventListener(
-        "click",
-        this.updateTranslation.bind(this, "zh", "Chinese")
-      );
-    document
-      .getElementById("translateJapanese")
-      .addEventListener(
-        "click",
-        this.updateTranslation.bind(this, "ja", "Japanese")
-      );
-    document
-      .getElementById("translateSpanish")
-      .addEventListener(
-        "click",
-        this.updateTranslation.bind(this, "es", "Spanish")
-      );
-    document
-      .getElementById("translateArabic")
-      .addEventListener(
-        "click",
-        this.updateTranslation.bind(this, "ar", "Arabic")
-      );
+    for (let lang in this.languages) {
+      let { buttonColor } = this.languages[lang];
+      document.getElementById("languageList").innerHTML += `
+      <li>
+        <a
+        class="btn-floating"
+        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
+        id="translate-${lang}">
+          ${lang}
+        </a>
+      </li>
+      `;
+    }
+    for (let lang in this.languages) {
+      document
+        .getElementById("translate-" + lang)
+        .addEventListener(
+          "click",
+          this.updateTranslation.bind(
+            this,
+            lang,
+            this.languages[lang].name
+          )
+        );
+    }
 
     // Get the main language from the browser.
     const language = window.navigator.language.slice(0, 2);
@@ -558,14 +554,11 @@ class flipstarter {
     let languageCode = "en";
 
     // Make a list of availabe languages.
-    const availableLanguages = {
-      en: true,
-      zh: true,
-      ja: true,
-      es: true,
-      ar: true
-    };
+    const availableLanguages = {};
 
+    Object.keys(this.languages).forEach((lang) => {
+      availableLanguages[lang] = this.languages[lang];
+    });
     // If the requested language has a translation..
     if (typeof availableLanguages[locale] !== "undefined") {
       // Overwrite the default language with the users langauge code.
@@ -595,32 +588,22 @@ class flipstarter {
     let languageCurrencyCode = "USD";
 
     // Make a list of supported translations.
-    const languages = {
-      en: "English",
-      zh: "Chinese",
-      ja: "Japanese",
-      es: "Spanish",
-      ar: "Arabic",
-    };
+    const languages = {};
 
+    Object.keys(this.languages).forEach((lang) => {
+      languages[lang] = this.languages[lang].name;
+    });
     // Make a list of moment locales to use for each language.
-    const momentLocales = {
-      en: "en-gb",
-      zh: "zh-cn",
-      ja: "ja",
-      es: "es",
-      ar: "ar",
-    };
+    const momentLocales = {};
 
+    Object.keys(this.languages).forEach((lang) => {
+      momentLocales[lang] = this.languages[lang].momentLocales;
+    });
     // Make a list of currencies to use for each language.
-    const currencies = {
-      en: "USD",
-      zh: "CNY",
-      ja: "JPY",
-      es: "EUR",
-      ar: "USD"
-    };
-
+    const currencies = {};
+    Object.keys(this.languages).forEach((lang) => {
+      currencies[lang] = this.languages[lang].currency;
+    });
     // If the requested language has a translation..
     if (typeof languages[locale] !== "undefined") {
       // Overwrite the default language.

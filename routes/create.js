@@ -4,6 +4,7 @@ const router = express.Router();
 const app = require("../server.js");
 const moment = require("moment");
 const fs = require("fs");
+const languages = require("../static/ui/languages.json");
 
 const renderer = require("../src/renderer.js");
 
@@ -92,11 +93,9 @@ const initCapampaign = async function (req, res) {
   }
 
   // Write in /static/campaigns
-  writeDescription("en", req.body.abstract, req.body.proposal);
-  writeDescription("zh", req.body.abstractZH, req.body.proposalZH);
-  writeDescription("es", req.body.abstractES, req.body.proposalES);
-  writeDescription("ja", req.body.abstractJA, req.body.proposalJA);
-  writeDescription("ar", req.body.abstractAR, req.body.proposalAR);
+  for(let langaugeCode in languages) {
+    writeDescription(langaugeCode, req.body["abstract" + langaugeCode.toUpperCase()], req.body["proposal" + langaugeCode.toUpperCase()]);
+  }
 
   // IMPORTANT: do not let the user access this page again
   // and redirect to home if they try

@@ -111,3 +111,47 @@ function validateForm() {
     $("#error").removeClass("d-none");
   }
 }
+
+// Add languages tap
+async function addLanguages() {
+  let req = await fetch("/static/ui/languages.json");
+  let languages = await req.json();
+  // Start add tags
+  for (let lang in languages) {
+    let language = languages[lang];
+
+    $("#nav-tab").append(`
+      <a
+        class="nav-item nav-link"
+        id="${language.name}-tab"
+        data-toggle="tab"
+        href="#${language.name}"
+        role="tab"
+        aria-controls="${language.name}"
+        aria-selected="false"
+      >
+        ${language.name} ${language.unicode}
+      </a>
+    `);
+
+    lang = lang.toUpperCase();
+    let required = lang === "EN" ? 'required' : '';
+    
+    $("#nav-item").append(`
+      <div class="tab-pane fade" id="${language.name}" role="tabpanel" aria-labelledby="${language.name}-tab">
+        <div class="form-group">
+          <label for="abstract${lang}">Project Abstract <small>(Markdown Format Supported)</small></label>
+          <textarea class="form-control" id="abstract${lang}" name="abstract${lang}" rows="4" ${required}></textarea>
+        </div>
+        <div class="form-group">
+          <label for="proposal${lang}">Project Proposal <small>(Markdown Format Supported)</small></label>
+          <textarea class="form-control" id="proposal${lang}" name="proposal${lang}" rows="4"></textarea>
+        </div>
+      </div>
+    `);
+  }
+}
+
+addLanguages().then((e) => {
+  $("#English-tab").click();
+});

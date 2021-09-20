@@ -1,0 +1,37 @@
+{
+  "en": {
+    "name": "English",
+    "momentLocales": "en-gb",
+    "currency": "USD",
+    "unicode": "🇬🇧",
+    "buttonColor": "#7b1fa2"
+  },
+  "zh": {
+    "name": "Chinese",
+    "momentLocales": "zh-cn",
+    "currency": "CNY",
+    "unicode": "🇨🇳",
+    "buttonColor": "#C2185B"
+  },
+  "es": {
+    "name": "Spanish",
+    "momentLocales": "es",
+    "currency": "EUR",
+    "unicode": "🇪🇸",
+    "buttonColor": "#E53935"
+  },
+  "ja": {
+    "name": "Japanese",
+    "momentLocales": "ja",
+    "currency": "JPY",
+    "unicode": "🇯🇵",
+    "buttonColor": "#F57C00"
+  },
+  "ar": {
+    "name": "Arabic",
+    "momentLocales": "ar",
+    "currency": "USD",
+    "unicode": "🇸🇦",
+    "buttonColor": "#2196F3"
+  }
+}
