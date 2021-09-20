@@ -88,6 +88,10 @@ To edit the main application script, edit `/source.js` and run `/webpack.sh` to 
 
 ⚠️ Do NOT edit `application.js` directly ⚠️
 
+##### add new languages
+
+[How you can add new languages](./static/ui/languages.md)
+
 ## Deploy to production
 
 There are multiple ways to do this.
