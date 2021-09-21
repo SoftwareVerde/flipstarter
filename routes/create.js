@@ -56,16 +56,10 @@ const initCapampaign = async function (req, res) {
   req.app.debug.server("Init campaign from " + req.ip);
 
   // Convert date to EPOCH
-  const start_year = req.body.start_year;
-  const start_month = req.body.start_month;
-  const start_day = req.body.start_day;
-  let start_date = moment(start_year + "-" + start_month + "-" + start_day);
+  let start_date = moment(req.body.start_date);
   start_date = start_date.unix();
 
-  const end_year = req.body.end_year;
-  const end_month = req.body.end_month;
-  const end_day = req.body.end_day;
-  let end_date = moment(end_year + "-" + end_month + "-" + end_day);
+  let end_date = moment(req.body.end_date);
   end_date = end_date.unix();
 
   // Actually initialize the campaign with the POST data
