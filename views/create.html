@@ -110,7 +110,9 @@
           <hr>
           <p>Please check that everything is correct, you will not be able to edit your campaign later on.</p>
           <!-- Error message -->
-          <p class="alert alert-danger d-none" id="error">Some fields are incorrect.</p>
+          <div class="alert alert-danger d-none" id="error">
+            <!-- It will be generated from javascript -->
+          </div>
           <!-- Submit button -->
           <button class="btn btn-primary btn-lg btn-block" onclick="validateForm()" type="button">Create</button>
         </form>
