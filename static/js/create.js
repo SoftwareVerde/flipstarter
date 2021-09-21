@@ -130,12 +130,12 @@ function validateForm() {
   } else {
     $("#error").removeClass("d-none");
     $("#error").html(
-    `<p>Some fields are incorrect, maybe</p>
+    `<p>Some fields are incorrect,</p>
       <ul>
-        ${!valid.blank ? "<li> Fields blank </li>" : ""}
-        ${!valid.date ? "<li> date range is incorrect </li>" : ""}
-        ${!valid.url ? "<li> Some links are incorrect </li>" : ""}
-        ${!valid.address ? "<li> Some Wallet address are incorrect </li>" : ""}
+        ${!valid.blank ? "<li> Blank field </li>" : ""}
+        ${!valid.date ? "<li> Date range is incorrect </li>" : ""}
+        ${!valid.url ? "<li> One or more link address is incorrect </li>" : ""}
+        ${!valid.address ? "<li> One or more wallet address is invalid </li>" : ""}
       </ul>
       </p>`
     );
