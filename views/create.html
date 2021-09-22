@@ -11,9 +11,6 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/static/css/create.css">
 
-  <!-- Data picker plugin CSS -->
-  <link rel="stylesheet" href="/static/plugins/datepicker/datepicker.min.css">
- 
   <title>Create a campaign</title>
 </head>
 
@@ -35,14 +32,67 @@
           </div>
           <!-- /Title -->
           <hr>
-          <!-- Date -->
-          <h4 class="my-3">Date range <small>(UTC±00:00)</small></h4>
-          <div class="input-group">
-            <input type="text" name="start_date" id="start_date" placeholder="Start date" aria-label="First name" class="form-control start-date" autocomplete="off" required>
-            <input type="text" name="end_date" id="end_date" placeholder="End date" aria-label="Last name" class="form-control end-date" autocomplete="off" required>
+          <!-- Start Date -->
+          <p class="h4">Start Date <small>(UTC±00:00)</small></p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="start_year">Year</label>
+              <input type="number" class="form-control date-input" id="start_year" name="start_year" required>
+            </div>
+            <div class="form-group col-4">
+              <label for="start_month">Month</label>
+              <select class="form-control" id="start_month" name="start_month">
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="start_day">Day</label>
+              <input type="number" class="form-control date-input" id="start_day" name="start_day" required>
+            </div>
           </div>
+          <!-- /Start Date -->
           <hr>
-          <!-- / Date -->
+          <!-- End Date -->
+          <p class="h4">End Date <small>(UTC±00:00)</small></p>
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="end_year">Year</label>
+              <input type="number" class="form-control date-input" id="end_year" name="end_year" required>
+            </div>
+            <div class="form-group col-4">
+              <label for="end_month">Month</label>
+              <select class="form-control" id="end_month" name="end_month" required>
+                <option value="1">1 - January</option>
+                <option value="2">2 - February</option>
+                <option value="3">3 - March</option>
+                <option value="4">4 - April</option>
+                <option value="5">5 - May</option>
+                <option value="6">6 - June</option>
+                <option value="7">7 - July</option>
+                <option value="8">8 - August</option>
+                <option value="9">9 - September</option>
+                <option value="10">10 - October</option>
+                <option value="11">11 - November</option>
+                <option value="12">12 - December</option>
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label for="end_day">Day</label>
+              <input type="number" class="form-control date-input" id="end_day" name="end_day" required>
+            </div>
+          </div>
+          <!-- /End Date -->
           <!-- Recipients -->
           <div id="recipients">
             <p class="h4">Recipients</p>
@@ -120,13 +170,12 @@
     </div>
   </section>
 
-  <!-- JS, Popper.js, and jQuery , Date picker -->
+  <!-- JS, Popper.js, and jQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.9/dist/bchaddrjs-0.4.9.min.js" crossorigin="anonymous"></script>
   <script src="/static/js/create.js"></script>
-  <script src="/static/plugins/datepicker/datepicker.min.js"></script>
 
 </body>
 </html>

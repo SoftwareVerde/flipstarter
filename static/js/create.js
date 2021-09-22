@@ -47,6 +47,13 @@ $("#recipients").on("click", ".remove", function() {
   index--;
 });
 
+// Prevent letters in date inputs
+$(".date-input").on("keypress", function(evt) {
+  if (evt.which < 48 || evt.which > 57) {
+    evt.preventDefault();
+  }
+});
+
 // Allow only numbers and dot in goal input
 $(".goal-input").on("keypress", function(evt) {
   if (evt.which < 46 || evt.which > 57 || evt.which === 47) {
@@ -184,23 +191,4 @@ async function addLanguages() {
 
 addLanguages().then((e) => {
   $("#English-tab").click();
-});
-
-$(function() {
-  var $startDate = $('.start-date');
-  var $endDate = $('.end-date');
-
-  $startDate.datepicker({
-    autoHide: true,
-    format: 'yyyy-mm-dd'
-  });
-  $endDate.datepicker({
-    autoHide: true,
-    startDate: $startDate.datepicker('getDate'),
-    format: 'yyyy-mm-dd'
-  });
-
-  $startDate.on('change', function () {
-    $endDate.datepicker('setStartDate', $startDate.datepicker('getDate'));
-  });
 });
