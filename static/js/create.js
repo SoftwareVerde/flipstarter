@@ -72,6 +72,8 @@ function validateURL(textval) {
 function validateForm() {
   var formValid = true;
   var inputValid = true;
+  var startDate = ()=> $("#start_year").val() + "-" + $("#start_month").val() + "-" + $("#start_day").val();
+  var endDate = ()=> $("#end_year").val() + "-" + $("#end_month").val() + "-" + $("#end_day").val();
   var valid = {
     blank : true,
     url : true,
@@ -125,7 +127,46 @@ function validateForm() {
             formValid = false;
           }
         }
+
+        // Test year
+        if($(this).hasClass('check_year')){
+          var year = $('year').val()
+          if(year < 1000 || year > 3000){
+            valid.date = false;
+            inputValid = false;
+            formValid = false;
+          }
+        }
+
+        // Test day
+        if($(this).hasClass('check_day')){
+          var year = parseInt($('#' + $(this).data('range') + '_year').val());
+          var day = parseInt($(this).val());
+          var month = parseInt($('#' + $(this).data('range') + '_month').val());
+          if(year || day || year < 1000 || year > 3000){
+            valid.date = false;
+            inputValid = false;
+            formValid = false;
+          }else {
+            // convert from d to dd
+            $(this).val((day < 10) ? '0' + day : day.toString());
+
+            var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+            // Adjust for leap years
+            if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)){
+              monthLength[1] = 29;
+            }
+  
+            if(!(day > 0 && day <= monthLength[month - 1])){
+              valid.date = false;
+              inputValid = false;
+              formValid = false;
+            }
+          }
+        }
       }
+      
       // After all validation
       if (!inputValid) {
         $(this).addClass('border-danger text-danger');
