@@ -143,7 +143,7 @@ function validateForm() {
           var year = parseInt($('#' + $(this).data('range') + '_year').val());
           var day = parseInt($(this).val());
           var month = parseInt($('#' + $(this).data('range') + '_month').val());
-          if(year || day || year < 1000 || year > 3000){
+          if(!year || !day || year < 1000 || year > 3000){
             valid.date = false;
             inputValid = false;
             formValid = false;
