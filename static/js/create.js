@@ -130,7 +130,7 @@ function validateForm() {
 
         // Test year
         if($(this).hasClass('check_year')){
-          var year = $('year').val()
+          var year = $(this).val()
           if(year < 1000 || year > 3000){
             valid.date = false;
             inputValid = false;
