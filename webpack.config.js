@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const path = require("path");
 
 module.exports = {
   mode: "development",
@@ -6,7 +7,11 @@ module.exports = {
   // Add your application's scripts below
   entry: ["./source.js"],
   output: {
-    filename: "./static/js/application.js",
+    path: path.join(__dirname, "./static/js/"), // eslint-disable-line
+    filename: "application.js"
   },
-  plugins: [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)],
+  plugins: [new webpack.IgnorePlugin({
+    resourceRegExp: /^\.\/locale$/,
+    contextRegExp: /moment$/,
+  })]
 };
