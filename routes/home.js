@@ -4,6 +4,8 @@ const router = express.Router();
 const app = require("../server.js");
 
 const renderer = require("../src/renderer.js");
+const fs = require("fs");
+const marked = require("marked");
 
 // Wrap the campaign request in an async function.
 const home = async function (req, res) {
@@ -15,10 +17,17 @@ const home = async function (req, res) {
     return res.redirect("/create");
   }
 
-  // Render HTML
-  renderer.view("index.html", res);
-  res.end();
+  let description = fs.readFileSync("./static/campaigns/1/en/abstract.md").toString();
 
+  // Render HTML
+  renderer.view("index.html", res, {
+    "<!-- campaign.title -->":  req.app.queries.getCampaign.get({
+      campaign_id: 1,
+    }).title,
+    "<!-- campaign.description -->":  marked(description).replace(/<[^>]*>?/gm, "").trim(),
+  });
+
+  res.end();
   // Notify the server admin that a campaign has been requested.
   req.app.debug.server("Home page delivered to " + req.ip);
 };
