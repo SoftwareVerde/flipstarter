@@ -24,7 +24,7 @@
     "dompurify": "^2.3.2",
     "electrum-cash": "^2.0.8",
     "express": "^4.17.1",
-    "express-sse": "^0.5.3",
+    "express-sse": "^0.5.1",
     "marked": "^3.0.4",
     "materialize-css": "^1.0.0",
     "moment": "^2.29.1",
