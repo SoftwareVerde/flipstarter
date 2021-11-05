@@ -34,3 +34,36 @@ a:hover, .btn-link:hover {
     max-width: 922px;
   }
 }
+
+label {
+  padding: .5rem 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.modal.show {
+  display: block;
+}
+
+/* slide fade transition*/
+.slide-fade-enter-active {
+  transition: opacity .5s;
+}
+
+.slide-fade-enter {
+  opacity: 0;
+}
+
+.slide-fade-leave-active {
+  display: none;
+}
+
+/* fade transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
