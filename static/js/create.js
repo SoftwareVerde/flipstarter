@@ -35,6 +35,10 @@ async function init() {
     },
     campaign: {
       title: "",
+      track: {
+        name: "",
+        url: "",
+      },
       recipients: [],
       date: {
         start: new Date().toISOString().split("T")[0],

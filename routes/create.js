@@ -65,8 +65,11 @@ const initCapampaign = async function (req, res) {
   end_date = end_date.unix();
 
   // Actually initialize the campaign with the POST data
+  let track_name =  req.body.track_name.trim() || req.body.track_url;
   app.queries.addCampaign.run({
     title: req.body.title,
+    track_name,
+    track_url: req.body.track_url,
     starts: Number(start_date),
     expires: Number(end_date),
   });

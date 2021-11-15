@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS campaigns
 (
 	campaign_id INTEGER NOT NULL,
 	title TEXT NOT NULL,
+	track_name TEXT NOT NULL,
+	track_url TEXT NOT NULL,
 	starts INTEGER NOT NULL,
 	expires INTEGER NOT NULL,
 	PRIMARY KEY (campaign_id)

@@ -174,6 +174,11 @@ class flipstarter {
     this.updateRecipientCount(this.campaign.recipients.length);
     this.updateCampaignProgressCounter();
 
+    // Add track delivery url
+    let track_delivery = document.querySelector("#track-delivery");
+    track_delivery.textContent = this.campaign.track_name;
+    track_delivery.href = this.campaign.track_url;
+
     // Add each recipient to the fundraiser.
     for (const recipientIndex in fundraiser.recipients) {
       const recipientAmount = Number(
