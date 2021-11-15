@@ -44,6 +44,35 @@
               </div>
           </div>
           <!-- /End Date -->
+          <br>
+          <!-- Start track delivery -->
+          <p class="h4 pb-2">Track Delivery</p>
+          <p>Tell your donors where they can track your progress when funding is complete.</p>
+          <div class="row text-muted">
+            <div class="form-group col-lg-6">
+              <label for="track_name">Track Delivery Name <small>(optional)</small></label>
+              <input
+                v-model="campaign.track.name"
+                type="text"
+                class="form-control"
+                id="track_name"
+                name="track_name"
+              >
+            </div>
+            <div class="form-group col-lg-6">
+              <label for="track_url">Track Delivery URL</label>
+              <input
+                v-validate="validate.url"
+                v-model="campaign.track.url"
+                data-vv-name="track url"
+                type="text"
+                class="form-control"
+                id="track_url"
+                name="track_url"
+              >
+            </div>
+          </div>
+          <!-- /End track delivery -->
           <!-- Recipients -->
           <p class="h4 py-2">Recipients</p>
           <div id="recipients" v-for="(recipient , index) in campaign.recipients">
