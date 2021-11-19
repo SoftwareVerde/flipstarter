@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:12.22-alpine3.14
 RUN apk add python make gcc g++ git
 WORKDIR /app
 COPY package.json /app
