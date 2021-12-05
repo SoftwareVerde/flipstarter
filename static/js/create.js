@@ -72,6 +72,7 @@ async function init() {
       recipients.push({
         goal: 0,
         image_url: "",
+        image_file: "",
         name: "",
         website: "",
         address: "",

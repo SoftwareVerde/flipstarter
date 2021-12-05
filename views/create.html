@@ -24,7 +24,7 @@
           <h1 class="my-3">Create a campaign</h1>
         </div>
         <!-- Form -->
-        <form method="POST" action="" id="form" ref="form">
+        <form method="POST" action="" enctype="multipart/form-data" id="form" ref="form">
           <!-- Title -->
           <div class="form-group">
             <label for="title" class="h4">Campaign Title</label>
@@ -94,16 +94,30 @@
                 >
               </div>
               <div class="form-group col-lg-4">
-                <label :for="`image_url[${index}]`">Image URL</label>
-                <input 
-                  v-validate="validate.url" 
-                  v-model="recipient.image_url" 
-                  :data-vv-name="`recipient ${ index + 1 } image URL`" 
-                  type="text" 
-                  class="form-control check-url" 
-                  :id="`image_url[${index}]`" 
-                  :name="`image_url[${index}]`"
-                >
+                <label :for="`image_url[${index}]`">Image</label>
+                <div class="input-group mb-3">
+                  <input
+                    type="text" 
+                    v-validate="{regex : validate.url.regex, required: !recipient.image_file}"
+                    v-model="recipient.image_url"
+                    class="form-control check-url"
+                    :data-vv-name="`recipient ${ index + 1 } image URL`" 
+                    :id="`image_url[${index}]`"
+                    :name="`image_url[${index}]`"
+                    :placeholder="'image : ' + (recipient.image_file.name || 'url')"
+                  >
+                  <input
+                    type="file"
+                    class="d-none"
+                    accept=".png,.jpg,.jpeg,.svg"
+                    :id="`image_file[${index}]`"
+                    :name="`image_file[${index}]`"
+                    @change="recipient.image_file = $event.target.files[0]"
+                  />
+                  <label :for="`image_file[${index}]`" class="btn btn-outline-secondary input-group-text px-3" role="button">
+                    <img src="/static/img/upload.svg" alt="">
+                  </label>
+                </div>
               </div>
               <div class="form-group col-lg-4">
                 <label :for="`recipient_name[${index}]`">Recipient Name</label>
@@ -229,7 +243,7 @@
     </div>
   </section>
   <!-- JS, vue, vee-validate -->
-  <script src="https://unpkg.com/vee-validate@<3.0.0" integrity="sha384-7tFZHb5ob32ZwSaEC/CFJ1xYjmezMB2mJdGpNYo33iPRDAAuRLnDh1DRX0xs6hZt" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/vee-validate@2.2.15/dist/vee-validate.js" integrity="sha384-7tFZHb5ob32ZwSaEC/CFJ1xYjmezMB2mJdGpNYo33iPRDAAuRLnDh1DRX0xs6hZt" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js" integrity="sha384-ULpZhk1pvhc/UK5ktA9kwb2guy9ovNSTyxPNHANnA35YjBQgdwI+AhLkixDvdlw4" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.9/dist/bchaddrjs-0.4.9.min.js" integrity="sha384-C/wey7b4Ij3srh947CFzL96lH77IJNCONg6vahijvotBrYMo+yb0rMNOTMrIaT5l" crossorigin="anonymous"></script>
   <script src="/static/js/create.js"></script>

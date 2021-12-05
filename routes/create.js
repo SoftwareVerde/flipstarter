@@ -5,6 +5,8 @@ const app = require("../server.js");
 const moment = require("moment");
 const fs = require("fs");
 const languages = require("../static/ui/languages.json");
+const multer  = require("multer");
+const upload = multer({ dest: "static/campaigns/.cache" });
 
 const renderer = require("../src/renderer.js");
 
@@ -53,6 +55,37 @@ const initCapampaign = async function (req, res) {
     return res.redirect("/");
   }
 
+  let photoFile = {};
+  for(let index in req.files) {
+    /* filed name default image_file[index] */
+    let file = req.files[index];
+
+    // extract index "i" from "image_file[i]"
+    let recipientStartIndex = file.fieldname.indexOf("[") + 1;
+    let recipientEndIndex = file.fieldname.indexOf("]");
+    if(recipientStartIndex === 0) throw new Error("photo files incorrect");
+    if(recipientEndIndex === -1) throw new Error("photo files incorrect");
+    let recipient = file.fieldname.substring(recipientStartIndex, recipientEndIndex);
+
+    /*
+    * get MIMEtype ex: myavtar.photo.png
+    * split to ["myavtar","photo","png"] then use pop to select last one
+    */
+    let MIMEtype =  file.originalname.split(".").pop();
+    // set new path for images
+    let oldPath = "./static/campaigns/.cache/" + file.filename;
+    let newPath = "./static/campaigns/photo/avatar-" + recipient + "." + MIMEtype;
+    // add new path of image to list to add in database
+    photoFile[recipient] = `/static/campaigns/photo/avatar-${recipient}.${MIMEtype}`;
+    // rename image to new path
+    await new Promise(function (resolve) {
+      fs.rename(oldPath, newPath, function(err) {
+        if (err) throw err;
+        resolve("Rename complete!");
+      });
+    });
+  }
+
   req.app.debug.server("Init campaign from " + req.ip);
 
   // Convert date to EPOCH
@@ -79,7 +112,7 @@ const initCapampaign = async function (req, res) {
   for (let i in users) {
     app.queries.addUser.run({
       user_url: req.body.project_url[i],
-      user_image: req.body.image_url[i],
+      user_image: photoFile[i] || req.body.image_url[i],
       user_alias: req.body.recipient_name[i],
       user_address: req.body.bch_address[i],
       data_signature: null,
@@ -107,6 +140,6 @@ const initCapampaign = async function (req, res) {
 // Call create when this route is requested.
 router.get("/", create);
 // Init when the form is submitted
-router.post("/", initCapampaign);
+router.post("/", upload.any(), initCapampaign);
 
 module.exports = router;
