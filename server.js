@@ -1,9 +1,8 @@
 // Enable support for time management.
 const moment = require("moment");
 
-// Load the bitbox library.
-const bitboxSDK = require("bitbox-sdk");
-const bitbox = new bitboxSDK.BITBOX();
+// Load the libox file.
+const libox = require("./src/libox.js");
 
 class javascriptUtilities {
   /**
@@ -52,6 +51,8 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // Wrap application setup in order to allow async/await.
 const setup = async function () {
+  await libox.init();
+
   // Enable parsing of both JSON and URL-encoded bodies.
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
@@ -179,7 +180,7 @@ const setup = async function () {
           );
 
           // Hash the inputs lockscript to use for requesting UTXOs (Why can't electrum take the UTXO directly and give me info about it???)
-          const inputLockScriptHash = bitbox.Crypto.sha256(inputLockScript);
+          const inputLockScriptHash = libox.Crypto.sha256(inputLockScript);
 
           // Get a list of unspent outputs for the input address.
           const inputUTXOs = await app.electrum.request(
