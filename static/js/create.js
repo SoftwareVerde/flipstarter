@@ -19,7 +19,7 @@ async function init() {
         required: true,
         between: {
           min: 0.0001,
-          max: 1e999,
+          max: 1e999, // eslint-disable-line
         },
       },
       rangeDate: {

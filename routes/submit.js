@@ -8,12 +8,8 @@ const submissionLock = new asyncMutex();
 const express = require("express");
 const router = express.Router();
 
-// Load the bitbox library.
-const bitboxSDK = require("bitbox-sdk");
-const bitbox = new bitboxSDK.BITBOX();
-
-// Load the bitbox backend depency directly to get access to unexposed class necessary for signature verification.
-const ECSignature = require("@bitcoin-dot-com/bitcoincashjs2-lib").ECSignature;
+// Load the libauth box library.
+const libox = require("../src/libox");
 
 // Enable support for time management.
 const moment = require("moment");
@@ -229,7 +225,7 @@ const submitContribution = async function (req, res) {
         );
 
         // Hash the inputs lockscript to use for requesting UTXOs (Why can't electrum take the UTXO directly and give me info about it???)
-        const inputLockScriptHash = bitbox.Crypto.sha256(inputLockScript);
+        const inputLockScriptHash = libox.Crypto.sha256(inputLockScript);
 
         // Get a list of unspent outputs for the input address.
         const inputUTXOs = await req.app.electrum.request(
@@ -266,14 +262,14 @@ const submitContribution = async function (req, res) {
         );
 
         //
-        let previousTransactionOutputIndex = assuranceContract.encodeOutputIndex(
-          currentInput.previous_output_index
-        );
+        let previousTransactionOutputIndex =
+          assuranceContract.encodeOutputIndex(
+            currentInput.previous_output_index
+          );
 
         //
-        const previousTransactionOutputValue = assuranceContract.encodeOutputValue(
-          inputUTXO.value
-        );
+        const previousTransactionOutputValue =
+          assuranceContract.encodeOutputValue(inputUTXO.value);
 
         //
         const previousTransactionUnlockScript = Buffer.from(
@@ -288,20 +284,19 @@ const submitContribution = async function (req, res) {
           previousTransactionOutputValue,
           inputLockScript
         );
+
+        // For now, we only support contributions that come from P2PKH scripts.
         const verificationParts = assuranceContract.parseKeyHashUnlockScript(
           previousTransactionUnlockScript
         );
-        const verificationKey = bitbox.ECPair.fromPublicKey(
-          verificationParts.publicKey
+
+        const verificationStatus = libox.Signature.verifyDER(
+          // remove signature type from last byte
+          Uint8Array.from(verificationParts.signature).slice(0, -1),
+          Uint8Array.from(verificationParts.publicKey),
+          Uint8Array.from(verificationMessage)
         );
-        const verificationSignature = ECSignature.parseScriptSignature(
-          verificationParts.signature
-        ).signature;
-        const verificationStatus = bitbox.ECPair.verify(
-          verificationKey,
-          verificationMessage,
-          verificationSignature
-        );
+
 
         // If the signature verfication failed..
         if (!verificationStatus) {
@@ -386,7 +381,7 @@ const submitContribution = async function (req, res) {
           (remainingValue /
             (commitmentsPerTransaction - currentContributionCount) +
             546 / SATS_PER_BCH) /
-          remainingValue;
+            remainingValue;
         const maxPercent =
           1 -
           ((currentTransactionSize + 1650 + 49) * 1.0) /
@@ -408,7 +403,7 @@ const submitContribution = async function (req, res) {
         (contract.totalContractOutputValue +
           currentMinerFee -
           currentCommittedSatoshis) *
-        (await inputPercentModifier(0.75))
+          (await inputPercentModifier(0.75))
       );
 
       // Verify that the current contribution does not undercommit the contract floor.

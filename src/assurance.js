@@ -1,6 +1,5 @@
-// Load the bitbox library.
-const bitboxSDK = require("bitbox-sdk");
-const bitbox = new bitboxSDK.BITBOX();
+// Load the libox file.
+const libox = require("./libox.js");
 
 class javascriptUtilities {
   /**
@@ -198,7 +197,7 @@ class assuranceContract {
    */
   addOutput(satoshis, address) {
     // Check if the provided address is properly encoded.
-    if (!bitbox.Address.isCashAddress(address)) {
+    if (!libox.Address.isCashAddress(address)) {
       throw `Cannot add output, provided address '${address}' does not use the valid CashAddr encoding.`;
     }
 
@@ -417,7 +416,7 @@ class assuranceContract {
     ]);
     const value = previousTransactionOutputValue;
     const nSequence = Buffer.from("FFFFFFFF", "hex");
-    const hashOutputs = bitbox.Crypto.hash256(
+    const hashOutputs = libox.Crypto.hash256(
       Buffer.concat(transactionOutpoints)
     );
     const nLocktime = Buffer.from("00000000", "hex");
@@ -439,7 +438,7 @@ class assuranceContract {
       nLocktime,
       sighashType,
     ]);
-    const sighashDigest = bitbox.Crypto.hash256(sighashMessage);
+    const sighashDigest = libox.Crypto.hash256(sighashMessage);
 
     //
     return sighashDigest;
@@ -591,7 +590,7 @@ class assuranceContract {
    */
   serializeOutput(address, satoshis) {
     // Check if the provided address is properly encoded.
-    if (!bitbox.Address.isCashAddress(address)) {
+    if (!libox.Address.isCashAddress(address)) {
       // Return false to indicate that we only accept cashaddr encoding.
       return false;
     }
@@ -668,21 +667,21 @@ class assuranceContract {
   }
 
   static getAddressFromLockscript(lockscript) {
-    return bitbox.Address.fromOutputScript(lockscript);
+    return libox.Address.fromOutputScript(lockscript);
   }
 
   getLockscriptFromAddress(address) {
     // Check if the provided address is properly encoded.
-    if (!bitbox.Address.isCashAddress(address)) {
+    if (!libox.Address.isCashAddress(address)) {
       // Return false to indicate that we only accept cashaddr encoding.
       return false;
     }
 
     // Derive the address hash.
-    const hash160 = Buffer.from(bitbox.Address.cashToHash160(address), "hex");
+    const hash160 = Buffer.from(libox.Address.cashToHash160(address), "hex");
 
     // Detect address type.
-    const type = bitbox.Address.detectAddressType(address);
+    const type = libox.Address.detectAddressType(address);
 
     // If the type is a public key hash..
     if (type === "p2pkh") {
