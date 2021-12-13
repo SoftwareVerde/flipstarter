@@ -71,6 +71,9 @@ Suggested workflow:
 1. Work with maintainers to review and revise the proposed changes.
 1. Maintainers merge changes if/when they meet Flipstarter needs.
 
+#### Regarding dependency regressions
+
+- `express-sse@0.5.1`: Ensure that when updating package or package-lock that the version of express-sse remains at `0.5.1` and does not revert to `0.5.3`. Alternatively if express-sse version needs to change, confirm with manual testing that pledges and campaign completion both work. Background: The express-sse dependency has a problem if installed at =0.5.3 or perhaps >0.5.3. An incompatibility happens at runtime and while campaigns are able to start, they are unable to process pledges without intermediate errors, and also completely unable to complete the campaign. See [this thread](https://gitlab.com/flipstarter/backend/-/issues/80#note_720545050) more detail.
 
 #### Edit front-end
 
