@@ -7,6 +7,7 @@ const fs = require("fs");
 const languages = require("../static/ui/languages.json");
 const multer  = require("multer");
 const upload = multer({ dest: "static/campaigns/.cache" });
+const SATS_PER_BCH = 100000000;
 
 const renderer = require("../src/renderer.js");
 
@@ -120,7 +121,7 @@ const initCapampaign = async function (req, res) {
     app.queries.addRecipientToCampaign.run({
       user_id: Number(i) + 1,
       campaign_id: 1,
-      recipient_satoshis: Number(req.body.amount[i]) * 100000000, // to satoshis
+      recipient_satoshis: Math.round(Number(req.body.amount[i]) * SATS_PER_BCH), // to satoshis
     });
   }
 

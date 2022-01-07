@@ -385,7 +385,7 @@ const submitContribution = async function (req, res) {
         const maxPercent =
           1 -
           ((currentTransactionSize + 1650 + 49) * 1.0) /
-          (remainingValue * SATS_PER_BCH);
+          Math.round(remainingValue * SATS_PER_BCH);
 
         // ...
         const minValue = Math.log(minPercent * 100);
