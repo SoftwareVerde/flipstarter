@@ -45,7 +45,7 @@ async function init() {
         end: "",
       },
       abstract: "",
-      social_media: false,
+      default_language: "EN",
     },
   };
 
@@ -53,17 +53,12 @@ async function init() {
     activeLanguage(index) {
       this.languageTap = index;
     },
-    validateForm() {
-      let formValid = true;
-      for (let field in this.fields) {
-        if (!this.fields[field].valid) {
-          formValid = false;
-        }
-      }
+    async validateForm() {
+      const formValid = await this.$validator.validate();
+
       if (formValid) {
         this.$refs.form.submit();
       } else {
-        this.$validator.validate();
         this.error = true;
       }
     },
@@ -83,6 +78,14 @@ async function init() {
       let isValidAddress = bchaddr.isValidAddress(address);
       return isValidAddress && !bchaddr.isLegacyAddress(address);
     },
+    changeMainLanguage(event, lang) {
+      if(event.target.checked) {
+        this.campaign.default_language = lang;
+      }else {
+        // by default we set english default language
+        this.campaign.default_language = "EN";
+      }
+    }
   };
 
   Vue.use(VeeValidate, {
@@ -122,11 +125,11 @@ async function init() {
       let languages = await req.json();
 
       /* upper key languages */
-      let result = {};
       for (let key in languages) {
-        result[key.toUpperCase()] = languages[key];
+        languages[key].abstract = "";
+        languages[key].proposal = "";
+        this.$set(this.languages, key.toUpperCase(), languages[key]);
       }
-      this.languages = result;
 
       this.mounted = false;
     },

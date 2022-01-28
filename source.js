@@ -1,5 +1,7 @@
 // Load the moment library to better manage time.
 const moment = require("moment");
+// set this page languages
+const page_language = document.querySelector("html").lang;
 
 // Load languages.json
 const languages = require("./static/ui/languages.json");
@@ -70,11 +72,8 @@ class flipstarter {
     // Set languages in this class
     this.languages = languages;
 
-    // Get the main language from the browser.
-    const language = window.navigator.language.slice(0, 2);
-
     // Load the initial translation files in the background.
-    this.loadTranslation(language);
+    this.loadTranslation(page_language);
 
     // Once the page is loaded, initialize flipstarter.
     window.addEventListener("load", this.initialize.bind(this));
@@ -121,8 +120,44 @@ class flipstarter {
       .getElementById("commitment")
       .addEventListener("keyup", this.updateCommitButton.bind(this));
 
-    for (let lang in this.languages) {
-      let { buttonColor } = this.languages[lang];
+    // Wait for translations to finish loading..
+    await this.translationLoadingPromise;
+
+    // Wait for currency rates to be loaded..
+    await this.loadCurrencyRates();
+
+    // Fetch the campaign information from the backend.
+    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
+    let fundraiser = await response.json();
+
+    this.campaign = fundraiser.campaign;
+    this.campaign.recipients = fundraiser.recipients;
+    this.campaign.contributions = {};
+
+    // Make object with support languages in this campaign
+    const available_languages = {};
+
+    // Add languages data to campaign languages
+    this.campaign.available_languages.split(",").forEach(
+      (lang) => {
+        available_languages[lang] = this.languages[lang];
+      }
+    );
+
+    const rootPage = location.pathname === "/";
+    // Apply website translation (or load website content).
+
+    if(rootPage && localStorage.getItem("language")) {
+      await this.updateTranslation(localStorage.getItem("language"));
+    }else if(rootPage && available_languages[navigator.language.slice(0, 2)]) {
+      await this.updateTranslation(navigator.language.slice(0, 2));
+    }else {
+      await this.updateTranslation(page_language);
+    }
+
+
+    for (const lang in available_languages) {
+      let { buttonColor } = available_languages[lang];
       document.getElementById("languageList").innerHTML += `
       <li>
         <a
@@ -134,38 +169,21 @@ class flipstarter {
       </li>
       `;
     }
-    for (let lang in this.languages) {
+    for (const lang in available_languages) {
       document
         .getElementById("translate-" + lang)
         .addEventListener(
           "click",
-          this.updateTranslation.bind(
-            this,
-            lang,
-            this.languages[lang].name
-          )
+          () => {
+            localStorage.setItem("language", lang);
+            this.updateTranslation.bind(
+              this,
+              lang,
+              available_languages[lang].name
+            )();
+          }
         );
     }
-
-    // Get the main language from the browser.
-    const language = window.navigator.language.slice(0, 2);
-
-    // Wait for translations to finish loading..
-    await this.translationLoadingPromise;
-
-    // Wait for currency rates to be loaded..
-    await this.loadCurrencyRates();
-
-    // Apply website translation (or load website content).
-    this.applyTranslation(language);
-
-    // Fetch the campaign information from the backend.
-    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
-    let fundraiser = await response.json();
-
-    this.campaign = fundraiser.campaign;
-    this.campaign.recipients = fundraiser.recipients;
-    this.campaign.contributions = {};
 
     // Update the campaign status and timer.
     this.updateTimerPresentation();
@@ -207,6 +225,10 @@ class flipstarter {
     {
       // Fetch the DOM element.
       const languageSelector = document.getElementById("languageSelector");
+
+      if(this.campaign.available_languages.split(",").length === 1) {
+        languageSelector.style.display = "none";
+      }
 
       // Create a function to show the language selector options.
       const showLanguageOptions = function () {
@@ -540,6 +562,13 @@ class flipstarter {
   async updateTranslation(locale = "en") {
     // Hide the language selector.
     document.getElementById("languageSelector").className = "fixed-action-btn";
+
+    // Set url from locale
+    let url = "/" + locale;
+
+
+    // Edit url state
+    history.pushState({}, "", url);
 
     // Load the new translation.
     this.loadTranslation(locale);

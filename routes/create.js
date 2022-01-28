@@ -56,7 +56,7 @@ const initCapampaign = async function (req, res) {
     return res.redirect("/");
   }
 
-  let photoFile = {};
+  const photoFile = {};
   for(let index in req.files) {
     /* filed name default image_file[index] */
     let file = req.files[index];
@@ -89,6 +89,24 @@ const initCapampaign = async function (req, res) {
 
   req.app.debug.server("Init campaign from " + req.ip);
 
+  // unempty languages
+  const available_languages = [];
+
+  // Write in /static/campaigns
+  for(let languageCode in languages) {
+    const abstract = req.body["abstract" + languageCode.toUpperCase()];
+    const proposal = req.body["proposal" + languageCode.toUpperCase()];
+    // Check languages abstract and proposal not empty
+    if(abstract) {
+      available_languages.push(languageCode);
+      writeDescription(
+        languageCode,
+        abstract,
+        proposal
+      );
+    }
+  }
+
   // Convert date to EPOCH
   let start_date = req.body.start_date;
   start_date = moment(start_date);
@@ -104,12 +122,16 @@ const initCapampaign = async function (req, res) {
     title: req.body.title,
     track_name,
     track_url: req.body.track_url,
+    // by default default language send upper case
+    // ex : EN , AR , ....
+    default_language: req.body.default_language.toLowerCase() || "en",
+    // en code array to string
+    available_languages: available_languages.join(","),
     starts: Number(start_date),
     expires: Number(end_date),
   });
   // Add all Users + Recipients
   const users = req.body.recipient_name;
-
   for (let i in users) {
     app.queries.addUser.run({
       user_url: req.body.project_url[i],
@@ -123,11 +145,6 @@ const initCapampaign = async function (req, res) {
       campaign_id: 1,
       recipient_satoshis: Math.round(Number(req.body.amount[i]) * SATS_PER_BCH), // to satoshis
     });
-  }
-
-  // Write in /static/campaigns
-  for(let langaugeCode in languages) {
-    writeDescription(langaugeCode, req.body["abstract" + langaugeCode.toUpperCase()], req.body["proposal" + langaugeCode.toUpperCase()]);
   }
 
   // IMPORTANT: do not let the user access this page again

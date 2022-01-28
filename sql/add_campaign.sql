@@ -3,6 +3,8 @@ INSERT OR ROLLBACK INTO campaigns
     title,
 	starts,
 	track_name,
+	default_language,
+	available_languages,
 	track_url,
 	expires
 )
@@ -11,6 +13,8 @@ VALUES
     :title,
 	:starts,
 	:track_name,
+	:default_language,
+	:available_languages,
 	:track_url,
 	:expires
 )
