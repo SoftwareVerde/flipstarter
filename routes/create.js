@@ -6,7 +6,15 @@ const moment = require("moment");
 const fs = require("fs");
 const languages = require("../static/ui/languages.json");
 const multer  = require("multer");
-const upload = multer({ dest: "static/campaigns/.cache" });
+const upload = multer({
+  dest: "static/campaigns/.cache", // Where to store the files
+  fileFilter: function (req, file, next) {
+    if (!app.freshInstall) {
+      return next(null, false); // Stop upload because campaign created
+    }
+    next(null, true); // Allow upload file
+  }
+});
 const SATS_PER_BCH = 100000000;
 
 const renderer = require("../src/renderer.js");
