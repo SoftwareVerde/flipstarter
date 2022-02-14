@@ -25,11 +25,11 @@
     "electrum-cash": "^2.0.8",
     "express": "^4.17.1",
     "express-sse": "0.5.1",
-    "marked": "^3.0.4",
+    "marked": "^4.0.9",
     "moment": "^2.29.1",
+    "multer": "^1.4.3",
     "webpack": "^5.53.0",
-    "webpack-cli": "^4.8.0",
-    "multer": "^1.4.3"
+    "webpack-cli": "^4.8.0"
   },
   "devDependencies": {
     "eslint": "^8.3.0"

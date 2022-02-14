@@ -664,10 +664,10 @@ class flipstarter {
 
     // Print out the campaign texts.
     document.getElementById("campaignAbstract").innerHTML = DOMPurify.sanitize(
-      marked(campaignIntro)
+      marked.parse(campaignIntro)
     );
     document.getElementById("campaignDetails").innerHTML = DOMPurify.sanitize(
-      marked(campaignDetail)
+      marked.parse(campaignDetail)
     );
 
     // Parse the interface translation.
