@@ -1,4 +1,4 @@
-/* global Vue VeeValidate bchaddr */
+/* global Vue VeeValidate EasyMDE marked bchaddr */
 async function init() {
   let data = {
     languages: {},
@@ -135,6 +135,31 @@ async function init() {
     },
     data,
     methods,
+    directives: {
+      easymde: {
+        inserted: function (el) {
+          const easyMDE = new EasyMDE({
+            element: el,
+            previewRender: (plainText) => {
+              return `<div class="markdown-body">${marked.parse(plainText)}</div>`;
+            },
+            showIcons: ["code", "table"],
+          });
+
+          if(el.dataset.rtl) {
+            easyMDE.codemirror.setOption("direction", "rtl");
+          }
+
+          //
+          easyMDE.codemirror.on("change", () => {
+            el.value = easyMDE.value();
+            // run event input to use it in v-model
+            // https://v2.vuejs.org/v2/guide/components.html#Using-v-model-on-Components
+            el.dispatchEvent(new Event("input"));
+          });
+        },
+      },
+    },
   });
 
   window.vue = app;

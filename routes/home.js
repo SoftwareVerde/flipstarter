@@ -6,7 +6,7 @@ const languages = require("../static/ui/languages.json");
 
 const renderer = require("../src/renderer.js");
 const fs = require("fs");
-const marked = require("marked");
+const { marked } = require("marked");
 
 // Wrap the campaign request in an async function.
 const home = async function (req, res) {
@@ -49,7 +49,7 @@ const home = async function (req, res) {
   renderer.view("index.html", res, {
     "<!-- campaign.title -->": campaign.title,
     // Marked and remove html tags
-    "<!-- campaign.description -->": marked(description)
+    "<!-- campaign.description -->": marked.parse(description)
       .replace(/<[^>]*>?/gm, "")
       .trim(),
     "<!-- campaign.lang -->": lang
