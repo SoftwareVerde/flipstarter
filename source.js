@@ -1,3 +1,5 @@
+const shared = require("./shared.js");
+
 // Load the moment library to better manage time.
 const moment = require("moment");
 // set this page languages
@@ -61,8 +63,6 @@ const base64decode = function (binary) {
 };
 
 //
-const commitmentsPerTransaction = 650;
-const SATS_PER_BCH = 100000000;
 
 const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
 
@@ -200,7 +200,7 @@ class flipstarter {
     // Add each recipient to the fundraiser.
     for (const recipientIndex in fundraiser.recipients) {
       const recipientAmount = Number(
-        fundraiser.recipients[recipientIndex].recipient_satoshis / SATS_PER_BCH
+        fundraiser.recipients[recipientIndex].recipient_satoshis / shared.SATS_PER_BCH
       ).toLocaleString();
       const recipientName = fundraiser.recipients[recipientIndex].user_alias;
       const recipientURL = fundraiser.recipients[recipientIndex].user_url;
@@ -319,7 +319,7 @@ class flipstarter {
           ).textContent = DOMPurify.sanitize(
             (
               this.countCommittedSatoshis(this.campaign.contributions) /
-              SATS_PER_BCH
+              shared.SATS_PER_BCH
             ).toFixed(2)
           );
 
@@ -793,7 +793,7 @@ class flipstarter {
       "campaignRequestAmount"
     ).textContent = DOMPurify.sanitize(
       (
-        this.countRequestedSatoshis(this.campaign.recipients) / SATS_PER_BCH
+        this.countRequestedSatoshis(this.campaign.recipients) / shared.SATS_PER_BCH
       ).toFixed(2)
     );
   }
@@ -955,9 +955,9 @@ class flipstarter {
         (1 - committedSatoshis / requestedSatoshis)
       ).toFixed(2) + "%";
     document.getElementById("donationAmount").textContent =
-      (donationAmount / SATS_PER_BCH).toLocaleString() +
+      (donationAmount / shared.SATS_PER_BCH).toLocaleString() +
       " BCH (" +
-      (this.currencyValue * (donationAmount / SATS_PER_BCH)).toFixed(2) +
+      (this.currencyValue * (donationAmount / shared.SATS_PER_BCH)).toFixed(2) +
       " " +
       this.currencyCode +
       ")";
@@ -972,33 +972,8 @@ class flipstarter {
   }
 
   async inputPercentModifier(inputPercent) {
-    // Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
-    const remainingValue =
-      this.calculateMinerFee() +
-      (this.countRequestedSatoshis(this.campaign.recipients) -
-        this.countCommittedSatoshis(this.campaign.contributions));
-
-    const currentTransactionSize = 42; // this.contract.assembleTransaction().byteLength;
-
-    const minPercent =
-      0 +
-      (remainingValue /
-        (commitmentsPerTransaction - this.campaign.recipients.length) +
-        546 / SATS_PER_BCH) /
-        remainingValue;
-    const maxPercent =
-      1 -
-      ((currentTransactionSize + 1650 + 49) * 1.0) /
-        Math.round(remainingValue * SATS_PER_BCH);
-
-    // ...
-    const minValue = Math.log(minPercent * 100);
-    const maxValue = Math.log(maxPercent * 100);
-
-    // Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
-    return (
-      Math.exp(minValue + (inputPercent * (maxValue - minValue)) / 100) / 100
-    );
+    const remainingValue = this.calculateMinerFee() + (this.countRequestedSatoshis(this.campaign.recipients) - this.countCommittedSatoshis(this.campaign.contributions));
+    return shared.calculateMinimumDonation(inputPercent, this.campaign.recipients.length, remainingValue);
   }
 
   /**
@@ -1213,7 +1188,7 @@ class flipstarter {
     ).toFixed(2);
     const animationLength = 15;
     const animationDelay = (Math.random() * animationLength).toFixed(2);
-    const contributionAmount = (amount / SATS_PER_BCH).toFixed(2);
+    const contributionAmount = (amount / shared.SATS_PER_BCH).toFixed(2);
 
     // Update the data on the copy.
     contributionEntry.querySelector(

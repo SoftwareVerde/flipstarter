@@ -1,3 +1,5 @@
+const shared = require("../shared.js");
+
 // Initialize mutex locking library.
 const asyncMutex = require("async-mutex").Mutex;
 
@@ -16,8 +18,6 @@ const moment = require("moment");
 
 // Enable support for assurance contracts.
 const assuranceContract = require("../src/assurance.js").Contract;
-
-const SATS_PER_BCH = 100000000;
 
 class javascriptUtilities {
   /**
@@ -212,7 +212,7 @@ const submitContribution = async function (req, res) {
         // Store the inputs value.
         const inputSatoshis =
           inputTransaction.vout[currentInput.previous_output_index].value *
-          SATS_PER_BCH;
+          shared.SATS_PER_BCH;
 
         // Add this inputs satoshis to the total amount.
         totalSatoshis += inputSatoshis;
@@ -367,44 +367,12 @@ const submitContribution = async function (req, res) {
 
       // Define a helper function we need to calculate the floor.
       const inputPercentModifier = async function (inputPercent) {
-        const commitmentsPerTransaction = 650;
-
-        // Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
-        const remainingValue =
-          currentMinerFee +
-          (contract.totalContractOutputValue - currentCommittedSatoshis);
-
-        const currentTransactionSize = 42; // this.contract.assembleTransaction().byteLength;
-
-        const minPercent =
-          0 +
-          (remainingValue /
-            (commitmentsPerTransaction - currentContributionCount) +
-            546 / SATS_PER_BCH) /
-            remainingValue;
-        const maxPercent =
-          1 -
-          ((currentTransactionSize + 1650 + 49) * 1.0) /
-          Math.round(remainingValue * SATS_PER_BCH);
-
-        // ...
-        const minValue = Math.log(minPercent * 100);
-        const maxValue = Math.log(maxPercent * 100);
-
-        // Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
-        return (
-          Math.exp(minValue + (inputPercent * (maxValue - minValue)) / 100) /
-          100
-        );
+        const remainingValue = currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis);
+        return shared.calculateMinimumDonation(inputPercent, currentContributionCount, remainingValue);
       };
 
       // Calculate the current floor
-      const currentFloor = Math.ceil(
-        (contract.totalContractOutputValue +
-          currentMinerFee -
-          currentCommittedSatoshis) *
-          (await inputPercentModifier(0.75))
-      );
+      const currentFloor = Math.ceil((contract.totalContractOutputValue + currentMinerFee - currentCommittedSatoshis) * (await inputPercentModifier(0.75)));
 
       // Verify that the current contribution does not undercommit the contract floor.
       if (totalSatoshis < currentFloor) {
