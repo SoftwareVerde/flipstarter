@@ -51,45 +51,6 @@ input[type=range] { border: 0; }
 }
 
 
-/* Material icons packages with icomoon */
-[class^="icon-"], [class*=" icon-"]
-{
-	/* use !important to prevent issues with browser extensions that change fonts */
-	font-family: 'icons' !important;
-	speak: none;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	font-size: 1.5rem;
-	line-height: 1.25;
-	margin-top: -0.15rem;
-
-	/* Better Font Rendering =========== */
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-.icon-report_problem:before { content: "\e900"; }
-.icon-chat:before { content: "\e901"; }
-.icon-chat_bubble_outline:before { content: "\e902"; }
-.icon-email:before { content: "\e903"; }
-.icon-access_time:before { content: "\e904"; }
-.icon-attach_money:before { content: "\e905"; }
-.icon-download:before { content: "\e90e"; }
-.icon-security:before { content: "\e906"; }
-.icon-person_outline:before { content: "\e907"; }
-.icon-bookmark_border:before { content: "\e908"; }
-.icon-code:before { content: "\e909"; }
-.icon-face:before { content: "\e90a"; }
-.icon-favorite_border:before { content: "\e90b"; }
-.icon-info:before { content: "\e90c"; }
-.icon-translate:before { content: "\e90d"; }
-.icon-label:before { content: "\e90f"; }
-.icon-share:before { content: "\e910"; }
-.icon-help:before { content: "\e911"; }
-.icon-nightlife:before { content: "\e912"; }
-
 /** Animations **/
 @keyframes horizontalBackgroundMovement
 {
@@ -409,9 +370,7 @@ hr
 
 }
 
-#donateStatus,
-#donateForm
-{
+#donateStatus {
 	max-height: 10rem;
 }
 #sharingActions
@@ -451,12 +410,10 @@ hr
 
 #donateStatus.hidden,
 #donateForm.hidden,
-#donateSection.hidden
-{
-	opacity: 0;
-	visibility: hidden;
+#donateSection.hidden {
 	margin-top: 0rem;
 	max-height: 0;
+    display: none;
 }
 
 /* Make the range slider handle larger. */
@@ -665,4 +622,62 @@ aside > section > h3
 	             0px 0px 3px white,
 	             0px 0px 2px white,
 	             0px 0px 1px white;
+}
+
+#donateStatus {
+    text-align: center;
+}
+
+#donateForm .input-field {
+    padding: 0;
+    margin-top: -0.5rem;
+    overflow: visible;
+    max-height: none;
+}
+
+#donateForm .input-field:nth-child(2) {
+    text-align: center;
+}
+#donateForm .input-field:nth-child(3) {
+    padding: 0 0.75rem;
+    margin: 0.75rem 0rem;
+}
+
+#donateForm #donateButton {
+    width: 100%;
+    padding: 0;
+    margin: 0rem;
+}
+
+#donateForm .satoshis-container,
+#donateForm .dollars-container {
+    display: flex;
+    align-items: baseline;
+}
+#donateForm .satoshis-container .icon,
+#donateForm .dollars-container .icon {
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+#donateForm .satoshis-container input,
+#donateForm .dollars-container input {
+    width: auto;
+    flex-grow: 1;
+}
+
+#donateForm .input-field i.icon-attach_money {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    text-align: center;
+    opacity: 0.5;
+    font-size: 2.25rem;
+    line-height: 3.25rem;
+}
+
+#donateForm input.slider {
+    height: 3rem;
+    padding: 0;
+    display: block;
+    margin: auto;
 }

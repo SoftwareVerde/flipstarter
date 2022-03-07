@@ -53,6 +53,7 @@
   <!-- -->
   <link rel="icon" href="/static/img/logo.png">
   <link href="/static/css/materialize.min.css" rel="stylesheet">
+  <link href="/static/css/icons.css" rel="stylesheet">
   <link href="/static/css/style.css" rel="stylesheet">
 
   <!-- Website metadata -->
@@ -128,65 +129,30 @@
         <header id="campaignAbstract"></header>
 
         <!-- Campaign donation form -->
-        <fieldset id="donateField" class="row">
-          <div
-          id="donateStatus"
-          class="col s12 m12 l12 hidden"
-          style="text-align: center;"
-          ></div>
+        <fieldset id="donateField">
+          <div id="donateStatus" class="hidden"></div>
 
-          <div id="donateForm" class="col s12 m12 l12 hidden">
-            <div class="input-field col s1 m1 l1" style="padding: 0;">
-              <i
-              style="
-              display: inline-block;
-              width: 3rem;
-              height: 3rem;
-              text-align: center;
-              opacity: 0.5;
-              font-size: 2.25rem;
-              line-height: 3.25rem;
-              "
-              class="icon-attach_money"
-              ></i>
+          <div id="donateForm" class="hidden">
+            <div class="input-field">
+              <div class="dollars-container">
+                <i class="icon icon-dollar"></i>
+                <input type="number" min="0" max="100" value="0" step="1" class="dollars" id="donationDollar" />
+              </div>
+              <div class="satoshis-container">
+                <i class="icon icon-bitcoin"></i>
+                <input type="number" min="0" max="100" value="0" step="0.01" class="satoshis" id="donationBch" />
+              </div>
+              <input type="range" min="0" max="100" value="0" step="1" class="slider" id="donationSlider" />
             </div>
-            <div
-            class="input-field col s11 m5 l6"
-            style="padding: 0; text-align: center;"
-            >
-            <input
-            type="range"
-            min="0"
-            max="100"
-            value="0"
-            step="0.20"
-            class="slider"
-            id="donationSlider"
-            style="
-            height: 3rem;
-            padding: 0;
-            width: calc(100% - 2rem);
-            margin: 0rem;
-            "
-            >
+            <div class="input-field">
+              <button id="donateButton" class="btn waves-effect waves-light green" disabled="disabled">
+                <span id="donateText" data-string="donateText"></span>
+                <span id="donationAmount"></span>
+              </button>
+            </div>
           </div>
-          <div
-          class="input-field col s12 m6 l5"
-          style="padding: 0 0.75rem; margin: 0.75rem 0rem;"
-          >
-          <button
-          id="donateButton"
-          class="btn waves-effect waves-light green"
-          style="width: 100%; padding: 0; margin: 0rem;"
-          disabled="disabled"
-          >
-          <span id="donateText" data-string="donateText"></span>
-          <span id="donationAmount"></span>
-        </button>
-      </div>
-    </div>
 
-    <div id="donateSection" class="col s12 m12 hidden">
+    <div id="donateSection" class="col s12 m12 l12 hidden">
       <div
       class="col"
       style="
