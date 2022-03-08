@@ -1,24 +1,41 @@
 const SATS_PER_BCH = 100000000;
 const MAX_INPUTS_PER_TRANSACTION = 650;
+const MAX_SMALL_DONATION_COUNT = 250;
+const MINIMUM_DONATION_SATOSHI_COUNT = 100000;
 
-// Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
-function calculateMinimumDonation(inputPercent, currentInputCount, remainingValue) {
-  const smallDonationReservedInputCount = 250;
-  const modifiedCurrentInputCount = Math.max(0, (currentInputCount - smallDonationReservedInputCount));
+function calculateMinimumDonation(currentInputs, remainingValue, dollarsPerBch) {
+  const donationCount = (function() {
+    let count = 0;
+    for (let i in currentInputs) {
+      count += 1;
+    }
+    return count;
+  })();
 
-  const minPercent = 0 + (remainingValue / (MAX_INPUTS_PER_TRANSACTION - modifiedCurrentInputCount) + 546 / SATS_PER_BCH) / remainingValue;
-  const maxPercent = 1 - ((42 + 1650 + 49) * 1.0) / Math.round(remainingValue * SATS_PER_BCH);
+  const smallDonationCount = (function() {
+    let count = 0;
+    for (let i in currentInputs) {
+      const input = currentInputs[i];
+      const amount = input.satoshis;
+      if (amount <= MINIMUM_DONATION_SATOSHI_COUNT) {
+        count += 1;
+      }
+    }
+    return count;
+  })();
 
-  // ...
-  const minValue = Math.log(minPercent * 100);
-  const maxValue = Math.log(maxPercent * 100);
+  if (smallDonationCount < MAX_SMALL_DONATION_COUNT) {
+    return Math.min(remainingValue, MINIMUM_DONATION_SATOSHI_COUNT);
+  }
 
-  // Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
-  return (Math.exp(minValue + (inputPercent * (maxValue - minValue)) / 100) / 100);
+  const remainingInputCount = (MAX_INPUTS_PER_TRANSACTION - donationCount);
+  const minimumSatoshis = (remainingValue / remainingInputCount);
+  return Math.min(remainingValue, minimumSatoshis);
 }
 
 module.exports = {
   SATS_PER_BCH,
   MAX_INPUTS_PER_TRANSACTION,
+  MAX_SMALL_DONATION_COUNT,
   calculateMinimumDonation
 };

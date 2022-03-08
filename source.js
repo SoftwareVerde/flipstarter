@@ -96,6 +96,11 @@ class flipstarter {
     this.campaign.recipients = fundraiser.recipients;
     this.campaign.contributions = {};
 
+    // QUIRK: The contributions object is an object instead of an array...
+    for (let i = 0; i < fundraiser.contributions.length; i += 1) {
+        this.campaign.contributions[i] = fundraiser.contributions[i];
+    }
+
     // Make object with support languages in this campaign
     const available_languages = {};
 
@@ -106,6 +111,48 @@ class flipstarter {
       }
     );
 
+    // NOTE: currencyValue is only available after setting the page's locale...
+    const rootPage = location.pathname === "/";
+    if (rootPage && localStorage.getItem("language")) {
+      await this.updateTranslation(localStorage.getItem("language"));
+    }
+    else if (rootPage && available_languages[navigator.language.slice(0, 2)]) {
+      await this.updateTranslation(navigator.language.slice(0, 2));
+    }
+    else {
+      await this.updateTranslation(page_language);
+    }
+
+    // Apply website translation (or load website content).
+    for (const lang in available_languages) {
+      let { buttonColor } = available_languages[lang];
+      document.getElementById("languageList").innerHTML += `
+      <li>
+        <a
+        class="btn-floating"
+        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
+        id="translate-${lang}">
+          ${lang}
+        </a>
+      </li>
+      `;
+    }
+    for (const lang in available_languages) {
+      document
+        .getElementById("translate-" + lang)
+        .addEventListener(
+          "click",
+          () => {
+            localStorage.setItem("language", lang);
+            this.updateTranslation.bind(
+              this,
+              lang,
+              available_languages[lang].name
+            )();
+          }
+        );
+    }
+
     // Attach event handlers.
     const donationSlider = document.getElementById("donationSlider");
     const donationDollarInput = document.getElementById("donationDollar");
@@ -114,8 +161,9 @@ class flipstarter {
     // Set the slider min/max values...
     (function() {
         const remainingValue = _.calculateMinerFee() + (_.countRequestedSatoshis(_.campaign.recipients) - _.countCommittedSatoshis(_.campaign.contributions));
-        
-        donationSlider.setAttribute("min", 0);
+        const minimumDonation = shared.calculateMinimumDonation(_.campaign.contributions, remainingValue, _.currencyValue);
+
+        donationSlider.setAttribute("min", minimumDonation);
         donationSlider.setAttribute("max", remainingValue);
     })();
 
@@ -227,47 +275,6 @@ class flipstarter {
     document
       .getElementById("commitment")
       .addEventListener("keyup", this.updateCommitButton.bind(this));
-
-    const rootPage = location.pathname === "/";
-    // Apply website translation (or load website content).
-
-    if(rootPage && localStorage.getItem("language")) {
-      await this.updateTranslation(localStorage.getItem("language"));
-    }else if(rootPage && available_languages[navigator.language.slice(0, 2)]) {
-      await this.updateTranslation(navigator.language.slice(0, 2));
-    }else {
-      await this.updateTranslation(page_language);
-    }
-
-
-    for (const lang in available_languages) {
-      let { buttonColor } = available_languages[lang];
-      document.getElementById("languageList").innerHTML += `
-      <li>
-        <a
-        class="btn-floating"
-        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
-        id="translate-${lang}">
-          ${lang}
-        </a>
-      </li>
-      `;
-    }
-    for (const lang in available_languages) {
-      document
-        .getElementById("translate-" + lang)
-        .addEventListener(
-          "click",
-          () => {
-            localStorage.setItem("language", lang);
-            this.updateTranslation.bind(
-              this,
-              lang,
-              available_languages[lang].name
-            )();
-          }
-        );
-    }
 
     // Update the campaign status and timer.
     this.updateTimerPresentation();
@@ -852,8 +859,8 @@ class flipstarter {
   async toggleDonationSection(visibility = null) {
     const donateSection = document.getElementById("donateSection");
 
-    if (visibility !== false && ! donateSection.classList.contains("visible")) {
-      donateSection.classList.add("visible");
+    if (visibility !== false && donateSection.classList.contains("hidden")) {
+      donateSection.classList.remove("hidden");
 
       // Make name and comment enabled in case it was disabled as a result of an incomplete previous process.
       document.getElementById("contributionName").disabled = false;
@@ -861,8 +868,9 @@ class flipstarter {
 
       // Disable the action button.
       document.getElementById("donateButton").disabled = true;
-    } else {
-      donateSection.className = "hidden col s12 m12";
+    }
+    else {
+      donateSection.classList.add("hidden");
 
       // Enable the action button.
       document.getElementById("donateButton").disabled = false;
@@ -1039,11 +1047,6 @@ class flipstarter {
 
     // Update the template text.
     this.updateTemplate();
-  }
-
-  async inputPercentModifier(inputPercent) {
-    const remainingValue = this.calculateMinerFee() + (this.countRequestedSatoshis(this.campaign.recipients) - this.countCommittedSatoshis(this.campaign.contributions));
-    return shared.calculateMinimumDonation(inputPercent, this.campaign.recipients.length, remainingValue);
   }
 
   /**
