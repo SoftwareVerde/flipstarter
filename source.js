@@ -96,9 +96,10 @@ class flipstarter {
     this.campaign.recipients = fundraiser.recipients;
     this.campaign.contributions = {};
 
-    // QUIRK: The contributions object is an object instead of an array...
+    // NOTE: The contributions object is a map, not an array.
     for (let i = 0; i < fundraiser.contributions.length; i += 1) {
-        this.campaign.contributions[i] = fundraiser.contributions[i];
+        const contribution = fundraiser.contributions[i];
+        this.campaign.contributions[contribution.contribution_id] = contribution;
     }
 
     // Make object with support languages in this campaign
@@ -161,7 +162,7 @@ class flipstarter {
     // Set the slider min/max values...
     (function() {
         const remainingValue = _.calculateMinerFee() + (_.countRequestedSatoshis(_.campaign.recipients) - _.countCommittedSatoshis(_.campaign.contributions));
-        const minimumDonation = shared.calculateMinimumDonation(_.campaign.contributions, remainingValue, _.currencyValue);
+        const minimumDonation = shared.calculateMinimumDonation(_.campaign.contributions, remainingValue);
 
         donationSlider.setAttribute("min", minimumDonation);
         donationSlider.setAttribute("max", remainingValue);

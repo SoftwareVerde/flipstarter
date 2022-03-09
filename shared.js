@@ -3,7 +3,7 @@ const MAX_INPUTS_PER_TRANSACTION = 650;
 const MAX_SMALL_DONATION_COUNT = 250;
 const MINIMUM_DONATION_SATOSHI_COUNT = 100000;
 
-function calculateMinimumDonation(currentInputs, remainingValue, dollarsPerBch) {
+function calculateMinimumDonation(currentInputs, remainingValue) {
   const donationCount = (function() {
     let count = 0;
     for (let i in currentInputs) {

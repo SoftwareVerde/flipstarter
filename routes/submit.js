@@ -77,6 +77,8 @@ const submitContribution = async function (req, res) {
     req.app.debug.server("New contribution delivered from " + req.ip);
     req.app.debug.object(req.body);
 
+    const campaignId = Number(req.params["campaign_id"]);
+
     // Validate and store contribution.
     try {
       // Parse contribution.
@@ -84,7 +86,7 @@ const submitContribution = async function (req, res) {
 
       // Get the campaign information..
       const campaign = req.app.queries.getCampaign.get({
-        campaign_id: Number(req.params["campaign_id"]),
+        campaign_id: campaignId,
       });
 
       // If there is no matching campaign..
@@ -156,7 +158,7 @@ const submitContribution = async function (req, res) {
 
       // Get a list of all recipients for the campaign.
       const recipients = req.app.queries.listRecipientsByCampaign.all({
-        campaign_id: Number(req.params["campaign_id"]),
+        campaign_id: campaignId,
       });
 
       // Add each recipient as outputs.
@@ -169,15 +171,30 @@ const submitContribution = async function (req, res) {
 
       // Get currently committed information.
       const currentCommittedSatoshis = req.app.queries.getCampaignCommittedSatoshis.get(
-        { campaign_id: Number(req.params["campaign_id"]) }
+        { campaign_id: campaignId }
       ).committed_satoshis;
       const currentContributionCount = req.app.queries.countCommitmentsByCampaign.get(
-        { campaign_id: Number(req.params["campaign_id"]) }
+        { campaign_id: campaignId }
       ).commitment_count;
       const currentMinerFee = calculateMinerFee(
         recipients.length,
         currentContributionCount
       );
+
+      // Get an updates list of contributions.
+      const campaignContributions = req.app.queries.listAllContributions.all();
+
+      // Set up a filter function that..
+      const filterOnCampaign = function (contribution) {
+        // Return true if the contribution has not been revoced AND is from the correct campaign.
+        return (
+          !contribution.revocation_id &&
+          contribution.campaign_id === campaignId
+        );
+      };
+
+      // Filter out irrelevant contributions.
+      const relevantContributions = campaignContributions.filter(filterOnCampaign);
 
       let newCommitments = [];
       let totalSatoshis = 0;
@@ -365,14 +382,9 @@ const submitContribution = async function (req, res) {
         return false;
       }
 
-      // Define a helper function we need to calculate the floor.
-      const inputPercentModifier = async function (inputPercent) {
-        const remainingValue = currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis);
-        return shared.calculateMinimumDonation(inputPercent, currentContributionCount, remainingValue);
-      };
-
-      // Calculate the current floor
-      const currentFloor = Math.ceil((contract.totalContractOutputValue + currentMinerFee - currentCommittedSatoshis) * (await inputPercentModifier(0.75)));
+      // Calculate the minimum donation amount.
+      const remainingValue = currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis);
+      const currentFloor = shared.calculateMinimumDonation(relevantContributions, remainingValue);
 
       // Verify that the current contribution does not undercommit the contract floor.
       if (totalSatoshis < currentFloor) {
@@ -431,7 +443,7 @@ const submitContribution = async function (req, res) {
       const storeContributionResult = req.app.queries.addContributionToCampaign.run(
         {
           user_id: storeUserResult.lastInsertRowid,
-          campaign_id: Number(req.params["campaign_id"]),
+          campaign_id: campaignId,
           contribution_comment: contributionObject.data.comment,
           contribution_timestamp: moment().unix(),
         }
@@ -445,9 +457,6 @@ const submitContribution = async function (req, res) {
         });
       }
 
-      // Get an updates list of contributions.
-      const campaignContributions = req.app.queries.listAllContributions.all();
-
       // Update the initial push for the SSE stream.
       req.app.sse.updateInit(campaignContributions);
 
@@ -458,20 +467,6 @@ const submitContribution = async function (req, res) {
 
       // Push the contribution to the SSE stream.
       req.app.sse.send(contributionData);
-
-      // Set up a filter function that..
-      const filterOnCampaign = function (contribution) {
-        // Return true if the contribution has not been revoced AND is from the correct campaign.
-        return (
-          !contribution.revocation_id &&
-          contribution.campaign_id === Number(req.params["campaign_id"])
-        );
-      };
-
-      // Filter out irrelevant contributions.
-      const relevantContributions = campaignContributions.filter(
-        filterOnCampaign
-      );
 
       // Add relevant contributions to the contract..
       for (const currentContribution in relevantContributions) {
@@ -511,7 +506,7 @@ const submitContribution = async function (req, res) {
             const fullfillmentObject = {
               fullfillment_timestamp: moment().unix(),
               fullfillment_transaction: broadcastResult,
-              campaign_id: Number(req.params["campaign_id"]),
+              campaign_id: campaignId,
             };
 
             // Store the fullfillment in the database.
