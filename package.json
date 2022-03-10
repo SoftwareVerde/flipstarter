@@ -15,7 +15,7 @@
   "author": "Jonathan Silverblood",
   "license": "MIT",
   "dependencies": {
-    "@bitauth/libauth": "^1.18.1",
+    "@bitauth/libauth": "^1.19.1",
     "async-mutex": "^0.3.2",
     "better-sqlite3": "^7.4.3",
     "canvas-confetti": "^1.4.0",
