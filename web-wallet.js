@@ -1,4 +1,5 @@
 const libauth = require("@bitauth/libauth");
+const createQrCode = require("./src/qrcode.js");
 
 window.libauth = libauth;
 
@@ -25,7 +26,25 @@ class Wallet {
         const hash = this._crypto.ripemd160.hash(this._crypto.sha256.hash(publicKey));
         return libauth.encodeCashAddress(libauth.CashAddressNetworkPrefix.mainnet, libauth.CashAddressVersionByte.P2PKH, hash);
     }
-    
+
+    createQrCode(widthPx) {
+        const width = widthPx || 82;
+        const address = this.getAddress();
+
+        const qr = createQrCode(4, "M");
+        qr.addData(address);
+        qr.make();
+        const html = qr.createImgTag();
+
+        const divElement = document.createElement("div");
+        divElement.innerHTML = html;
+        const imgElement = divElement.firstChild;
+
+        imgElement.setAttribute("width", width);
+        imgElement.setAttribute("height", width);
+
+        return imgElement;
+    }
 }
 
 window.Wallet = Wallet;
