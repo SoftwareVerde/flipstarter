@@ -4,33 +4,8 @@ const moment = require("moment");
 // Load the libox file.
 const libox = require("./src/libox.js");
 
-class javascriptUtilities {
-  /**
-   * Reverses a Buffers content
-   *
-   * @param source   the Buffer to reverse
-   *
-   * @returns a new Buffer with the contents reversed.
-   */
-  static reverseBuf(source) {
-    // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
-
-    // Iterate over half of the buffers length, rounded up..
-    for (
-      let lowIndex = 0, highIndex = source.length - 1;
-      lowIndex <= highIndex;
-      lowIndex += 1, highIndex -= 1
-    ) {
-      // .. and swap each position from the beggining to the end.
-      reversed[lowIndex] = source[highIndex];
-      reversed[highIndex] = source[lowIndex];
-    }
-
-    // Return the reversed buffer.
-    return reversed;
-  }
-}
+const websocket = require("./websocket");
+const javascriptUtilities = require("./src/util.js");
 
 // Initialize mutex locking library.
 const asyncMutex = require("async-mutex").Mutex;
@@ -324,7 +299,9 @@ const setup = async function () {
   // app.use('/status', require('./routes/status.js'));
 
   // Listen to incoming connections on port X.
-  app.listen(app.config.server.port, "0.0.0.0");
+  const server = app.listen(app.config.server.port, "0.0.0.0");
+
+  websocket.createServer(app, server);
 
   // Notify user that the service is ready for incoming connections.
   app.debug.status(

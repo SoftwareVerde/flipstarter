@@ -38,7 +38,7 @@ class Wallet {
 
         const divElement = document.createElement("div");
         divElement.innerHTML = html;
-        const imgElement = divElement.firstChild;
+        const imgElement = divElement.firstElementChild;
 
         imgElement.setAttribute("width", width);
         imgElement.setAttribute("height", width);
@@ -48,3 +48,23 @@ class Wallet {
 }
 
 window.Wallet = Wallet;
+
+window.setTimeout(async function() {
+    const wallet = await Wallet.create();
+    const address = wallet.getAddress();
+
+    const subscribeAddress = function() {
+        window.webSocket.send(JSON.stringify({
+            address: address
+        }));
+    };
+
+    if (window.webSocket.readyState == WebSocket.OPEN) {
+        subscribeAddress();
+    }
+    else {
+        window.webSocket.onopen = subscribeAddress;
+    }
+
+    window.Wallet.instance = wallet;
+}, 0);
