@@ -130,7 +130,7 @@ const setup = async function () {
     // Fetch the referenced transaction.
     const currentTransaction = await app.electrum.request(
       "blockchain.transaction.get",
-      transactionHash.toString("hex"),
+      transactionHash.toString("hex"), // Legacy Note: transactionHash is already be a hex string, so this is likely unnecessary.
       true
     );
 
