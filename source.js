@@ -21,47 +21,6 @@ const DOMPurify = createDOMPurify(window);
 // Load the celebratory confetti library.
 const confetti = require("canvas-confetti").default;
 
-/**
- * Encodes a string into binary with support for multibyte content.
- *
- * @param string   a unicode (utf16) string to encode.
- * @returns the string encoded in base64.
- */
-const base64encode = function (string) {
-  const codeUnits = new Uint16Array(string.length);
-
-  for (let i = 0; i < codeUnits.length; i += 1) {
-    codeUnits[i] = string.charCodeAt(i);
-  }
-
-  return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
-};
-
-/**
- * Decodes a binary into a string taking care to properly decode multibyte content.
- *
- * @param binary   a base64 encoded string to decode.
- * @returns the binary decoded from base64.
- */
-const base64decode = function (binary) {
-  return atob(binary);
-
-  // NOTE: The below code should have worked according to MDN,
-  //       but caused issues when used with JSON.parse.
-  /*
-	let string = atob(binary);
-
-	const bytes = new Uint8Array(string.length);
-
-	for (let i = 0; i < bytes.length; i++)
-	{
-		bytes[i] = string.charCodeAt(i);
-	}
-
-	return String.fromCharCode(...new Uint16Array(bytes.buffer));
-	*/
-};
-
 //
 
 const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
@@ -984,7 +943,7 @@ class flipstarter {
       }
 
       // Assemble an assurance request template.
-      const templateString = base64encode(JSON.stringify(requestObject));
+      const templateString = shared.base64encode(JSON.stringify(requestObject));
 
       // Update the website template string.
       templateTextArea.textContent = templateString;
@@ -1062,7 +1021,7 @@ class flipstarter {
 
     try {
       // Attempt to decode the base64 contribution.
-      commitmentObject = JSON.parse(base64decode(base64text));
+      commitmentObject = JSON.parse(shared.base64decode(base64text));
     } catch (error) {
       // Update form to indicate success and prevent further entry.
       this.updateStatus(

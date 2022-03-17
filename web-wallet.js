@@ -10,6 +10,15 @@ class Wallet {
         return new Wallet(crypto);
     }
 
+    static fromHexString(hexString) {
+        return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    }
+
+    static toHexString(bytes) {
+        return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+    }
+
+
     #_crypto = null;
     #_privateKey = null;
 
@@ -19,6 +28,9 @@ class Wallet {
         this._privateKey = libauth.generatePrivateKey(function() {
             return window.crypto.getRandomValues(new Uint8Array(32))
         });
+
+        // TODO: Hardcoded private key for debugging... DO NOT USE
+        this._privateKey = Wallet.fromHexString("A7A117BE6E294242C997B34F0EC8F41EC9F104B445712B1AA41C0D38C204C879");
     }
 
     getAddress() {
