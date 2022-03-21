@@ -1,7 +1,24 @@
+window.Buffer = require("buffer/").Buffer; // Global export for usage in assurance::Contract
+
 const libauth = require("@bitauth/libauth");
+const contract = require("./src/assurance").Contract;
 
 // Wrap the application in an async function to allow use of await/async.
-const main = async function (transactionToSpendHex, privateKey) {
+const main = async function(transactionToSpendHex, privateKey, contractRecipients) {
+    const serializeContractOutputs = function(recipientOutputs) {
+        const outputs = [];
+        for (const outputIndex in recipientOutputs) {
+            const output = recipientOutputs[outputIndex];
+            const lockingScript = contract.getLockscriptFromAddress(output.user_address);
+            const satoshis = contract.encodeOutputValue(output.recipient_satoshis);
+            outputs.push({
+                "satoshis": satoshis,
+                "lockingBytecode": lockingScript
+            });
+        }
+        return outputs;
+    };
+
     const crypto = await libauth.instantiateBIP32Crypto()
 
     const publicKey = crypto.secp256k1.derivePublicKeyCompressed(privateKey);
@@ -27,6 +44,8 @@ const main = async function (transactionToSpendHex, privateKey) {
     })();
     const outputToSpend = transactionToSpend.outputs[outputIndexToSpend];
 
+    const contractOutputs = serializeContractOutputs(contractRecipients);
+
     const sequenceNumber = 4294967295;
     const signingSerialization = libauth.generateSigningSerializationBCH({
         correspondingOutput: Uint8Array.of(),
@@ -37,9 +56,9 @@ const main = async function (transactionToSpendHex, privateKey) {
         outputValue: outputToSpend.satoshis,
         sequenceNumber: sequenceNumber,
         sha256: crypto.sha256,
-        signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
+        signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
         transactionOutpoints: libauth.encodeOutpoints(transactionToSpend.inputs),
-        transactionOutputs: libauth.encodeOutputsForSigning(transactionToSpend.outputs),
+        transactionOutputs: libauth.encodeOutputsForSigning(contractOutputs),
         transactionSequenceNumbers: libauth.encodeSequenceNumbersForSigning(transactionToSpend.inputs),
         version: 2
     });
