@@ -74,7 +74,7 @@ const setup = async function () {
   app.get("/events", app.sse.init);
 
   // Initialize an empty set of scripthashes that we are subscribed to.
-  app.subscribedScriphashes = {};
+  app.subscribedScriptHashes = {};
 
   // initialize a revocation event check lock.
   app.handleRevocationsLock = new asyncMutex();
@@ -98,9 +98,9 @@ const setup = async function () {
 
       try {
         // If this event is new or has a changed scripthash status..
-        if (app.subscribedScriphashes[scriptHash] !== scriptHashStatus) {
+        if (app.subscribedScriptHashes[scriptHash] !== scriptHashStatus) {
           // Update this scripthash status to prevent redundant work..
-          app.subscribedScriphashes[scriptHash] = scriptHashStatus;
+          app.subscribedScriptHashes[scriptHash] = scriptHashStatus;
 
           // For each transaction for this scripthash..
           for (const transactionIndex in transactions) {
@@ -207,14 +207,14 @@ const setup = async function () {
 
             // If we are currently subscribed to changes for this script hash..
             if (
-              app.subscribedScriphashes[
+              app.subscribedScriptHashes[
                 javascriptUtilities
                   .reverseBuf(inputLockScriptHash)
                   .toString("hex")
               ]
             ) {
               // Mark this scripthash as no longer subscribed to.
-              app.subscribedScriphashes[
+              app.subscribedScriptHashes[
                 javascriptUtilities
                   .reverseBuf(inputLockScriptHash)
                   .toString("hex")
@@ -234,14 +234,14 @@ const setup = async function () {
               `Marked spent commitment '${commitment.commitment_id}' as revoked.`
             );
           } else if (
-            !app.subscribedScriphashes[
+            !app.subscribedScriptHashes[
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)
                 .toString("hex")
             ]
           ) {
             // Mark this scripthash as subscribed to.
-            app.subscribedScriphashes[
+            app.subscribedScriptHashes[
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)
                 .toString("hex")
