@@ -1,6 +1,10 @@
+const buffer = require("buffer/").Buffer;
 const libauth = require("@bitauth/libauth");
-const createQrCode = require("./src/qrcode.js");
+const contract = require("./src/assurance").Contract;
+const QrCode = require("./src/qrcode.js");
 
+// Global exports...
+window.Buffer = buffer;
 window.libauth = libauth;
 
 class Wallet {
@@ -39,12 +43,12 @@ class Wallet {
         return libauth.encodeCashAddress(libauth.CashAddressNetworkPrefix.mainnet, libauth.CashAddressVersionByte.P2PKH, hash);
     }
 
-    createQrCode(widthPx) {
+    createQrCode(widthPx, amount) {
         const width = widthPx || 82;
         const address = this.getAddress();
 
-        const qr = createQrCode(4, "M");
-        qr.addData(address);
+        const qr = QrCode(0, "M");
+        qr.addData(address + "?amount=" + amount);
         qr.make();
         const html = qr.createImgTag();
 
@@ -57,26 +61,106 @@ class Wallet {
 
         return imgElement;
     }
+
+   async createPledge(transactionToSpendHex, contractRecipients, donationAmount, alias, comment) {
+        const serializeContractOutputs = function(recipientOutputs) {
+            const outputs = [];
+            for (const outputIndex in recipientOutputs) {
+                const output = recipientOutputs[outputIndex];
+                const lockingScript = contract.getLockscriptFromAddress(output.user_address);
+                const satoshis = contract.encodeOutputValue(output.recipient_satoshis);
+                outputs.push({
+                    "satoshis": satoshis,
+                    "lockingBytecode": lockingScript
+                });
+            }
+            return outputs;
+        };
+
+        const crypto = await libauth.instantiateBIP32Crypto()
+
+        const publicKey = crypto.secp256k1.derivePublicKeyCompressed(this._privateKey);
+        const addressHash = crypto.ripemd160.hash(crypto.sha256.hash(publicKey));
+
+        const transactionToSpendBytes = libauth.hexToBin(transactionToSpendHex);
+        const transactionToSpendHash = (function() {
+            const hashReverseEndian = (crypto.sha256.hash(crypto.sha256.hash(transactionToSpendBytes)));
+            hashReverseEndian.reverse();
+            return hashReverseEndian;
+        })();
+        const transactionToSpend = libauth.decodeTransactionUnsafe(transactionToSpendBytes);
+
+        const outputIndexToSpend = (function() {
+            const expectedOutputLockingScript = ("76a914" + libauth.binToHex(addressHash) + "88ac");
+            for (let outputIndex in transactionToSpend.outputs) {
+                const transactionOutput = transactionToSpend.outputs[outputIndex];
+                if (libauth.binToHex(transactionOutput.lockingBytecode) == expectedOutputLockingScript) {
+                    const outputAmount = libauth.binToBigIntUint64LE(transactionOutput.satoshis);
+                    if (outputAmount == donationAmount) {
+                        return outputIndex;
+                    }
+                }
+            }
+            return null;
+        })();
+        if (outputIndexToSpend == null) { return null; }
+
+        const outputToSpend = transactionToSpend.outputs[outputIndexToSpend];
+
+        const contractOutputs = serializeContractOutputs(contractRecipients);
+
+        const sequenceNumber = 4294967295;
+        const signingSerialization = libauth.generateSigningSerializationBCH({
+            correspondingOutput: Uint8Array.of(),
+            coveredBytecode: outputToSpend.lockingBytecode,
+            locktime: 0,
+            outpointIndex: outputIndexToSpend,
+            outpointTransactionHash: transactionToSpendHash,
+            outputValue: outputToSpend.satoshis,
+            sequenceNumber: sequenceNumber,
+            sha256: crypto.sha256,
+            signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
+            transactionOutpoints: libauth.encodeOutpoints(transactionToSpend.inputs),
+            transactionOutputs: libauth.encodeOutputsForSigning(contractOutputs),
+            transactionSequenceNumbers: libauth.encodeSequenceNumbersForSigning(transactionToSpend.inputs),
+            version: 2
+        });
+
+        const signingSerializationHash = crypto.sha256.hash(crypto.sha256.hash(signingSerialization));
+
+        // generate ecdsa signature
+        const signatureFlags = Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId);
+        const rawSignature = crypto.secp256k1.signMessageHashDER(this._privateKey, signingSerializationHash);
+        const libauthSig = libauth.flattenBinArray([rawSignature, signatureFlags]);
+
+        // applying a signature to transaction
+        const scriptSig = libauth.flattenBinArray([
+            libauth.encodeDataPush(libauthSig),
+            libauth.encodeDataPush(publicKey),
+        ]);
+
+        transactionToSpend.inputs[0].unlockingBytecode = scriptSig;
+
+        const pledge = {
+            "inputs": [{
+                "previous_output_transaction_hash": libauth.binToHex(transactionToSpendHash),
+                "previous_output_index": outputIndexToSpend,
+                "sequence_number": sequenceNumber,
+                "unlocking_script": libauth.binToHex(scriptSig),
+            }],
+            "data": {
+                "alias": alias,
+                "comment": comment,
+            },
+            "data_signature": null
+        };
+
+        return window.btoa(JSON.stringify(pledge));
+    };
 }
 
 window.Wallet = Wallet;
-
 window.setTimeout(async function() {
     const wallet = await Wallet.create();
-    const address = wallet.getAddress();
-
-    const subscribeAddress = function() {
-        window.webSocket.send(JSON.stringify({
-            address: address
-        }));
-    };
-
-    if (window.webSocket.readyState == WebSocket.OPEN) {
-        subscribeAddress();
-    }
-    else {
-        window.webSocket.onopen = subscribeAddress;
-    }
-
     window.Wallet.instance = wallet;
 }, 0);

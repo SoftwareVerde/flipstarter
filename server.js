@@ -118,6 +118,14 @@ const setup = async function () {
     }
   };
 
+  app.electrumSubscribeCallbacks = [app.handleRevocations];
+  app.electrumSubscribeCallback = async function(data) {
+    for (let i = 0; i < app.electrumSubscribeCallbacks.length; i += 1) {
+      const callback = app.electrumSubscribeCallbacks[i];
+      callback(data);
+    }
+  };
+
   // initialize a transaction revocation check lock.
   app.checkForTransactionUpdatesLock = new asyncMutex();
 
@@ -241,7 +249,7 @@ const setup = async function () {
 
             // Subscribe to changes for this output.
             await app.electrum.subscribe(
-              app.handleRevocations,
+              app.electrumSubscribeCallback,
               "blockchain.scripthash.subscribe",
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)

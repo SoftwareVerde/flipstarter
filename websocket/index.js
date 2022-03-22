@@ -53,7 +53,6 @@ function createServer(app, webServer) {
                         setAddressVersion(nonPrefixAddressString, addressDecodeResult);
 
                         const addressBytes = (addressDecodeResult.payload || addressDecodeResult.hash);
-
                         const lockingScript = assuranceContract.getLockscriptFromAddress(addressString);
                         const lockingScriptHash = libox.Crypto.sha256(lockingScript);
                         const lockingScriptHashReverseHex = javascriptUtilities.reverseBuf(lockingScriptHash).toString("hex");
@@ -68,7 +67,8 @@ function createServer(app, webServer) {
                             sendTransactionsToSocket(transactions);
                         };
 
-                        app.electrum.subscribe(callback, "blockchain.scripthash.subscribe", lockingScriptHashReverseHex);
+                        app.electrumSubscribeCallbacks.push(callback);
+                        app.electrum.subscribe(app.electrumSubscribeCallback, "blockchain.scripthash.subscribe", lockingScriptHashReverseHex);
 
                         const transactions = await app.electrum.request("blockchain.scripthash.get_history", lockingScriptHashReverseHex);
                         sendTransactionsToSocket(transactions);

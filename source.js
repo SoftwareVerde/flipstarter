@@ -200,9 +200,9 @@ class flipstarter {
 
     donationSlider.addEventListener("input", this.updateContributionInput.bind(this));
 
-    document
-      .getElementById("donateButton")
-      .addEventListener("click", this.toggleDonationSection.bind(this));
+    const donateButton = document.getElementById("donateButton");
+    donateButton.addEventListener("click", this.bindWallet);
+    donateButton.addEventListener("click", this.toggleDonationSection.bind(this));
 
     document
       .getElementById("template")
@@ -816,7 +816,64 @@ class flipstarter {
     templateButton.disabled = "disabled";
   }
 
+  async bindWallet() {
+      const donationSlider = document.getElementById("donationSlider");
+      const aliasInput = document.getElementById("contributionName");
+      const commentInput = document.getElementById("contributionComment");
+      const commitmentInput = document.getElementById("commitment");
+
+      const wallet = window.Wallet.instance;
+      if (wallet._isBound) { return; }
+
+      const address = wallet.getAddress();
+
+      window.webSocket.addConnectCallback(function() {
+          window.webSocket.send(JSON.stringify({
+              address: address
+          }));
+      });
+
+      window.webSocket.addMessageReceivedCallback(async function(message) {
+          if (message.transaction) {
+              const transaction = message.transaction;
+
+              webSocket._consumedTransactions = webSocket._transactions || [];
+              if (webSocket._consumedTransactions.indexOf(transaction) >= 0) { return; }
+
+              const alias = aliasInput.value;
+              const comment = commentInput.value;
+              const amount = Number(donationSlider.value);
+
+              const recipients = window.flipstarter.campaign.recipients;
+              const pledge = await wallet.createPledge(transaction, recipients, amount, alias, comment);
+
+              commitmentInput.value = pledge;
+              if (pledge) {
+                  webSocket._consumedTransactions.push(transaction);
+                  await window.flipstarter.parseCommitment();
+              }
+          }
+      });
+
+      wallet._isBound = true;
+  }
+
   async toggleDonationSection(visibility = null) {
+    const donationSlider = document.getElementById("donationSlider");
+    const aliasInput = document.getElementById("contributionName");
+    const commentInput = document.getElementById("contributionComment");
+    const commitmentInput = document.getElementById("commitment");
+
+    const wallet = window.Wallet.instance;
+
+    const amount = Number(donationSlider.value);
+    const walletAddressImage = wallet.createQrCode(256, amount / shared.SATS_PER_BCH);
+    const webWalletAddressContainer = document.getElementById("web-wallet-address");
+    while (webWalletAddressContainer.firstChild) {
+        webWalletAddressContainer.firstChild.remove();
+    }
+    webWalletAddressContainer.appendChild(walletAddressImage);
+
     const donateSection = document.getElementById("donateSection");
 
     if (visibility !== false && donateSection.classList.contains("hidden")) {
