@@ -869,7 +869,10 @@ class flipstarter {
                       if (! result) { return; }
 
                       const revokeTokenContainer = document.getElementById("revokeToken");
-                      revokeTokenContainer.textContent = wallet.createRefundTransaction(transaction, "bitcoincash:qqverdefl9xtryyx8y52m6va5j8s2s4eq59fjdn97e"); // TODO
+                      const returnAddressInput = revokeTokenContainer.querySelector(".return-address");
+                      const tokenHexContainer = revokeTokenContainer.querySelector(".transaction-hex");
+
+                      tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, "bitcoincash:qqverdefl9xtryyx8y52m6va5j8s2s4eq59fjdn97e");
                       revokeTokenContainer.classList.remove("hidden");
 
                       window.flipstarter.unbindWallet();
@@ -1272,7 +1275,9 @@ class flipstarter {
       );
 
       if (callback) {
-        callback(true);
+        window.setTimeout(function() {
+          callback(true);
+        }, 0);
       }
     }
   }
