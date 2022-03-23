@@ -122,7 +122,9 @@ const setup = async function () {
   app.electrumSubscribeCallback = async function(data) {
     for (let i = 0; i < app.electrumSubscribeCallbacks.length; i += 1) {
       const callback = app.electrumSubscribeCallbacks[i];
-      callback(data);
+      if (callback) {
+          callback(data);
+      }
     }
   };
 

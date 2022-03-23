@@ -816,20 +816,35 @@ class flipstarter {
     templateButton.disabled = "disabled";
   }
 
+  async unbindWallet() {
+      const wallet = window.Wallet.instance;
+      if (! wallet._isBound) { return; }
+
+      window.clearInterval(wallet._isBound);
+      wallet._isBound = null;
+
+      const address = wallet.getAddress();
+      window.webSocket.addConnectCallback(function() {
+          window.webSocket.send(JSON.stringify({
+              removeAddress: address
+          }));
+      });
+  }
+
   async bindWallet() {
+      const wallet = window.Wallet.instance;
+      if (wallet._isBound) { return; }
+
       const donationSlider = document.getElementById("donationSlider");
       const aliasInput = document.getElementById("contributionName");
       const commentInput = document.getElementById("contributionComment");
       const commitmentInput = document.getElementById("commitment");
 
-      const wallet = window.Wallet.instance;
-      if (wallet._isBound) { return; }
-
       const address = wallet.getAddress();
 
       window.webSocket.addConnectCallback(function() {
           window.webSocket.send(JSON.stringify({
-              address: address
+              addAddress: address
           }));
       });
 
@@ -837,25 +852,39 @@ class flipstarter {
           if (message.transaction) {
               const transaction = message.transaction;
 
-              webSocket._consumedTransactions = webSocket._transactions || [];
-              if (webSocket._consumedTransactions.indexOf(transaction) >= 0) { return; }
+              webSocket._transactions = webSocket._transactions || [];
+              if (webSocket._transactions.indexOf(transaction) >= 0) { return; }
 
               const alias = aliasInput.value;
               const comment = commentInput.value;
               const amount = Number(donationSlider.value);
 
               const recipients = window.flipstarter.campaign.recipients;
-              const pledge = await wallet.createPledge(transaction, recipients, amount, alias, comment);
+              const pledge = wallet.createPledge(transaction, recipients, amount, alias, comment);
 
               commitmentInput.value = pledge;
               if (pledge) {
-                  webSocket._consumedTransactions.push(transaction);
-                  await window.flipstarter.parseCommitment();
+                  webSocket._transactions.push(transaction);
+                  window.flipstarter.parseCommitment(function(result) {
+                      if (! result) { return; }
+
+                      const revokeTokenContainer = document.getElementById("revokeToken");
+                      revokeTokenContainer.textContent = wallet.createRefundTransaction(transaction, "bitcoincash:qqverdefl9xtryyx8y52m6va5j8s2s4eq59fjdn97e"); // TODO
+                      revokeTokenContainer.classList.remove("hidden");
+
+                      window.flipstarter.unbindWallet();
+                  });
               }
           }
       });
 
-      wallet._isBound = true;
+      wallet._isBound = window.setInterval(function() {
+          if (window.webSocket.readyState != window.webSocket.OPEN) { return; }
+
+          window.webSocket.send(JSON.stringify({
+              addAddress: address
+          }));
+      }, 2500);
   }
 
   async toggleDonationSection(visibility = null) {
@@ -864,15 +893,37 @@ class flipstarter {
     const commentInput = document.getElementById("contributionComment");
     const commitmentInput = document.getElementById("commitment");
 
-    const wallet = window.Wallet.instance;
+    // Bind WebWallet...
+    (function() {
+        const webWalletContainer = document.getElementById("web-wallet");
+        const wallet = window.Wallet.instance;
 
-    const amount = Number(donationSlider.value);
-    const walletAddressImage = wallet.createQrCode(256, amount / shared.SATS_PER_BCH);
-    const webWalletAddressContainer = document.getElementById("web-wallet-address");
-    while (webWalletAddressContainer.firstChild) {
-        webWalletAddressContainer.firstChild.remove();
-    }
-    webWalletAddressContainer.appendChild(walletAddressImage);
+        const privateKeyWif = wallet.getPrivateKey();
+        const cashAddress = wallet.getAddress();
+        const amount = Number(donationSlider.value);
+        const bchAmount = (amount / shared.SATS_PER_BCH).toFixed(8);
+        const walletAddressImage = wallet.createQrCode(256, bchAmount);
+
+        const walletAddressSpan = document.createElement("a");
+        walletAddressSpan.setAttribute("href", cashAddress + "?amount=" + bchAmount);
+        walletAddressSpan.textContent = cashAddress;
+
+        const webWalletPrivateKeyContainer = webWalletContainer.querySelector(".private-key");
+        webWalletPrivateKeyContainer.classList.add("hidden");
+        webWalletPrivateKeyContainer.textContent = privateKeyWif;
+
+        const webWalletPrivateKeyButton = webWalletContainer.querySelector(".private-key-button");
+        webWalletPrivateKeyButton.onclick = function() {
+            webWalletPrivateKeyContainer.classList.toggle("hidden");
+        };
+
+        const webWalletAddressContainer = webWalletContainer.querySelector(".address");
+        while (webWalletAddressContainer.firstChild) {
+            webWalletAddressContainer.firstChild.remove();
+        }
+        webWalletAddressContainer.appendChild(walletAddressImage);
+        webWalletAddressContainer.appendChild(walletAddressSpan);
+    })();
 
     const donateSection = document.getElementById("donateSection");
 
@@ -1069,7 +1120,7 @@ class flipstarter {
   /**
    *
    */
-  async parseCommitment() {
+  async parseCommitment(callback) {
     //
     const base64text = document.getElementById("commitment").value;
 
@@ -1219,6 +1270,10 @@ class flipstarter {
         "statusContribution",
         this.translation["statusContribution"]
       );
+
+      if (callback) {
+        callback(true);
+      }
     }
   }
 

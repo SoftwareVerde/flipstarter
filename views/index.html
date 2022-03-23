@@ -131,6 +131,11 @@
         <!-- Campaign donation form -->
         <fieldset id="donateField">
           <div id="donateStatus" class="hidden"></div>
+          <div id="revokeToken" class="hidden">
+            <div data-string="revokeInfo"></div>
+            <input class="return-address" />
+            <div class="transaction-hex"></div>
+          </div>
 
           <div id="donateForm" class="hidden">
             <div class="input-field">
@@ -163,7 +168,7 @@
       padding-top: 0.75rem;
       "
       >
-      <div class="col s12 m12 l12" style="margin-top: 0.75rem;">
+      <div class="col s12 m12 l12" style="margin-top: 0.75rem;" id="donateAliasContainer">
         <div
         class="row"
         style="
@@ -221,7 +226,12 @@
       </div>
     </div>
 
-    <div id="web-wallet-address"></div>
+    <div id="web-wallet">
+        <div data-string="webWalletInfo"></div>
+        <div data-string="privateKeyInfo" class="private-key-button"></div>
+        <div class="private-key"></div>
+        <div class="address"></div>
+    </div>
 
     <div class="col s12 m12 l3" style="margin-top: 0.75rem;">
       <small

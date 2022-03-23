@@ -334,12 +334,12 @@ const submitContribution = async function (req, res) {
 
         // If we have not yet subscribed to this script hash..
         if (
-          !req.app.subscribedScriphashes[
+          !req.app.subscribedScriptHashes[
             javascriptUtilities.reverseBuf(inputLockScriptHash).toString("hex")
           ]
         ) {
           // Mark this scripthash as subscribed to.
-          req.app.subscribedScriphashes[
+          req.app.subscribedScriptHashes[
             javascriptUtilities.reverseBuf(inputLockScriptHash).toString("hex")
           ] = true;
 
@@ -532,6 +532,7 @@ const submitContribution = async function (req, res) {
       // Send an OK signal back to the client.
       res.status(200).json({ status: "ok" });
     } catch (error) {
+      console.log(error);
       // Send an ERROR signal back to the client.
       res.status(500).json({ error: error });
 

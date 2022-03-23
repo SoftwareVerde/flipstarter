@@ -681,3 +681,39 @@ aside > section > h3
     display: block;
     margin: auto;
 }
+
+#donateSection #donateAliasContainer {
+    float: none;
+}
+
+#web-wallet {
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+#web-wallet a {
+    display: block;
+}
+
+#web-wallet .private-key-button {
+    cursor: pointer;
+    margin: 1em;
+    border: solid 1px #abf4a8;
+    background-color: #d8ffd5;
+    padding: 0.5em;
+    font-size: 0.8em;
+}
+#web-wallet .private-key {
+    font-weight: bold;
+    padding: 0.5em;
+    font-size: 0.75em;
+}
+#web-wallet .private-key.hidden {
+    display: none;
+}
+
+#web-wallet .address {
+    text-align: center;
+    margin-top: 1em;
+}

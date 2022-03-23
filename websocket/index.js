@@ -54,10 +54,9 @@ function createServer(app, webServer) {
             const maxTimeoutMs = 60000;
             webSocketServer.purgeTimeout = setTimeout(function() {
                 webSocketServer.purgeOldConnections(maxTimeoutMs, function(closedWebSocket) {
-                    for (let i = 0; i < closedWebSocket.subscriptions.length; i += 1) {
-                        const lockingScriptHashReverseHex = closedWebSocket.subscriptions[i];
+                    for (let lockingScriptHashReverseHex in closedWebSocket.subscriptions) {
                         const isWatchedDonationAddress = app.subscribedScriptHashes[lockingScriptHashReverseHex];
-                        if (! isWatchedDonationAddress) { // Only subscribe from addresses that don't have a donation.
+                        if (! isWatchedDonationAddress) { // Only unsubscribe from addresses that don't have a donation.
                             app.electrum.request("blockchain.scripthash.unsubscribe", lockingScriptHashReverseHex);
                         }
                     }
@@ -67,7 +66,7 @@ function createServer(app, webServer) {
         }
 
         webSocketConnection.connectTimestamp = (new Date()).getTime();
-        webSocketConnection.subscriptions = []; // Array of lockingScriptHashHex (reversed), representing subscribed electrum addresses.
+        webSocketConnection.subscriptions = {}; // Map of lockingScriptHashHex (reversed) to callbackId, representing subscribed electrum addresses.
 
         webSocketServer.connections.push(webSocketConnection);
 
@@ -78,8 +77,9 @@ function createServer(app, webServer) {
                 webSocketConnection.pongTimestamp = (new Date()).getTime();
             }
 
-            const addressString = message.address;
+            const addressString = (message.addAddress || message.removeAddress);
             if (addressString) {
+                const isUnsubscribe = (message.removeAddress ? true : false);
                 const setAddressVersion = function(addressString, addressObject) {
                     if (addressString.startsWith("3") || addressString.startsWith("p")) {
                         addressObject.version = 1;
@@ -113,27 +113,39 @@ function createServer(app, webServer) {
                     const lockingScriptHash = libox.Crypto.sha256(lockingScript);
                     const lockingScriptHashReverseHex = javascriptUtilities.reverseBuf(lockingScriptHash).toString("hex");
 
-                    if (webSocketConnection.subscriptions.indexOf(lockingScriptHashReverseHex) >= 0) {
-                        return; // Already subscribed...
+                    if (isUnsubscribe) {
+                        const callbackId = webSocketConnection.subscriptions[lockingScriptHashReverseHex];
+                        if (! callbackId) { return; }
+
+                        delete webSocketConnection.subscriptions[lockingScriptHashReverseHex];
+                        app.electrumSubscribeCallbacks[callbackId] = null;
+
+                        const isWatchedDonationAddress = app.subscribedScriptHashes[lockingScriptHashReverseHex];
+                        if (! isWatchedDonationAddress) { // Only unsubscribe from addresses that don't have a donation.
+                            app.electrum.request("blockchain.scripthash.unsubscribe", lockingScriptHashReverseHex);
+                        }
                     }
+                    else {
+                        if (webSocketConnection.subscriptions[lockingScriptHashReverseHex]) { // Already subscribed...
+                            const callback = async function(data) {
+                                if (! Array.isArray(data)) { return; }
+                                const scriptHash = data[0];
+                                const scriptHashStatus = [1];
+                                if (lockingScriptHashReverseHex != scriptHash) { return; }
 
-                    const callback = async function(data) {
-                        if (! Array.isArray(data)) { return; }
-                        const scriptHash = data[0];
-                        const scriptHashStatus = [1];
-                        if (lockingScriptHashReverseHex != scriptHash) { return; }
+                                const transactions = await app.electrum.request("blockchain.scripthash.get_history", scriptHash);
+                                sendTransactionsToSocket(transactions);
+                            };
 
-                        const transactions = await app.electrum.request("blockchain.scripthash.get_history", scriptHash);
+                            const callbackId = app.electrumSubscribeCallbacks.push(callback) - 1;
+                            webSocketConnection.subscriptions[lockingScriptHashReverseHex] = callbackId;
+
+                            app.electrum.subscribe(app.electrumSubscribeCallback, "blockchain.scripthash.subscribe", lockingScriptHashReverseHex);
+                        }
+
+                        const transactions = await app.electrum.request("blockchain.scripthash.get_history", lockingScriptHashReverseHex);
                         sendTransactionsToSocket(transactions);
-                    };
-
-                    app.electrumSubscribeCallbacks.push(callback);
-                    app.electrum.subscribe(app.electrumSubscribeCallback, "blockchain.scripthash.subscribe", lockingScriptHashReverseHex);
-
-                    const transactions = await app.electrum.request("blockchain.scripthash.get_history", lockingScriptHashReverseHex);
-                    sendTransactionsToSocket(transactions);
-
-                    webSocketConnection.subscriptions.push(lockingScriptHashReverseHex);
+                    }
                 }
             }
         });
