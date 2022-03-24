@@ -206,38 +206,13 @@ class flipstarter {
         input.addEventListener("focus", function(event) {
             input.select();
         });
-        input.addEventListener("keyup", function(event) {
+        input.addEventListener("change", function(event) {
             synchronizeInputs(input);
         });
     });
     donationSlider.addEventListener("input", function(event) {
         synchronizeInputs(donationSlider);
     });
-    donationDollarInput.addEventListener("keydown", function(event) {
-        const charCode = (event.which) ? event.which : event.keyCode;
-        if (charCode == 8) { return true; } // DEL
-        if (charCode == 9) { return true; } // TAB
-        if (charCode == 27) { return true; } // ESC
-        if (charCode >= 37 && charCode <= 40) { return true; } // Directional Arrows
-        if (charCode == 190) { return true; } // .
-        if (charCode == 188) { return true; } // ,
-        if (charCode >= 48 && charCode <= 57) { return true; } // 0-9
-
-        event.preventDefault();
-        return false;
-    }, false);
-    donationBchInput.addEventListener("keydown", function(event) {
-        const charCode = (event.which) ? event.which : event.keyCode;
-        if (charCode == 8) { return true; } // DEL
-        if (charCode == 9) { return true; } // TAB
-        if (charCode == 27) { return true; } // ESC
-        if (charCode >= 37 && charCode <= 40) { return true; } // Directional Arrows
-        if (charCode >= 48 && charCode <= 57) { return true; } // 0-9
-
-        event.preventDefault();
-        return false;
-    }, false);
-
 
     donationSlider.addEventListener("input", this.updateContributionInput.bind(this));
 
