@@ -482,9 +482,12 @@ class flipstarter {
     let committedSatoshis = 0;
 
     for (const contributionIndex in contributions) {
-      if (typeof contributions[contributionIndex].satoshis !== "undefined") {
-        committedSatoshis += contributions[contributionIndex].satoshis;
-      }
+      const contribution = contributions[contributionIndex];
+
+      if (typeof contribution.satoshis == "undefined") { continue; }
+      if (contribution.revocation_id != null) { continue; }
+
+      committedSatoshis += contributions[contributionIndex].satoshis;
     }
 
     return committedSatoshis;
