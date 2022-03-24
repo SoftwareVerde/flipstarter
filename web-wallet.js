@@ -26,21 +26,72 @@ class Wallet {
     #_crypto = null;
     #_privateKey = null;
 
+    _getPublicKey() {
+        const privateKey = this._privateKey;
+        return this._crypto.secp256k1.derivePublicKeyCompressed(privateKey);
+    }
+
+    _getPublicKeyHash() {
+        const publicKey = this._getPublicKey();
+        return this._crypto.ripemd160.hash(
+            this._crypto.sha256.hash(publicKey)
+        );
+    }
+
+    _parseTransactionHex(transactionHex) {
+        const wallet = this;
+
+        const transactionBytes = libauth.hexToBin(transactionHex);
+        const transactionHash = (function() {
+            const hashReverseEndian = (wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(transactionBytes)));
+            hashReverseEndian.reverse();
+            return hashReverseEndian;
+        })();
+        const transaction = libauth.decodeTransactionUnsafe(transactionBytes);
+        
+        const getOutputIndexToSpend = function(amount) {
+            const publicKeyHash = wallet._getPublicKeyHash();
+
+            const expectedOutputLockingScript = ("76a914" + libauth.binToHex(publicKeyHash) + "88ac");
+            for (let outputIndex in transaction.outputs) {
+                const transactionOutput = transaction.outputs[outputIndex];
+                if (libauth.binToHex(transactionOutput.lockingBytecode) == expectedOutputLockingScript) {
+                    if (amount) {
+                        const outputAmount = libauth.binToBigIntUint64LE(transactionOutput.satoshis);
+                        if (outputAmount == amount) {
+                            return outputIndex;
+                        }
+                    }
+                    else {
+                        return outputIndex;
+                    }
+                }
+            }
+            return null;
+        };
+
+        return {
+            hash: transactionHash,      // Uint8Array
+            hex: transactionHex,        // String
+            bytes: transactionBytes,    // Uint8Array
+            getOutputIndex: getOutputIndexToSpend, // function(matchingOutputAmount)
+            getOutput: function(outputIndex) {
+                return transaction.outputs[outputIndex];
+            }
+        };
+    }
+
     constructor(crypto) {
         this._crypto = crypto;
 
         this._privateKey = libauth.generatePrivateKey(function() {
-            return window.crypto.getRandomValues(new Uint8Array(32))
+            return window.crypto.getRandomValues(new Uint8Array(32));
         });
-
-        // TODO: Hardcoded private key for debugging... DO NOT USE
-        // this._privateKey = Wallet.fromHexString("A7A117BE6E294242C997B34F0EC8F41EC9F104B445712B1AA41C0D38C204C879");
     }
 
     getAddress() {
-        const publicKey = this._crypto.secp256k1.derivePublicKeyCompressed(this._privateKey);
-        const hash = this._crypto.ripemd160.hash(this._crypto.sha256.hash(publicKey));
-        return libauth.encodeCashAddress(libauth.CashAddressNetworkPrefix.mainnet, libauth.CashAddressVersionByte.P2PKH, hash);
+        const publicKeyHash = this._getPublicKeyHash();
+        return libauth.encodeCashAddress(libauth.CashAddressNetworkPrefix.mainnet, libauth.CashAddressVersionByte.P2PKH, publicKeyHash);
     }
 
     createQrCode(widthPx, amount) {
@@ -64,33 +115,13 @@ class Wallet {
 
     createRefundTransaction(transactionToSpendHex, donationAmount, returnAddressString) {
         const wallet = this;
-        const publicKey = wallet._crypto.secp256k1.derivePublicKeyCompressed(wallet._privateKey);
-        const addressHash = wallet._crypto.ripemd160.hash(wallet._crypto.sha256.hash(publicKey));
 
-        const transactionToSpendBytes = libauth.hexToBin(transactionToSpendHex);
-        const transactionToSpendHash = (function() {
-            const hashReverseEndian = (wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(transactionToSpendBytes)));
-            hashReverseEndian.reverse();
-            return hashReverseEndian;
-        })();
-        const transactionToSpend = libauth.decodeTransactionUnsafe(transactionToSpendBytes);
-
-        const outputIndexToSpend = (function() {
-            const expectedOutputLockingScript = ("76a914" + libauth.binToHex(addressHash) + "88ac");
-            for (let outputIndex in transactionToSpend.outputs) {
-                const transactionOutput = transactionToSpend.outputs[outputIndex];
-                if (libauth.binToHex(transactionOutput.lockingBytecode) == expectedOutputLockingScript) {
-                    const outputAmount = libauth.binToBigIntUint64LE(transactionOutput.satoshis);
-                    if (outputAmount == donationAmount) {
-                        return outputIndex;
-                    }
-                }
-            }
-            return null;
-        })();
+        const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
+        const outputIndexToSpend = transactionToSpend.getOutputIndex(donationAmount);
         if (outputIndexToSpend == null) { return null; }
 
-        const outputToSpend = transactionToSpend.outputs[outputIndexToSpend];
+        const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);
+
         const miningFee = BigInt(546);
         const refundAmount = libauth.binToBigIntUint64LE(outputToSpend.satoshis) - miningFee;
         const outputs = (function() {
@@ -101,50 +132,37 @@ class Wallet {
                 "lockingBytecode": lockingScript
             }];
         })();
-        console.log(libauth.binToBigIntUint64LE(outputs[0].satoshis));
 
         const sequenceNumber = 4294967295;
-        const signingSerialization = libauth.generateSigningSerializationBCH({
-            correspondingOutput: Uint8Array.of(),
-            coveredBytecode: outputToSpend.lockingBytecode,
-            locktime: 0,
-            outpointIndex: outputIndexToSpend,
-            outpointTransactionHash: transactionToSpendHash,
-            outputValue: outputToSpend.satoshis,
-            sequenceNumber: sequenceNumber,
-            sha256: wallet._crypto.sha256,
-            signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
-            transactionOutpoints: libauth.encodeOutpoints([{outpointIndex: outputIndexToSpend, outpointTransactionHash: transactionToSpendHash}]),
-            transactionOutputs: libauth.encodeOutputsForSigning(outputs),
-            transactionSequenceNumbers: libauth.encodeSequenceNumbersForSigning([{sequenceNumber: sequenceNumber}]),
-            version: 2
-        });
-console.log({
-            correspondingOutput: Uint8Array.of(),
-            coveredBytecode: outputToSpend.lockingBytecode,
-            locktime: 0,
-            outpointIndex: outputIndexToSpend,
-            outpointTransactionHash: transactionToSpendHash,
-            outputValue: outputToSpend.satoshis,
-            sequenceNumber: sequenceNumber,
-            sha256: wallet._crypto.sha256,
-            signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
-            transactionOutpoints: libauth.encodeOutpoints([{outpointIndex: outputIndexToSpend, outpointTransactionHash: transactionToSpendHash}]),
-            transactionOutputs: libauth.encodeOutputsForSigning(outputs),
-            transactionSequenceNumbers: libauth.encodeSequenceNumbersForSigning([{sequenceNumber: sequenceNumber}]),
-            version: 2
-        });
+        const signature = (function() {
+            const signatureFlagEnum = libauth.SigningSerializationFlag;
+            const signatureFlags = Uint8Array.of(signatureFlagEnum.allOutputs | signatureFlagEnum.forkId);
 
-        const signingSerializationHash = wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(signingSerialization));
+            const signingSerialization = libauth.generateSigningSerializationBCH({
+                correspondingOutput: Uint8Array.of(),
+                coveredBytecode: outputToSpend.lockingBytecode,
+                locktime: 0,
+                outpointIndex: outputIndexToSpend,
+                outpointTransactionHash: transactionToSpend.hash,
+                outputValue: outputToSpend.satoshis,
+                sequenceNumber: sequenceNumber,
+                sha256: wallet._crypto.sha256,
+                signingSerializationType: signatureFlags,
+                transactionOutpoints: libauth.encodeOutpoints([{outpointIndex: outputIndexToSpend, outpointTransactionHash: transactionToSpend.hash}]),
+                transactionOutputs: libauth.encodeOutputsForSigning(outputs),
+                transactionSequenceNumbers: libauth.encodeSequenceNumbersForSigning([{sequenceNumber: sequenceNumber}]),
+                version: 2
+            });
 
-        // generate ecdsa signature
-        const signatureFlags = Uint8Array.of(libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId);
-        const rawSignature = wallet._crypto.secp256k1.signMessageHashDER(wallet._privateKey, signingSerializationHash);
-        const libauthSig = libauth.flattenBinArray([rawSignature, signatureFlags]);
+            const signingSerializationHash = wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(signingSerialization));
+            const rawSignature = wallet._crypto.secp256k1.signMessageHashDER(wallet._privateKey, signingSerializationHash);
 
-        // applying a signature to transaction
+            return libauth.flattenBinArray([rawSignature, signatureFlags]);
+        })();
+
+        const publicKey = wallet._getPublicKey();
         const unlockingScript = libauth.flattenBinArray([
-            libauth.encodeDataPush(libauthSig),
+            libauth.encodeDataPush(signature),
             libauth.encodeDataPush(publicKey)
         ]);
 
@@ -152,7 +170,7 @@ console.log({
             version: 2,
             inputs: [{
                 outpointIndex: outputIndexToSpend,
-                outpointTransactionHash: transactionToSpendHash,
+                outpointTransactionHash: transactionToSpend.hash,
                 sequenceNumber: sequenceNumber,
                 unlockingBytecode: unlockingScript
             }],
@@ -160,121 +178,66 @@ console.log({
             locktime: 0
         };
 
-        (async function() {
-            const program = {
-                inputIndex: 0,
-                sourceOutput: {
-                    lockingBytecode: outputToSpend.lockingBytecode,
-                    satoshis: libauth.bigIntToBinUint64LE(BigInt(donationAmount)),
-                },
-                spendingTransaction: transaction,
-            };
-
-            const vm = await libauth.instantiateVirtualMachineBCH();
-            const programEval = vm.evaluate(program);
-            console.log('program evaluation post sig:');
-            console.log(JSON.stringify(programEval));
-        })();
-
         const transactionBytes = libauth.encodeTransaction(transaction);
         return Wallet.toHexString(transactionBytes);
     }
 
     createPledge(transactionToSpendHex, contractRecipients, donationAmount, alias, comment) {
         const wallet = this;
-        const serializeContractOutputs = function(recipientOutputs) {
-            const outputs = [];
-            for (const outputIndex in recipientOutputs) {
-                const output = recipientOutputs[outputIndex];
+
+        const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
+        const outputIndexToSpend = transactionToSpend.getOutputIndex(donationAmount);
+        if (outputIndexToSpend == null) { return null; }
+
+        const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);
+
+        const sequenceNumber = 4294967295;
+        const signature = (function() {
+            const contractOutputs = [];
+            for (const outputIndex in contractRecipients) {
+                const output = contractRecipients[outputIndex];
                 const lockingScript = contract.getLockscriptFromAddress(output.user_address);
                 const satoshis = contract.encodeOutputValue(output.recipient_satoshis);
-                outputs.push({
+                contractOutputs.push({
                     "satoshis": satoshis,
                     "lockingBytecode": lockingScript
                 });
             }
-            return outputs;
-        };
 
-        const publicKey = wallet._crypto.secp256k1.derivePublicKeyCompressed(wallet._privateKey);
-        const addressHash = wallet._crypto.ripemd160.hash(wallet._crypto.sha256.hash(publicKey));
+            const signatureFlagEnum = libauth.SigningSerializationFlag;
+            const signatureFlags = Uint8Array.of(signatureFlagEnum.singleInput | signatureFlagEnum.allOutputs | signatureFlagEnum.forkId);
 
-        const transactionToSpendBytes = libauth.hexToBin(transactionToSpendHex);
-        const transactionToSpendHash = (function() {
-            const hashReverseEndian = (wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(transactionToSpendBytes)));
-            hashReverseEndian.reverse();
-            return hashReverseEndian;
+            const signingSerialization = libauth.generateSigningSerializationBCH({
+                correspondingOutput: Uint8Array.of(),
+                coveredBytecode: outputToSpend.lockingBytecode,
+                locktime: 0,
+                outpointIndex: outputIndexToSpend,
+                outpointTransactionHash: transactionToSpend.hash,
+                outputValue: outputToSpend.satoshis,
+                sequenceNumber: sequenceNumber,
+                sha256: wallet._crypto.sha256,
+                signingSerializationType: signatureFlags,
+                transactionOutpoints: null,
+                transactionOutputs: libauth.encodeOutputsForSigning(contractOutputs),
+                transactionSequenceNumbers: null,
+                version: 2
+            });
+
+            const signingSerializationHash = wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(signingSerialization));
+            const rawSignature = wallet._crypto.secp256k1.signMessageHashDER(wallet._privateKey, signingSerializationHash);
+
+            return libauth.flattenBinArray([rawSignature, signatureFlags]);
         })();
-        const transactionToSpend = libauth.decodeTransactionUnsafe(transactionToSpendBytes);
 
-        const outputIndexToSpend = (function() {
-            const expectedOutputLockingScript = ("76a914" + libauth.binToHex(addressHash) + "88ac");
-            for (let outputIndex in transactionToSpend.outputs) {
-                const transactionOutput = transactionToSpend.outputs[outputIndex];
-                if (libauth.binToHex(transactionOutput.lockingBytecode) == expectedOutputLockingScript) {
-                    const outputAmount = libauth.binToBigIntUint64LE(transactionOutput.satoshis);
-                    if (outputAmount == donationAmount) {
-                        return outputIndex;
-                    }
-                }
-            }
-            return null;
-        })();
-        if (outputIndexToSpend == null) { return null; }
-
-        const outputToSpend = transactionToSpend.outputs[outputIndexToSpend];
-
-        const contractOutputs = serializeContractOutputs(contractRecipients);
-        console.log(libauth.binToBigIntUint64LE(contractOutputs[0].satoshis));
-
-        const sequenceNumber = 4294967295;
-        const signingSerialization = libauth.generateSigningSerializationBCH({
-            correspondingOutput: Uint8Array.of(),
-            coveredBytecode: outputToSpend.lockingBytecode,
-            locktime: 0,
-            outpointIndex: outputIndexToSpend,
-            outpointTransactionHash: transactionToSpendHash,
-            outputValue: outputToSpend.satoshis,
-            sequenceNumber: sequenceNumber,
-            sha256: wallet._crypto.sha256,
-            signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
-            transactionOutpoints: null,
-            transactionOutputs: libauth.encodeOutputsForSigning(contractOutputs),
-            transactionSequenceNumbers: null,
-            version: 2
-        });
-console.log({
-            correspondingOutput: Uint8Array.of(),
-            coveredBytecode: outputToSpend.lockingBytecode,
-            locktime: 0,
-            outpointIndex: outputIndexToSpend,
-            outpointTransactionHash: transactionToSpendHash,
-            outputValue: outputToSpend.satoshis,
-            sequenceNumber: sequenceNumber,
-            sha256: wallet._crypto.sha256,
-            signingSerializationType: Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId),
-            transactionOutpoints: null,
-            transactionOutputs: libauth.encodeOutputsForSigning(contractOutputs),
-            transactionSequenceNumbers: null,
-            version: 2
-        });
-
-        const signingSerializationHash = wallet._crypto.sha256.hash(wallet._crypto.sha256.hash(signingSerialization));
-
-        // generate ecdsa signature
-        const signatureFlags = Uint8Array.of(libauth.SigningSerializationFlag.singleInput | libauth.SigningSerializationFlag.allOutputs | libauth.SigningSerializationFlag.forkId);
-        const rawSignature = wallet._crypto.secp256k1.signMessageHashDER(wallet._privateKey, signingSerializationHash);
-        const libauthSig = libauth.flattenBinArray([rawSignature, signatureFlags]);
-
-        // applying a signature to transaction
+        const publicKey = wallet._getPublicKey();
         const unlockingScript = libauth.flattenBinArray([
-            libauth.encodeDataPush(libauthSig),
+            libauth.encodeDataPush(signature),
             libauth.encodeDataPush(publicKey),
         ]);
 
         const pledge = {
             "inputs": [{
-                "previous_output_transaction_hash": libauth.binToHex(transactionToSpendHash),
+                "previous_output_transaction_hash": libauth.binToHex(transactionToSpend.hash),
                 "previous_output_index": outputIndexToSpend,
                 "sequence_number": sequenceNumber,
                 "unlocking_script": libauth.binToHex(unlockingScript),
