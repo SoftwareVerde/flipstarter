@@ -22,7 +22,6 @@ class Wallet {
         return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
     }
 
-
     #_crypto = null;
     #_privateKey = null;
 
@@ -47,8 +46,8 @@ class Wallet {
             hashReverseEndian.reverse();
             return hashReverseEndian;
         })();
-        const transaction = libauth.decodeTransactionUnsafe(transactionBytes);
-        
+        const transaction = libauth.decodeTransaction(transactionBytes);
+
         const getOutputIndexToSpend = function(amount) {
             const publicKeyHash = wallet._getPublicKeyHash();
 
@@ -70,14 +69,52 @@ class Wallet {
             return null;
         };
 
+
+        const getPreviousOutputAddress = function(inputIndex) {
+            const areEqual = function(a, b) {
+                if (a.length != b.length) { return false; }
+
+                for (let i = 0; i < a.length; i += 1) {
+                    if (a[i] != b[i]) { return false; }
+                }
+
+                return true;
+            };
+
+            try {
+                const unlockingScript = transaction.inputs[inputIndex].unlockingBytecode; // P2PKH = [push(Signature), push(PublicKey)]
+                const scriptString = libauth.disassembleBytecodeBCH(unlockingScript).split(' ');
+                if (scriptString.length != 4) { return null; }
+
+                const signature = libauth.hexToBin(scriptString[1].substr(2));
+                const publicKey = libauth.hexToBin(scriptString[3].substr(2));
+
+                const expectedUnlockingScript = libauth.flattenBinArray([
+                    libauth.encodeDataPush(signature),
+                    libauth.encodeDataPush(publicKey)
+                ]);
+
+                if (! areEqual(expectedUnlockingScript, unlockingScript)) { return null; }
+
+                const publicKeyHash = wallet._crypto.ripemd160.hash(wallet._crypto.sha256.hash(publicKey));
+                return libauth.encodeCashAddress(libauth.CashAddressNetworkPrefix.mainnet, libauth.CashAddressVersionByte.P2PKH, publicKeyHash);
+            }
+            catch (exception) {
+                console.log(exception);
+                return null;
+            }
+        };
+
         return {
             hash: transactionHash,      // Uint8Array
             hex: transactionHex,        // String
             bytes: transactionBytes,    // Uint8Array
+            libauthObject: transaction,
             getOutputIndex: getOutputIndexToSpend, // function(matchingOutputAmount)
             getOutput: function(outputIndex) {
                 return transaction.outputs[outputIndex];
-            }
+            },
+            getPreviousOutputAddress: getPreviousOutputAddress // function(inputIndex)
         };
     }
 
@@ -87,6 +124,10 @@ class Wallet {
         this._privateKey = libauth.generatePrivateKey(function() {
             return window.crypto.getRandomValues(new Uint8Array(32));
         });
+    }
+
+    getPrivateKey() {
+        return libauth.encodePrivateKeyWif(this._crypto.sha256, this._privateKey, "mainnet");
     }
 
     getAddress() {
@@ -115,6 +156,7 @@ class Wallet {
 
     createRefundTransaction(transactionToSpendHex, donationAmount, returnAddressString) {
         const wallet = this;
+        if (! returnAddressString) { return null; }
 
         const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
         const outputIndexToSpend = transactionToSpend.getOutputIndex(donationAmount);
@@ -126,12 +168,14 @@ class Wallet {
         const refundAmount = libauth.binToBigIntUint64LE(outputToSpend.satoshis) - miningFee;
         const outputs = (function() {
             const lockingScript = contract.getLockscriptFromAddress(returnAddressString);
+            if (! lockingScript) { return null; }
             const satoshis = contract.encodeOutputValue(Number(refundAmount));
             return [{
                 "satoshis": satoshis,
                 "lockingBytecode": lockingScript
             }];
         })();
+        if (outputs == null) { return null; }
 
         const sequenceNumber = 4294967295;
         const signature = (function() {
@@ -179,6 +223,8 @@ class Wallet {
         };
 
         const transactionBytes = libauth.encodeTransaction(transaction);
+        if (! transactionBytes) { return null; }
+
         return Wallet.toHexString(transactionBytes);
     }
 
@@ -252,8 +298,14 @@ class Wallet {
         return window.btoa(JSON.stringify(pledge));
     };
 
-    getPrivateKey() {
-        return libauth.encodePrivateKeyWif(this._crypto.sha256, this._privateKey, "mainnet");
+    getRefundAddress(transactionHex) {
+        const wallet = this;
+        const transaction = wallet._parseTransactionHex(transactionHex);
+        for (let i = 0; i < transaction.libauthObject.inputs.length; i += 1) {
+            const address = transaction.getPreviousOutputAddress(i);
+            if (address) { return address; }
+        }
+        return null;
     }
 }
 

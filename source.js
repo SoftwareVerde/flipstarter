@@ -868,11 +868,29 @@ class flipstarter {
                   window.flipstarter.parseCommitment(function(result) {
                       if (! result) { return; }
 
+                      const refundAddress = wallet.getRefundAddress(transaction);
+
                       const revokeTokenContainer = document.getElementById("revokeToken");
-                      const returnAddressInput = revokeTokenContainer.querySelector(".return-address");
+                      const refundAddressInput = revokeTokenContainer.querySelector(".refund-address");
                       const tokenHexContainer = revokeTokenContainer.querySelector(".transaction-hex");
 
-                      tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, "bitcoincash:qqverdefl9xtryyx8y52m6va5j8s2s4eq59fjdn97e");
+                      const isValidAddress = function(addressString) {
+                          return ((typeof libauth.decodeCashAddress(addressString)) !== "string")
+                      };
+
+                      refundAddressInput.onchange = function(event) {
+                          const customRefundAddressString = refundAddressInput.value;
+                          if (isValidAddress(customRefundAddressString)) {
+                              refundAddressInput.classList.remove("invalid");
+                              tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, customRefundAddressString);
+                          }
+                          else {
+                              refundAddressInput.classList.add("invalid");
+                          }
+                      };
+
+                      refundAddressInput.value = refundAddress;
+                      tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, refundAddress);
                       revokeTokenContainer.classList.remove("hidden");
 
                       window.flipstarter.unbindWallet();

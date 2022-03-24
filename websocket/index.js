@@ -126,7 +126,7 @@ function createServer(app, webServer) {
                         }
                     }
                     else {
-                        if (webSocketConnection.subscriptions[lockingScriptHashReverseHex]) { // Already subscribed...
+                        if (! webSocketConnection.subscriptions[lockingScriptHashReverseHex]) { // Already subscribed...
                             const callback = async function(data) {
                                 if (! Array.isArray(data)) { return; }
                                 const scriptHash = data[0];

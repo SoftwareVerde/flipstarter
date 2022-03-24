@@ -691,6 +691,9 @@ aside > section > h3
     margin-top: 1em;
     margin-bottom: 2em;
 }
+#web-wallet.hidden {
+    display: none;
+}
 
 #web-wallet a {
     display: block;
@@ -716,4 +719,54 @@ aside > section > h3
 #web-wallet .address {
     text-align: center;
     margin-top: 1em;
+}
+
+#revokeToken {
+    text-align: center;
+    margin-top: 2em;
+}
+#revokeToken.hidden {
+    display: none;
+}
+
+#revokeToken .refund-address {
+    display: block;
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border: solid 1px #BFEDBF;
+    font-size: 0.9em;
+    box-shadow: none;
+}
+#revokeToken .refund-address.invalid {
+    border-color: #FF0000;
+}
+
+#revokeToken .transaction-hex {
+    word-wrap: break-word;
+    max-width: 300px;
+    padding: 0.5em;
+    font-family: monospace;
+    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 0.75em;
+    border: solid 1px #BFEDBF;
+    text-align: left;
+}
+
+#revokeToken .refund-info {
+    font-size: 0.85em;
+    font-style: italic;
+    margin-top: 2em;
+}
+
+#ec-plugin-info {
+    margin: auto;
+    text-align: center;
+    margin-bottom: 1em;
+    margin-top: 2em;
+    font-style: italic;
+    border-top: solid 1px #96E090;
+    padding-top: 2em;
 }
