@@ -48,7 +48,7 @@ class Wallet {
         })();
         const transaction = libauth.decodeTransaction(transactionBytes);
 
-        const getOutputIndexToSpend = function(amount) {
+        const getOutputIndexMatchingAmount = function(amount) {
             const publicKeyHash = wallet._getPublicKeyHash();
 
             const expectedOutputLockingScript = ("76a914" + libauth.binToHex(publicKeyHash) + "88ac");
@@ -110,7 +110,7 @@ class Wallet {
             hex: transactionHex,        // String
             bytes: transactionBytes,    // Uint8Array
             libauthObject: transaction,
-            getOutputIndex: getOutputIndexToSpend, // function(matchingOutputAmount)
+            getOutputIndexMatchingAmount: getOutputIndexMatchingAmount, // function(matchingOutputAmount)
             getOutput: function(outputIndex) {
                 return transaction.outputs[outputIndex];
             },
@@ -159,7 +159,7 @@ class Wallet {
         if (! returnAddressString) { return null; }
 
         const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
-        const outputIndexToSpend = transactionToSpend.getOutputIndex(donationAmount);
+        const outputIndexToSpend = transactionToSpend.getOutputIndexMatchingAmount(donationAmount);
         if (outputIndexToSpend == null) { return null; }
 
         const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);
@@ -232,7 +232,7 @@ class Wallet {
         const wallet = this;
 
         const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
-        const outputIndexToSpend = transactionToSpend.getOutputIndex(donationAmount);
+        const outputIndexToSpend = transactionToSpend.getOutputIndexMatchingAmount(donationAmount);
         if (outputIndexToSpend == null) { return null; }
 
         const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);

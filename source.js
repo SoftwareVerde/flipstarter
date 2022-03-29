@@ -58,7 +58,23 @@ class flipstarter {
     // NOTE: The contributions object is a map, not an array.
     for (let i = 0; i < fundraiser.contributions.length; i += 1) {
         const contribution = fundraiser.contributions[i];
+
+        const wasRevoked = (function(campaign) {
+            if (! contribution.revocation_id) { return false; }
+
+            // Check if the contribution was revoked after the campaign completed...
+            const contributionRevocationTimestamp = contribution.revocation_timestamp;
+            const campaignFulfillmentTimestamp = campaign.fullfillment_timestamp;
+            if (! campaignFulfillmentTimestamp) { return true; }
+
+            return (contributionRevocationTimestamp < campaignFulfillmentTimestamp);
+        })(this.campaign);
+
+        if (wasRevoked) { continue; }
         this.campaign.contributions[contribution.contribution_id] = contribution;
+        window.setTimeout(function() {
+            _.updateContributionList();
+        }, 0);
     }
 
     // Make object with support languages in this campaign
@@ -378,6 +394,10 @@ class flipstarter {
       "statusFullfilled",
       this.translation["statusFullfilled"]
     );
+
+    // Hide the revoke token since it is no longer elligible.
+    const revokeTokenContainer = document.getElementById("revokeToken");
+    revokeTokenContainer.classList.add("hidden");
 
     // Add interactive content to the status message.
     let sharingActions = "";
