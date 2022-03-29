@@ -1,4 +1,5 @@
 const shared = require("../shared.js");
+const javascriptUtilities = require("../src/util.js");
 
 // Initialize mutex locking library.
 const asyncMutex = require("async-mutex").Mutex;
@@ -18,34 +19,6 @@ const moment = require("moment");
 
 // Enable support for assurance contracts.
 const assuranceContract = require("../src/assurance.js").Contract;
-
-class javascriptUtilities {
-  /**
-   * Reverses a Buffers content
-   *
-   * @param source   the Buffer to reverse
-   *
-   * @returns a new Buffer with the contents reversed.
-   */
-  static reverseBuf(source) {
-    // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
-
-    // Iterate over half of the buffers length, rounded up..
-    for (
-      let lowIndex = 0, highIndex = source.length - 1;
-      lowIndex <= highIndex;
-      lowIndex += 1, highIndex -= 1
-    ) {
-      // .. and swap each position from the beggining to the end.
-      reversed[lowIndex] = source[highIndex];
-      reversed[highIndex] = source[lowIndex];
-    }
-
-    // Return the reversed buffer.
-    return reversed;
-  }
-}
 
 const calculateMinerFee = function (RECIPIENT_COUNT, CONTRIBUTION_COUNT) {
   // Aim for two satoshis per byte to get a clear margin for error and priority on fullfillment.
@@ -192,6 +165,8 @@ const submitContribution = async function (req, res) {
 
       let newCommitments = [];
       let totalSatoshis = 0;
+
+      let refundToken = null;
 
       // For each input committed..
       for (const inputIndex in contributionObject.inputs) {
@@ -457,6 +432,26 @@ const submitContribution = async function (req, res) {
         });
       }
 
+      // Create a refund token to be broadcast upon expiration.
+      for (const index in newCommitments) {
+        const commitmentId = newCommitments[index];
+        const token = (function() {
+          const encoder = new TextEncoder();
+          const preImage = encoder.encode(commitmentId + ":" + Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
+          const buffer = libox.Crypto.hash256(preImage);
+          return javascriptUtilities.toHexString(buffer);
+        })();
+
+        req.app.queries.createRefundTransaction.run({
+          token: token,
+          commitment_id: commitmentId
+        });
+
+        // NOTE: There can technically be multiple refund tokens created, but the web wallet only support one.
+        refundToken = token;
+      }
+
+
       // Reload all of the campaign contributions (including the newest contribution).
       const updatedCampaignContributions = req.app.queries.listAllContributions.all();
       const updatedRelevantContributions = updatedCampaignContributions.filter(filterOnCampaign);
@@ -534,7 +529,7 @@ const submitContribution = async function (req, res) {
       req.app.debug.server("Contribution acceptance confirmed to " + req.ip);
 
       // Send an OK signal back to the client.
-      res.status(200).json({ status: "ok" });
+      res.status(200).json({ status: "ok", refundToken: refundToken });
     } catch (error) {
       console.log(error);
       // Send an ERROR signal back to the client.

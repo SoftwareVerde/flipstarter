@@ -93,6 +93,18 @@ module.exports = function (app) {
         "utf8"
       ).trim()
     ),
+    createRefundTransaction: app.sql.prepare(
+      Filesystem.readFileSync(
+        "sql/create_refund_transaction.sql",
+        "utf8"
+      ).trim()
+    ),
+    setRefundTransaction: app.sql.prepare(
+      Filesystem.readFileSync(
+        "sql/set_refund_transaction.sql",
+        "utf8"
+      ).trim()
+    ),
     //
     getContributionByCommitment: app.sql.prepare(
       Filesystem.readFileSync(

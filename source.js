@@ -323,6 +323,7 @@ class flipstarter {
 
           // Update timer and status message to indicate successful fullfillment.
           this.showFullfilledStatus(eventData.fullfillment_transaction);
+          window.flipstarter.unbindWallet();
         }
       } else {
         // If the data refers to the current campaign...
@@ -863,8 +864,8 @@ class flipstarter {
               commitmentInput.value = pledge;
               if (pledge) {
                   webSocket._transactions.push(transaction);
-                  window.flipstarter.parseCommitment(function(result) {
-                      if (! result) { return; }
+                  window.flipstarter.parseCommitment(function(refundToken) {
+                      if (! refundToken) { return; }
 
                       const refundAddress = wallet.getRefundAddress(transaction);
 
@@ -873,14 +874,21 @@ class flipstarter {
                       const tokenHexContainer = revokeTokenContainer.querySelector(".transaction-hex");
 
                       const isValidAddress = function(addressString) {
-                          return ((typeof libauth.decodeCashAddress(addressString)) !== "string")
+                          return ((typeof libauth.decodeCashAddress(addressString)) !== "string");
                       };
 
                       refundAddressInput.onchange = function(event) {
                           const customRefundAddressString = refundAddressInput.value;
                           if (isValidAddress(customRefundAddressString)) {
                               refundAddressInput.classList.remove("invalid");
-                              tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, customRefundAddressString);
+                              const refundTransaction = wallet.createRefundTransaction(transaction, amount, customRefundAddressString);
+                              tokenHexContainer.textContent = refundTransaction;
+
+                              const refundObject = {
+                                  token: refundToken,
+                                  transaction: refundTransaction
+                              };
+                              webSocket.send(JSON.stringify({ refund: refundObject }));
                           }
                           else {
                               refundAddressInput.classList.add("invalid");
@@ -888,8 +896,15 @@ class flipstarter {
                       };
 
                       refundAddressInput.value = refundAddress;
-                      tokenHexContainer.textContent = wallet.createRefundTransaction(transaction, amount, refundAddress);
+                      const refundTransaction = wallet.createRefundTransaction(transaction, amount, refundAddress);
+                      tokenHexContainer.textContent = refundTransaction;
                       revokeTokenContainer.classList.remove("hidden");
+
+                      const refundObject = {
+                          token: refundToken,
+                          transaction: refundTransaction
+                      };
+                      webSocket.send(JSON.stringify({ refund: refundObject }));
 
                       window.flipstarter.unbindWallet();
                   });
@@ -1291,8 +1306,11 @@ class flipstarter {
       );
 
       if (callback) {
+        const responseJson = await submissionStatus.json();
+        const refundToken = responseJson.refundToken;
+
         window.setTimeout(function() {
-          callback(true);
+          callback(refundToken);
         }, 0);
       }
     }

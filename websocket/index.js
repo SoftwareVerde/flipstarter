@@ -77,6 +77,22 @@ function createServer(app, webServer) {
                 webSocketConnection.pongTimestamp = (new Date()).getTime();
             }
 
+            if (message.refund) {
+                const refundObject = message.refund;
+                const token = refundObject.token;
+                const transactionHex = refundObject.transaction;
+
+                try {
+                    const result = app.queries.setRefundTransaction.run({
+                        token: token,
+                        data: transactionHex
+                    });
+                }
+                catch (exception) {
+                    console.log(exception);
+                }
+            }
+
             const addressString = (message.addAddress || message.removeAddress);
             if (addressString) {
                 const isUnsubscribe = (message.removeAddress ? true : false);
