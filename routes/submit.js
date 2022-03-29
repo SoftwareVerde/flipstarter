@@ -181,9 +181,6 @@ const submitContribution = async function (req, res) {
         currentContributionCount
       );
 
-      // Get an updates list of contributions.
-      const campaignContributions = req.app.queries.listAllContributions.all();
-
       // Set up a filter function that..
       const filterOnCampaign = function (contribution) {
         // Return true if the contribution has not been revoced AND is from the correct campaign.
@@ -192,9 +189,6 @@ const submitContribution = async function (req, res) {
           contribution.campaign_id === campaignId
         );
       };
-
-      // Filter out irrelevant contributions.
-      const relevantContributions = campaignContributions.filter(filterOnCampaign);
 
       let newCommitments = [];
       let totalSatoshis = 0;
@@ -384,7 +378,13 @@ const submitContribution = async function (req, res) {
 
       // Calculate the minimum donation amount.
       const remainingValue = currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis);
-      const currentFloor = shared.calculateMinimumDonation(relevantContributions, remainingValue);
+      const currentFloor = (function() {
+          // Load all relevant existing contributions to calculate the floor.
+          const campaignContributions = req.app.queries.listAllContributions.all();
+          const relevantContributions = campaignContributions.filter(filterOnCampaign);
+
+          shared.calculateMinimumDonation(relevantContributions, remainingValue);
+      })();
 
       // Verify that the current contribution does not undercommit the contract floor.
       if (totalSatoshis < currentFloor) {
@@ -457,8 +457,12 @@ const submitContribution = async function (req, res) {
         });
       }
 
+      // Reload all of the campaign contributions (including the newest contribution).
+      const updatedCampaignContributions = req.app.queries.listAllContributions.all();
+      const updatedRelevantContributions = updatedCampaignContributions.filter(filterOnCampaign);
+
       // Update the initial push for the SSE stream.
-      req.app.sse.updateInit(campaignContributions);
+      req.app.sse.updateInit(updatedCampaignContributions);
 
       // Get the currently added contribution.
       const contributionData = req.app.queries.getContribution.get({
@@ -469,8 +473,8 @@ const submitContribution = async function (req, res) {
       req.app.sse.send(contributionData);
 
       // Add relevant contributions to the contract..
-      for (const currentContribution in relevantContributions) {
-        const commitment = relevantContributions[currentContribution];
+      for (const contributionIndex in updatedRelevantContributions) {
+        const commitment = updatedRelevantContributions[contributionIndex];
 
         const commitmentObject = {
           previousTransactionHash: commitment.previous_transaction_hash,
