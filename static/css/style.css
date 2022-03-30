@@ -413,6 +413,21 @@ hr
 #donateSection.hidden {
 	margin-top: 0rem;
 	max-height: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+#donateSection.hidden {
+    max-height: unset;
+    min-height: unset;
+    margin-top: 1rem;
+}
+#donateSection.hidden > div {
+    border: 0 !important;
+    padding: 0 !important;
+}
+/* Weird hide mechanic to allow web-wallet force show. */
+#donateSection.hidden > div > * {
     display: none;
 }
 
@@ -694,6 +709,13 @@ aside > section > h3
 #web-wallet.hidden {
     display: none;
 }
+#web-wallet.force-show {
+    display: block !important;
+}
+.hidden #web-wallet.force-show .web-wallet-info,
+.hidden #web-wallet.force-show .address {
+    display: none !important;
+}
 
 #web-wallet a {
     display: block;
@@ -727,6 +749,9 @@ aside > section > h3
 }
 #revokeToken.hidden {
     display: none;
+}
+.fullfilled #revokeToken {
+    display: none !important;
 }
 
 #revokeToken .refund-address {

@@ -396,10 +396,6 @@ class flipstarter {
       this.translation["statusFullfilled"]
     );
 
-    // Hide the revoke token since it is no longer elligible.
-    const revokeTokenContainer = document.getElementById("revokeToken");
-    revokeTokenContainer.classList.add("hidden");
-
     // Add interactive content to the status message.
     let sharingActions = "";
     sharingActions +=
@@ -863,6 +859,10 @@ class flipstarter {
 
               commitmentInput.value = pledge;
               if (pledge) {
+                  // Force showing the private key...
+                  const webWalletContainer = document.getElementById("web-wallet");
+                  webWalletContainer.classList.add("force-show");
+
                   webSocket._transactions.push(transaction);
                   window.flipstarter.parseCommitment(function(refundToken) {
                       if (! refundToken) { return; }
@@ -1340,6 +1340,11 @@ class flipstarter {
 
       // Show status.
       donateStatus.classList.remove("hidden");
+    }
+    else {
+      // WebWallet information is not applicable.
+      const webWalletContainer = document.getElementById("web-wallet");
+      webWalletContainer.classList.remove("force-show");
     }
   }
 
