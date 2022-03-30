@@ -1,8 +1,8 @@
 const WebSocket = require("ws");
 const libauth = require("@bitauth/libauth");
-const libox = require("../src/libox.js");
-const assuranceContract = require("../src/assurance.js").Contract;
-const javascriptUtilities = require("../src/util.js");
+const libox = require("../../src/libox.js");
+const assuranceContract = require("../../src/assurance.js").Contract;
+const javascriptUtilities = require("../../src/util.js");
 
 function createServer(app, webServer) {
     const webSocketServer = new WebSocket.Server({

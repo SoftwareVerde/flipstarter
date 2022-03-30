@@ -1,7 +1,7 @@
 const buffer = require("buffer/").Buffer;
 const libauth = require("@bitauth/libauth");
-const contract = require("./src/assurance").Contract;
-const QrCode = require("./src/qrcode.js");
+const contract = require("./assurance").Contract;
+const QrCode = require("./qrcode.js");
 
 // Global exports...
 window.Buffer = buffer;

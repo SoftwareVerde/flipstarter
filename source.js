@@ -1,4 +1,4 @@
-const shared = require("./shared.js");
+const shared = require("./src/shared.js");
 
 // Load the moment library to better manage time.
 const moment = require("moment");

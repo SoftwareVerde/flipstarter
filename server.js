@@ -4,7 +4,7 @@ const moment = require("moment");
 // Load the libox file.
 const libox = require("./src/libox.js");
 
-const websocket = require("./websocket");
+const websocketServer = require("./routes/websocket");
 const javascriptUtilities = require("./src/util.js");
 
 // Initialize mutex locking library.
@@ -311,7 +311,7 @@ const setup = async function () {
   // Listen to incoming connections on port X.
   const server = app.listen(app.config.server.port, "0.0.0.0");
 
-  websocket.createServer(app, server);
+  websocketServer.createServer(app, server);
 
   // Notify user that the service is ready for incoming connections.
   app.debug.status(

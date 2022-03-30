@@ -1,4 +1,4 @@
-const shared = require("../shared.js");
+const shared = require("../src/shared.js");
 const javascriptUtilities = require("../src/util.js");
 
 // Initialize mutex locking library.
