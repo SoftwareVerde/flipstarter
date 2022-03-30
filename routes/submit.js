@@ -1,3 +1,6 @@
+const shared = require("../src/shared.js");
+const javascriptUtilities = require("../src/util.js");
+
 // Initialize mutex locking library.
 const asyncMutex = require("async-mutex").Mutex;
 
@@ -16,36 +19,6 @@ const moment = require("moment");
 
 // Enable support for assurance contracts.
 const assuranceContract = require("../src/assurance.js").Contract;
-
-const SATS_PER_BCH = 100000000;
-
-class javascriptUtilities {
-  /**
-   * Reverses a Buffers content
-   *
-   * @param source   the Buffer to reverse
-   *
-   * @returns a new Buffer with the contents reversed.
-   */
-  static reverseBuf(source) {
-    // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
-
-    // Iterate over half of the buffers length, rounded up..
-    for (
-      let lowIndex = 0, highIndex = source.length - 1;
-      lowIndex <= highIndex;
-      lowIndex += 1, highIndex -= 1
-    ) {
-      // .. and swap each position from the beggining to the end.
-      reversed[lowIndex] = source[highIndex];
-      reversed[highIndex] = source[lowIndex];
-    }
-
-    // Return the reversed buffer.
-    return reversed;
-  }
-}
 
 const calculateMinerFee = function (RECIPIENT_COUNT, CONTRIBUTION_COUNT) {
   // Aim for two satoshis per byte to get a clear margin for error and priority on fullfillment.
@@ -77,6 +50,8 @@ const submitContribution = async function (req, res) {
     req.app.debug.server("New contribution delivered from " + req.ip);
     req.app.debug.object(req.body);
 
+    const campaignId = Number(req.params["campaign_id"]);
+
     // Validate and store contribution.
     try {
       // Parse contribution.
@@ -84,7 +59,7 @@ const submitContribution = async function (req, res) {
 
       // Get the campaign information..
       const campaign = req.app.queries.getCampaign.get({
-        campaign_id: Number(req.params["campaign_id"]),
+        campaign_id: campaignId,
       });
 
       // If there is no matching campaign..
@@ -156,7 +131,7 @@ const submitContribution = async function (req, res) {
 
       // Get a list of all recipients for the campaign.
       const recipients = req.app.queries.listRecipientsByCampaign.all({
-        campaign_id: Number(req.params["campaign_id"]),
+        campaign_id: campaignId,
       });
 
       // Add each recipient as outputs.
@@ -169,18 +144,29 @@ const submitContribution = async function (req, res) {
 
       // Get currently committed information.
       const currentCommittedSatoshis = req.app.queries.getCampaignCommittedSatoshis.get(
-        { campaign_id: Number(req.params["campaign_id"]) }
+        { campaign_id: campaignId }
       ).committed_satoshis;
       const currentContributionCount = req.app.queries.countCommitmentsByCampaign.get(
-        { campaign_id: Number(req.params["campaign_id"]) }
+        { campaign_id: campaignId }
       ).commitment_count;
       const currentMinerFee = calculateMinerFee(
         recipients.length,
         currentContributionCount
       );
 
+      // Set up a filter function that..
+      const filterOnCampaign = function (contribution) {
+        // Return true if the contribution has not been revoced AND is from the correct campaign.
+        return (
+          !contribution.revocation_id &&
+          contribution.campaign_id === campaignId
+        );
+      };
+
       let newCommitments = [];
       let totalSatoshis = 0;
+
+      let refundToken = null;
 
       // For each input committed..
       for (const inputIndex in contributionObject.inputs) {
@@ -212,7 +198,7 @@ const submitContribution = async function (req, res) {
         // Store the inputs value.
         const inputSatoshis =
           inputTransaction.vout[currentInput.previous_output_index].value *
-          SATS_PER_BCH;
+          shared.SATS_PER_BCH;
 
         // Add this inputs satoshis to the total amount.
         totalSatoshis += inputSatoshis;
@@ -317,12 +303,12 @@ const submitContribution = async function (req, res) {
 
         // If we have not yet subscribed to this script hash..
         if (
-          !req.app.subscribedScriphashes[
+          !req.app.subscribedScriptHashes[
             javascriptUtilities.reverseBuf(inputLockScriptHash).toString("hex")
           ]
         ) {
           // Mark this scripthash as subscribed to.
-          req.app.subscribedScriphashes[
+          req.app.subscribedScriptHashes[
             javascriptUtilities.reverseBuf(inputLockScriptHash).toString("hex")
           ] = true;
 
@@ -365,46 +351,15 @@ const submitContribution = async function (req, res) {
         return false;
       }
 
-      // Define a helper function we need to calculate the floor.
-      const inputPercentModifier = async function (inputPercent) {
-        const commitmentsPerTransaction = 650;
+      // Calculate the minimum donation amount.
+      const remainingValue = currentMinerFee + (contract.totalContractOutputValue - currentCommittedSatoshis);
+      const currentFloor = (function() {
+          // Load all relevant existing contributions to calculate the floor.
+          const campaignContributions = req.app.queries.listAllContributions.all();
+          const relevantContributions = campaignContributions.filter(filterOnCampaign);
 
-        // Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
-        const remainingValue =
-          currentMinerFee +
-          (contract.totalContractOutputValue - currentCommittedSatoshis);
-
-        const currentTransactionSize = 42; // this.contract.assembleTransaction().byteLength;
-
-        const minPercent =
-          0 +
-          (remainingValue /
-            (commitmentsPerTransaction - currentContributionCount) +
-            546 / SATS_PER_BCH) /
-            remainingValue;
-        const maxPercent =
-          1 -
-          ((currentTransactionSize + 1650 + 49) * 1.0) /
-          Math.round(remainingValue * SATS_PER_BCH);
-
-        // ...
-        const minValue = Math.log(minPercent * 100);
-        const maxValue = Math.log(maxPercent * 100);
-
-        // Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
-        return (
-          Math.exp(minValue + (inputPercent * (maxValue - minValue)) / 100) /
-          100
-        );
-      };
-
-      // Calculate the current floor
-      const currentFloor = Math.ceil(
-        (contract.totalContractOutputValue +
-          currentMinerFee -
-          currentCommittedSatoshis) *
-          (await inputPercentModifier(0.75))
-      );
+          shared.calculateMinimumDonation(relevantContributions, remainingValue);
+      })();
 
       // Verify that the current contribution does not undercommit the contract floor.
       if (totalSatoshis < currentFloor) {
@@ -463,7 +418,7 @@ const submitContribution = async function (req, res) {
       const storeContributionResult = req.app.queries.addContributionToCampaign.run(
         {
           user_id: storeUserResult.lastInsertRowid,
-          campaign_id: Number(req.params["campaign_id"]),
+          campaign_id: campaignId,
           contribution_comment: contributionObject.data.comment,
           contribution_timestamp: moment().unix(),
         }
@@ -477,11 +432,32 @@ const submitContribution = async function (req, res) {
         });
       }
 
-      // Get an updates list of contributions.
-      const campaignContributions = req.app.queries.listAllContributions.all();
+      // Create a refund token to be broadcast upon expiration.
+      for (const index in newCommitments) {
+        const commitmentId = newCommitments[index];
+        const token = (function() {
+          const encoder = new TextEncoder();
+          const preImage = encoder.encode(commitmentId + ":" + Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
+          const buffer = libox.Crypto.hash256(preImage);
+          return javascriptUtilities.toHexString(buffer);
+        })();
+
+        req.app.queries.createRefundTransaction.run({
+          token: token,
+          commitment_id: commitmentId
+        });
+
+        // NOTE: There can technically be multiple refund tokens created, but the web wallet only supports one.
+        refundToken = token;
+      }
+
+
+      // Reload all of the campaign contributions (including the newest contribution).
+      const updatedCampaignContributions = req.app.queries.listAllContributions.all();
+      const updatedRelevantContributions = updatedCampaignContributions.filter(filterOnCampaign);
 
       // Update the initial push for the SSE stream.
-      req.app.sse.updateInit(campaignContributions);
+      req.app.sse.updateInit(updatedCampaignContributions);
 
       // Get the currently added contribution.
       const contributionData = req.app.queries.getContribution.get({
@@ -491,23 +467,9 @@ const submitContribution = async function (req, res) {
       // Push the contribution to the SSE stream.
       req.app.sse.send(contributionData);
 
-      // Set up a filter function that..
-      const filterOnCampaign = function (contribution) {
-        // Return true if the contribution has not been revoced AND is from the correct campaign.
-        return (
-          !contribution.revocation_id &&
-          contribution.campaign_id === Number(req.params["campaign_id"])
-        );
-      };
-
-      // Filter out irrelevant contributions.
-      const relevantContributions = campaignContributions.filter(
-        filterOnCampaign
-      );
-
       // Add relevant contributions to the contract..
-      for (const currentContribution in relevantContributions) {
-        const commitment = relevantContributions[currentContribution];
+      for (const contributionIndex in updatedRelevantContributions) {
+        const commitment = updatedRelevantContributions[contributionIndex];
 
         const commitmentObject = {
           previousTransactionHash: commitment.previous_transaction_hash,
@@ -543,11 +505,18 @@ const submitContribution = async function (req, res) {
             const fullfillmentObject = {
               fullfillment_timestamp: moment().unix(),
               fullfillment_transaction: broadcastResult,
-              campaign_id: Number(req.params["campaign_id"]),
+              campaign_id: campaignId,
             };
 
-            // Store the fullfillment in the database.
-            req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
+            try {
+              // Store the fullfillment in the database.
+              req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
+            }
+            catch (exception) {
+              console.log("Campaign completed; error storing fulfillment.");
+              console.log(fullfillmentObject);
+              console.log(exception);
+            }
 
             // Push the fullfillment to the SSE stream.
             req.app.sse.send(fullfillmentObject);
@@ -567,8 +536,9 @@ const submitContribution = async function (req, res) {
       req.app.debug.server("Contribution acceptance confirmed to " + req.ip);
 
       // Send an OK signal back to the client.
-      res.status(200).json({ status: "ok" });
+      res.status(200).json({ status: "ok", refundToken: refundToken });
     } catch (error) {
+      console.log(error);
       // Send an ERROR signal back to the client.
       res.status(500).json({ error: error });
 

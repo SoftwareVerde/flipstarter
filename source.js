@@ -1,3 +1,5 @@
+const shared = require("./src/shared.js");
+
 // Load the moment library to better manage time.
 const moment = require("moment");
 // set this page languages
@@ -19,50 +21,7 @@ const DOMPurify = createDOMPurify(window);
 // Load the celebratory confetti library.
 const confetti = require("canvas-confetti").default;
 
-/**
- * Encodes a string into binary with support for multibyte content.
- *
- * @param string   a unicode (utf16) string to encode.
- * @returns the string encoded in base64.
- */
-const base64encode = function (string) {
-  const codeUnits = new Uint16Array(string.length);
-
-  for (let i = 0; i < codeUnits.length; i += 1) {
-    codeUnits[i] = string.charCodeAt(i);
-  }
-
-  return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
-};
-
-/**
- * Decodes a binary into a string taking care to properly decode multibyte content.
- *
- * @param binary   a base64 encoded string to decode.
- * @returns the binary decoded from base64.
- */
-const base64decode = function (binary) {
-  return atob(binary);
-
-  // NOTE: The below code should have worked according to MDN,
-  //       but caused issues when used with JSON.parse.
-  /*
-	let string = atob(binary);
-
-	const bytes = new Uint8Array(string.length);
-
-	for (let i = 0; i < bytes.length; i++)
-	{
-		bytes[i] = string.charCodeAt(i);
-	}
-
-	return String.fromCharCode(...new Uint16Array(bytes.buffer));
-	*/
-};
-
 //
-const commitmentsPerTransaction = 650;
-const SATS_PER_BCH = 100000000;
 
 const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
 
@@ -80,13 +39,161 @@ class flipstarter {
   }
 
   async initialize() {
+    const _ = this;
+
+    // Wait for translations to finish loading..
+    await this.translationLoadingPromise;
+
+    // Wait for currency rates to be loaded..
+    await this.loadCurrencyRates();
+
+    // Fetch the campaign information from the backend.
+    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
+    let fundraiser = await response.json();
+
+    this.campaign = fundraiser.campaign;
+    this.campaign.recipients = fundraiser.recipients;
+    this.campaign.contributions = {};
+
+    // NOTE: The contributions object is a map, not an array.
+    for (let i = 0; i < fundraiser.contributions.length; i += 1) {
+        const contribution = fundraiser.contributions[i];
+
+        const wasRevoked = (function(campaign) {
+            if (! contribution.revocation_id) { return false; }
+
+            // Check if the contribution was revoked after the campaign completed...
+            const contributionRevocationTimestamp = contribution.revocation_timestamp;
+            const campaignFulfillmentTimestamp = campaign.fullfillment_timestamp;
+            if (! campaignFulfillmentTimestamp) { return true; }
+
+            return (contributionRevocationTimestamp < campaignFulfillmentTimestamp);
+        })(this.campaign);
+
+        if (wasRevoked) { continue; }
+        this.campaign.contributions[contribution.contribution_id] = contribution;
+        window.setTimeout(function() {
+            _.updateContributionList();
+        }, 0);
+    }
+
+    // Make object with support languages in this campaign
+    const available_languages = {};
+
+    // Add languages data to campaign languages
+    this.campaign.available_languages.split(",").forEach(
+      (lang) => {
+        available_languages[lang] = this.languages[lang];
+      }
+    );
+
+    // NOTE: currencyValue is only available after setting the page's locale...
+    const rootPage = location.pathname === "/";
+    if (rootPage && localStorage.getItem("language")) {
+      await this.updateTranslation(localStorage.getItem("language"));
+    }
+    else if (rootPage && available_languages[navigator.language.slice(0, 2)]) {
+      await this.updateTranslation(navigator.language.slice(0, 2));
+    }
+    else {
+      await this.updateTranslation(page_language);
+    }
+
+    // Apply website translation (or load website content).
+    for (const lang in available_languages) {
+      let { buttonColor } = available_languages[lang];
+      document.getElementById("languageList").innerHTML += `
+      <li>
+        <a
+        class="btn-floating"
+        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
+        id="translate-${lang}">
+          ${lang}
+        </a>
+      </li>
+      `;
+    }
+    for (const lang in available_languages) {
+      document
+        .getElementById("translate-" + lang)
+        .addEventListener(
+          "click",
+          () => {
+            localStorage.setItem("language", lang);
+            this.updateTranslation.bind(
+              this,
+              lang,
+              available_languages[lang].name
+            )();
+          }
+        );
+    }
+
     // Attach event handlers.
-    document
-      .getElementById("donationSlider")
-      .addEventListener("input", this.updateContributionInput.bind(this));
-    document
-      .getElementById("donateButton")
-      .addEventListener("click", this.toggleDonationSection.bind(this));
+    const donationSlider = document.getElementById("donationSlider");
+    const donationDollarInput = document.getElementById("donationDollar");
+    const donationBchInput = document.getElementById("donationBch");
+
+    // Set the slider min/max values...
+    (function() {
+        const remainingValue = _.calculateMinerFee() + (_.countRequestedSatoshis(_.campaign.recipients) - _.countCommittedSatoshis(_.campaign.contributions));
+        const minimumDonation = shared.calculateMinimumDonation(_.campaign.contributions, remainingValue);
+
+        donationSlider.setAttribute("min", minimumDonation);
+        donationSlider.setAttribute("max", remainingValue);
+    })();
+
+    const synchronizeInputs = function(triggeringInput) {
+        let satoshis = 0;
+        if (triggeringInput == donationDollarInput) {
+            satoshis = ((triggeringInput.value / _.currencyValue) * shared.SATS_PER_BCH).toFixed();
+        }
+        else if (triggeringInput == donationBchInput) {
+            satoshis = (triggeringInput.value * shared.SATS_PER_BCH).toFixed();
+        }
+        else { // (triggeringInput == donationSlider)
+            satoshis = triggeringInput.value;
+        }
+
+        if (triggeringInput != donationSlider) {
+            // Update the donation slider...
+            donationSlider.value = satoshis;
+        }
+
+        if (triggeringInput != donationDollarInput) {
+            const dollars = ((satoshis / shared.SATS_PER_BCH) * _.currencyValue).toFixed(2);
+            // Update the dollar input...
+            donationDollarInput.value = dollars;
+        }
+
+        if (triggeringInput != donationBchInput) {
+            // Update the BCH input...
+            donationBchInput.value = (satoshis / shared.SATS_PER_BCH).toFixed(Math.log10(shared.SATS_PER_BCH));
+        }
+
+        // Trigger an input event to the slider since it is the "source of truth"...
+        if (triggeringInput != donationSlider) {
+            donationSlider.dispatchEvent(new Event("input"));
+        }
+    };
+
+    [donationDollarInput, donationBchInput].forEach(function(input, index) {
+        input.addEventListener("focus", function(event) {
+            input.select();
+        });
+        input.addEventListener("change", function(event) {
+            synchronizeInputs(input);
+        });
+    });
+    donationSlider.addEventListener("input", function(event) {
+        synchronizeInputs(donationSlider);
+    });
+
+    donationSlider.addEventListener("input", this.updateContributionInput.bind(this));
+
+    const donateButton = document.getElementById("donateButton");
+    donateButton.addEventListener("click", this.bindWallet);
+    donateButton.addEventListener("click", this.toggleDonationSection.bind(this));
 
     document
       .getElementById("template")
@@ -120,71 +227,6 @@ class flipstarter {
       .getElementById("commitment")
       .addEventListener("keyup", this.updateCommitButton.bind(this));
 
-    // Wait for translations to finish loading..
-    await this.translationLoadingPromise;
-
-    // Wait for currency rates to be loaded..
-    await this.loadCurrencyRates();
-
-    // Fetch the campaign information from the backend.
-    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
-    let fundraiser = await response.json();
-
-    this.campaign = fundraiser.campaign;
-    this.campaign.recipients = fundraiser.recipients;
-    this.campaign.contributions = {};
-
-    // Make object with support languages in this campaign
-    const available_languages = {};
-
-    // Add languages data to campaign languages
-    this.campaign.available_languages.split(",").forEach(
-      (lang) => {
-        available_languages[lang] = this.languages[lang];
-      }
-    );
-
-    const rootPage = location.pathname === "/";
-    // Apply website translation (or load website content).
-
-    if(rootPage && localStorage.getItem("language")) {
-      await this.updateTranslation(localStorage.getItem("language"));
-    }else if(rootPage && available_languages[navigator.language.slice(0, 2)]) {
-      await this.updateTranslation(navigator.language.slice(0, 2));
-    }else {
-      await this.updateTranslation(page_language);
-    }
-
-
-    for (const lang in available_languages) {
-      let { buttonColor } = available_languages[lang];
-      document.getElementById("languageList").innerHTML += `
-      <li>
-        <a
-        class="btn-floating"
-        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
-        id="translate-${lang}">
-          ${lang}
-        </a>
-      </li>
-      `;
-    }
-    for (const lang in available_languages) {
-      document
-        .getElementById("translate-" + lang)
-        .addEventListener(
-          "click",
-          () => {
-            localStorage.setItem("language", lang);
-            this.updateTranslation.bind(
-              this,
-              lang,
-              available_languages[lang].name
-            )();
-          }
-        );
-    }
-
     // Update the campaign status and timer.
     this.updateTimerPresentation();
 
@@ -200,7 +242,7 @@ class flipstarter {
     // Add each recipient to the fundraiser.
     for (const recipientIndex in fundraiser.recipients) {
       const recipientAmount = Number(
-        fundraiser.recipients[recipientIndex].recipient_satoshis / SATS_PER_BCH
+        fundraiser.recipients[recipientIndex].recipient_satoshis / shared.SATS_PER_BCH
       ).toLocaleString();
       const recipientName = fundraiser.recipients[recipientIndex].user_alias;
       const recipientURL = fundraiser.recipients[recipientIndex].user_url;
@@ -281,6 +323,7 @@ class flipstarter {
 
           // Update timer and status message to indicate successful fullfillment.
           this.showFullfilledStatus(eventData.fullfillment_transaction);
+          window.flipstarter.unbindWallet();
         }
       } else {
         // If the data refers to the current campaign...
@@ -319,7 +362,7 @@ class flipstarter {
           ).textContent = DOMPurify.sanitize(
             (
               this.countCommittedSatoshis(this.campaign.contributions) /
-              SATS_PER_BCH
+              shared.SATS_PER_BCH
             ).toFixed(2)
           );
 
@@ -442,7 +485,7 @@ class flipstarter {
       this.hideStatus();
 
       // Show the campaign input form.
-      document.getElementById("donateForm").className = "col s12 m12 l12";
+      document.getElementById("donateForm").classList.remove("hidden");
 
       // Automatically update campaign status 500ms after campaign ends.
       setTimeout(
@@ -456,9 +499,12 @@ class flipstarter {
     let committedSatoshis = 0;
 
     for (const contributionIndex in contributions) {
-      if (typeof contributions[contributionIndex].satoshis !== "undefined") {
-        committedSatoshis += contributions[contributionIndex].satoshis;
-      }
+      const contribution = contributions[contributionIndex];
+
+      if (typeof contribution.satoshis == "undefined") { continue; }
+      if (contribution.revocation_id != null) { continue; }
+
+      committedSatoshis += contributions[contributionIndex].satoshis;
     }
 
     return committedSatoshis;
@@ -765,14 +811,166 @@ class flipstarter {
     templateButton.disabled = "disabled";
   }
 
-  async toggleDonationSection(visibility = null) {
-    const donationSection = document.getElementById("donateSection");
+  async unbindWallet() {
+      const wallet = window.Wallet.instance;
+      if (! wallet._isBound) { return; }
 
-    if (
-      visibility !== false &&
-      donationSection.className !== "visible col s12 m12"
-    ) {
-      donationSection.className = "visible col s12 m12";
+      window.clearInterval(wallet._isBound);
+      wallet._isBound = null;
+
+      const address = wallet.getAddress();
+      window.webSocket.addConnectCallback(function() {
+          window.webSocket.send(JSON.stringify({
+              removeAddress: address
+          }));
+      });
+  }
+
+  async bindWallet() {
+      const wallet = window.Wallet.instance;
+      if (wallet._isBound) { return; }
+
+      const donationSlider = document.getElementById("donationSlider");
+      const donationAmountButton = document.getElementById("donationAmount");
+      const aliasInput = document.getElementById("contributionName");
+      const commentInput = document.getElementById("contributionComment");
+      const commitmentInput = document.getElementById("commitment");
+
+      const address = wallet.getAddress();
+
+      window.webSocket.addConnectCallback(function() {
+          window.webSocket.send(JSON.stringify({
+              addAddress: address
+          }));
+      });
+
+      window.webSocket.addMessageReceivedCallback(async function(message) {
+          if (message.transaction) {
+              const transaction = message.transaction;
+
+              webSocket._transactions = webSocket._transactions || [];
+              if (webSocket._transactions.indexOf(transaction) >= 0) { return; }
+
+              const alias = aliasInput.value;
+              const comment = commentInput.value;
+              const amount = Number(donationSlider.value);
+
+              const recipients = window.flipstarter.campaign.recipients;
+              const pledgeObject = wallet.createPledge(transaction, recipients, amount, alias, comment);
+              const pledge = (pledgeObject ? pledgeObject.pledge : null);
+              const actualPledgedAmount = (pledgeObject ? pledgeObject.amount : null);
+
+              commitmentInput.value = pledge;
+              if (pledge) {
+                  // Update the app's donation amount to match the amount actually received.
+                  donationSlider.value = actualPledgedAmount;
+                  donationAmountButton.setAttribute("data-satoshis", actualPledgedAmount);
+                  await window.flipstarter.updateContributionInput(null);
+
+                  // Force showing the private key...
+                  const webWalletContainer = document.getElementById("web-wallet");
+                  webWalletContainer.classList.add("force-show");
+
+                  webSocket._transactions.push(transaction);
+                  window.flipstarter.parseCommitment(function(refundToken) {
+                      if (! refundToken) { return; }
+
+                      const refundAddress = wallet.getRefundAddress(transaction);
+
+                      const revokeTokenContainer = document.getElementById("revokeToken");
+                      const refundAddressInput = revokeTokenContainer.querySelector(".refund-address");
+                      const tokenHexContainer = revokeTokenContainer.querySelector(".transaction-hex");
+
+                      const isValidAddress = function(addressString) {
+                          return ((typeof libauth.decodeCashAddress(addressString)) !== "string");
+                      };
+
+                      refundAddressInput.onchange = function(event) {
+                          const customRefundAddressString = refundAddressInput.value;
+                          if (isValidAddress(customRefundAddressString)) {
+                              refundAddressInput.classList.remove("invalid");
+                              const refundTransaction = wallet.createRefundTransaction(transaction, amount, customRefundAddressString);
+                              tokenHexContainer.textContent = refundTransaction;
+
+                              const refundObject = {
+                                  token: refundToken,
+                                  transaction: refundTransaction
+                              };
+                              webSocket.send(JSON.stringify({ refund: refundObject }));
+                          }
+                          else {
+                              refundAddressInput.classList.add("invalid");
+                          }
+                      };
+
+                      refundAddressInput.value = refundAddress;
+                      const refundTransaction = wallet.createRefundTransaction(transaction, amount, refundAddress);
+                      tokenHexContainer.textContent = refundTransaction;
+                      revokeTokenContainer.classList.remove("hidden");
+
+                      const refundObject = {
+                          token: refundToken,
+                          transaction: refundTransaction
+                      };
+                      webSocket.send(JSON.stringify({ refund: refundObject }));
+
+                      window.flipstarter.unbindWallet();
+                  });
+              }
+          }
+      });
+
+      wallet._isBound = window.setInterval(function() {
+          if (window.webSocket.readyState != window.webSocket.OPEN) { return; }
+
+          window.webSocket.send(JSON.stringify({
+              addAddress: address
+          }));
+      }, 2500);
+  }
+
+  async toggleDonationSection(visibility = null) {
+    const donationSlider = document.getElementById("donationSlider");
+    const aliasInput = document.getElementById("contributionName");
+    const commentInput = document.getElementById("contributionComment");
+    const commitmentInput = document.getElementById("commitment");
+
+    // Bind WebWallet...
+    (function() {
+        const webWalletContainer = document.getElementById("web-wallet");
+        const wallet = window.Wallet.instance;
+
+        const privateKeyWif = wallet.getPrivateKey();
+        const cashAddress = wallet.getAddress();
+        const amount = Number(donationSlider.value);
+        const bchAmount = (amount / shared.SATS_PER_BCH).toFixed(8);
+        const walletAddressImage = wallet.createQrCode(256, bchAmount);
+
+        const walletAddressSpan = document.createElement("a");
+        walletAddressSpan.setAttribute("href", cashAddress + "?amount=" + bchAmount);
+        walletAddressSpan.textContent = cashAddress;
+
+        const webWalletPrivateKeyContainer = webWalletContainer.querySelector(".private-key");
+        webWalletPrivateKeyContainer.classList.add("hidden");
+        webWalletPrivateKeyContainer.textContent = privateKeyWif;
+
+        const webWalletPrivateKeyButton = webWalletContainer.querySelector(".private-key-button");
+        webWalletPrivateKeyButton.onclick = function() {
+            webWalletPrivateKeyContainer.classList.toggle("hidden");
+        };
+
+        const webWalletAddressContainer = webWalletContainer.querySelector(".address");
+        while (webWalletAddressContainer.firstChild) {
+            webWalletAddressContainer.firstChild.remove();
+        }
+        webWalletAddressContainer.appendChild(walletAddressImage);
+        webWalletAddressContainer.appendChild(walletAddressSpan);
+    })();
+
+    const donateSection = document.getElementById("donateSection");
+
+    if (visibility !== false && donateSection.classList.contains("hidden")) {
+      donateSection.classList.remove("hidden");
 
       // Make name and comment enabled in case it was disabled as a result of an incomplete previous process.
       document.getElementById("contributionName").disabled = false;
@@ -780,8 +978,9 @@ class flipstarter {
 
       // Disable the action button.
       document.getElementById("donateButton").disabled = true;
-    } else {
-      donationSection.className = "hidden col s12 m12";
+    }
+    else {
+      donateSection.classList.add("hidden");
 
       // Enable the action button.
       document.getElementById("donateButton").disabled = false;
@@ -793,7 +992,7 @@ class flipstarter {
       "campaignRequestAmount"
     ).textContent = DOMPurify.sanitize(
       (
-        this.countRequestedSatoshis(this.campaign.recipients) / SATS_PER_BCH
+        this.countRequestedSatoshis(this.campaign.recipients) / shared.SATS_PER_BCH
       ).toFixed(2)
     );
   }
@@ -894,7 +1093,7 @@ class flipstarter {
       }
 
       // Assemble an assurance request template.
-      const templateString = base64encode(JSON.stringify(requestObject));
+      const templateString = shared.base64encode(JSON.stringify(requestObject));
 
       // Update the website template string.
       templateTextArea.textContent = templateString;
@@ -918,8 +1117,9 @@ class flipstarter {
 
     // Enable the action button.
     document.getElementById("donateButton").disabled = false;
+    const donationSlider = document.getElementById("donationSlider");
 
-    if (Number(event.target.value) <= 1) {
+    if (Number(donationSlider.value) <= 1) {
       // Reset metadata.
       document.getElementById("contributionName").value = "";
       document.getElementById("contributionComment").value = "";
@@ -929,82 +1129,40 @@ class flipstarter {
 
       // Set amount to 0.
       donationAmount = 0;
-    } else {
-      donationAmount = Math.ceil(
-        (this.calculateMinerFee() + requestedSatoshis - committedSatoshis) *
-          (await this.inputPercentModifier(event.target.value))
-      );
+    }
+    else {
+      donationAmount = Number(donationSlider.value);
     }
 
-    if (Number(event.target.value) >= 100) {
-      document.getElementById("donateText").textContent = this.translation[
-        "fullfillText"
-      ];
-    } else {
-      document.getElementById("donateText").textContent = this.translation[
-        "donateText"
-      ];
+    const remainingValue = this.calculateMinerFee() + (this.countRequestedSatoshis(this.campaign.recipients) - this.countCommittedSatoshis(this.campaign.contributions));
+    const willCompleteCampaign = (donationAmount >= remainingValue);
+
+    if (willCompleteCampaign) {
+      document.getElementById("donateText").textContent = this.translation["fullfillText"];
+    }
+    else {
+      document.getElementById("donateText").textContent = this.translation["donateText"];
     }
 
-    document.getElementById("campaignContributionBar").style.left =
-      (100 * (committedSatoshis / requestedSatoshis)).toFixed(2) + "%";
-    document.getElementById("campaignContributionBar").style.width =
-      (
-        100 *
-        (await this.inputPercentModifier(event.target.value)) *
-        (1 - committedSatoshis / requestedSatoshis)
-      ).toFixed(2) + "%";
-    document.getElementById("donationAmount").textContent =
-      (donationAmount / SATS_PER_BCH).toLocaleString() +
-      " BCH (" +
-      (this.currencyValue * (donationAmount / SATS_PER_BCH)).toFixed(2) +
-      " " +
-      this.currencyCode +
-      ")";
+    const contributionBar = document.getElementById("campaignContributionBar");
+    contributionBar.style.left = (100 * (committedSatoshis / requestedSatoshis)).toFixed(2) + "%";
+    contributionBar.style.width = (100 * donationAmount / requestedSatoshis).toFixed(2) + "%";
+
+    const bchString = (donationAmount / shared.SATS_PER_BCH).toLocaleString();
+    const dollarString = (this.currencyValue * (donationAmount / shared.SATS_PER_BCH)).toFixed(2);
+    document.getElementById("donationAmount").textContent = bchString + " BCH (" + dollarString + " " + this.currencyCode + ")";
 
     //
-    document
-      .getElementById("donationAmount")
-      .setAttribute("data-satoshis", donationAmount);
+    document.getElementById("donationAmount").setAttribute("data-satoshis", donationAmount);
 
     // Update the template text.
     this.updateTemplate();
   }
 
-  async inputPercentModifier(inputPercent) {
-    // Calculate how many % of the total fundraiser the smallest acceptable contribution is at the moment.
-    const remainingValue =
-      this.calculateMinerFee() +
-      (this.countRequestedSatoshis(this.campaign.recipients) -
-        this.countCommittedSatoshis(this.campaign.contributions));
-
-    const currentTransactionSize = 42; // this.contract.assembleTransaction().byteLength;
-
-    const minPercent =
-      0 +
-      (remainingValue /
-        (commitmentsPerTransaction - this.campaign.recipients.length) +
-        546 / SATS_PER_BCH) /
-        remainingValue;
-    const maxPercent =
-      1 -
-      ((currentTransactionSize + 1650 + 49) * 1.0) /
-        Math.round(remainingValue * SATS_PER_BCH);
-
-    // ...
-    const minValue = Math.log(minPercent * 100);
-    const maxValue = Math.log(maxPercent * 100);
-
-    // Return a percentage number on a non-linear scale with higher resolution in the lower boundaries.
-    return (
-      Math.exp(minValue + (inputPercent * (maxValue - minValue)) / 100) / 100
-    );
-  }
-
   /**
    *
    */
-  async parseCommitment() {
+  async parseCommitment(callback) {
     //
     const base64text = document.getElementById("commitment").value;
 
@@ -1013,7 +1171,7 @@ class flipstarter {
 
     try {
       // Attempt to decode the base64 contribution.
-      commitmentObject = JSON.parse(base64decode(base64text));
+      commitmentObject = JSON.parse(shared.base64decode(base64text));
     } catch (error) {
       // Update form to indicate success and prevent further entry.
       this.updateStatus(
@@ -1141,7 +1299,7 @@ class flipstarter {
       );
     } else {
       // Reset slider amount.
-      document.getElementById("donationSlider").value = 0.8;
+      document.getElementById("donationSlider").value = 0;
 
       // Update the input to reflect new amount.
       document
@@ -1154,6 +1312,15 @@ class flipstarter {
         "statusContribution",
         this.translation["statusContribution"]
       );
+
+      if (callback) {
+        const responseJson = await submissionStatus.json();
+        const refundToken = responseJson.refundToken;
+
+        window.setTimeout(function() {
+          callback(refundToken);
+        }, 0);
+      }
     }
   }
 
@@ -1172,15 +1339,20 @@ class flipstarter {
       donateField.className = `row ${type}`;
 
       // Hide form and section.
-      donateForm.className = "col s12 m12 l12 hidden";
-      donateSection.className = "col s12 m12 l12 hidden";
+      donateForm.classList.add("hidden");
+      donateSection.classList.add("hidden");
 
       // Add status content.
       donateStatus.setAttribute("data-string", label);
       donateStatus.innerHTML = content;
 
       // Show status.
-      donateStatus.className = "col s12 m12 l12";
+      donateStatus.classList.remove("hidden");
+    }
+    else {
+      // WebWallet information is not applicable.
+      const webWalletContainer = document.getElementById("web-wallet");
+      webWalletContainer.classList.remove("force-show");
     }
   }
 
@@ -1189,7 +1361,7 @@ class flipstarter {
     const donateStatus = document.getElementById("donateStatus");
 
     // Hide status.
-    donateStatus.className = "col s12 m12 l12 hidden";
+    donateStatus.classList.add("hidden");
     donateStatus.textContent = "";
   }
 
@@ -1213,7 +1385,7 @@ class flipstarter {
     ).toFixed(2);
     const animationLength = 15;
     const animationDelay = (Math.random() * animationLength).toFixed(2);
-    const contributionAmount = (amount / SATS_PER_BCH).toFixed(2);
+    const contributionAmount = (amount / shared.SATS_PER_BCH).toFixed(2);
 
     // Update the data on the copy.
     contributionEntry.querySelector(

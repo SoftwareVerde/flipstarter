@@ -21,6 +21,11 @@
 
   "usernameLabel": "姓名(非必选项)",
   "commentLabel": "留言 (非必选项)",
+  "privateKeyInfo": "单击此处显示您的网络钱包的私钥。 此密钥可用于撤销您的承诺，并确保您是唯一可以控制您的承诺的人，直到活动完成。",
+  "webWalletInfo": "通过将 BCH 发送到以下地址或使用 Electrum Cash 钱包上的 Flipstarter 插件来完成您的贡献。",
+  "revokeInfo": "将此交易保存在安全的地方； 它可用于在活动结束前的任何时间撤销您的承诺。 如果活动到期，您的资金将自动退回。",
+  "refundAddressInfo": "如果您希望将您的承诺退回到其他地址，请在此处指定。",
+  "ecPluginInfo": "要使用 Electron Cash 进行质押，请按照以下步骤操作。",
   "copyLabel": "1. 复制细节",
   "copyButton": "复制细节",
   "downloadText": "下载",

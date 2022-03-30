@@ -4,33 +4,8 @@ const moment = require("moment");
 // Load the libox file.
 const libox = require("./src/libox.js");
 
-class javascriptUtilities {
-  /**
-   * Reverses a Buffers content
-   *
-   * @param source   the Buffer to reverse
-   *
-   * @returns a new Buffer with the contents reversed.
-   */
-  static reverseBuf(source) {
-    // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
-
-    // Iterate over half of the buffers length, rounded up..
-    for (
-      let lowIndex = 0, highIndex = source.length - 1;
-      lowIndex <= highIndex;
-      lowIndex += 1, highIndex -= 1
-    ) {
-      // .. and swap each position from the beggining to the end.
-      reversed[lowIndex] = source[highIndex];
-      reversed[highIndex] = source[lowIndex];
-    }
-
-    // Return the reversed buffer.
-    return reversed;
-  }
-}
+const websocketServer = require("./routes/websocket");
+const javascriptUtilities = require("./src/util.js");
 
 // Initialize mutex locking library.
 const asyncMutex = require("async-mutex").Mutex;
@@ -99,7 +74,7 @@ const setup = async function () {
   app.get("/events", app.sse.init);
 
   // Initialize an empty set of scripthashes that we are subscribed to.
-  app.subscribedScriphashes = {};
+  app.subscribedScriptHashes = {};
 
   // initialize a revocation event check lock.
   app.handleRevocationsLock = new asyncMutex();
@@ -123,9 +98,9 @@ const setup = async function () {
 
       try {
         // If this event is new or has a changed scripthash status..
-        if (app.subscribedScriphashes[scriptHash] !== scriptHashStatus) {
+        if (app.subscribedScriptHashes[scriptHash] !== scriptHashStatus) {
           // Update this scripthash status to prevent redundant work..
-          app.subscribedScriphashes[scriptHash] = scriptHashStatus;
+          app.subscribedScriptHashes[scriptHash] = scriptHashStatus;
 
           // For each transaction for this scripthash..
           for (const transactionIndex in transactions) {
@@ -143,6 +118,16 @@ const setup = async function () {
     }
   };
 
+  app.electrumSubscribeCallbacks = [app.handleRevocations];
+  app.electrumSubscribeCallback = async function(data) {
+    for (let i = 0; i < app.electrumSubscribeCallbacks.length; i += 1) {
+      const callback = app.electrumSubscribeCallbacks[i];
+      if (callback) {
+          callback(data);
+      }
+    }
+  };
+
   // initialize a transaction revocation check lock.
   app.checkForTransactionUpdatesLock = new asyncMutex();
 
@@ -155,7 +140,7 @@ const setup = async function () {
     // Fetch the referenced transaction.
     const currentTransaction = await app.electrum.request(
       "blockchain.transaction.get",
-      transactionHash.toString("hex"),
+      transactionHash.toString("hex"), // Legacy Note: transactionHash is already be a hex string, so this is likely unnecessary.
       true
     );
 
@@ -224,14 +209,14 @@ const setup = async function () {
 
             // If we are currently subscribed to changes for this script hash..
             if (
-              app.subscribedScriphashes[
+              app.subscribedScriptHashes[
                 javascriptUtilities
                   .reverseBuf(inputLockScriptHash)
                   .toString("hex")
               ]
             ) {
               // Mark this scripthash as no longer subscribed to.
-              app.subscribedScriphashes[
+              app.subscribedScriptHashes[
                 javascriptUtilities
                   .reverseBuf(inputLockScriptHash)
                   .toString("hex")
@@ -251,14 +236,14 @@ const setup = async function () {
               `Marked spent commitment '${commitment.commitment_id}' as revoked.`
             );
           } else if (
-            !app.subscribedScriphashes[
+            !app.subscribedScriptHashes[
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)
                 .toString("hex")
             ]
           ) {
             // Mark this scripthash as subscribed to.
-            app.subscribedScriphashes[
+            app.subscribedScriptHashes[
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)
                 .toString("hex")
@@ -266,7 +251,7 @@ const setup = async function () {
 
             // Subscribe to changes for this output.
             await app.electrum.subscribe(
-              app.handleRevocations,
+              app.electrumSubscribeCallback,
               "blockchain.scripthash.subscribe",
               javascriptUtilities
                 .reverseBuf(inputLockScriptHash)
@@ -324,13 +309,45 @@ const setup = async function () {
   // app.use('/status', require('./routes/status.js'));
 
   // Listen to incoming connections on port X.
-  app.listen(app.config.server.port, "0.0.0.0");
+  const server = app.listen(app.config.server.port, "0.0.0.0");
+
+  websocketServer.createServer(app, server);
 
   // Notify user that the service is ready for incoming connections.
   app.debug.status(
     "Listening for incoming connections on port " + app.config.server.port
   );
 };
+
+// Check for expired campaigns and refund transactions...
+(function() {
+    const expiredCampaignIds = [];
+    setInterval(function() {
+        const campaigns = app.queries.listCampaigns.all();
+
+        for (const campaignIndex in campaigns) {
+            const campaign = campaigns[campaignIndex];
+            const campaignId = campaign.campaign_id;
+            const isExpired = (moment().unix() >= campaign.expires);
+
+            if (isExpired) {
+                if (expiredCampaignIds.indexOf(campaignId) >= 0) { continue; } // Already processed.
+                expiredCampaignIds.push(campaignId);
+
+                const refundTransactions = app.queries.getRefundTransactions.all({ campaign_id: campaignId });
+                for (let  i = 0; i < refundTransactions.length; i += 1) {
+                    const refundTransaction = refundTransactions[i];
+                    const transactionHex = refundTransaction.data;
+
+                    if (transactionHex) {
+                        app.electrum.request("blockchain.transaction.broadcast", transactionHex);
+                        console.log("Refunded: " + transactionHex);
+                    }
+                }
+            }
+        }
+    }, 300000);
+})();
 
 // Initialize the server.
 setup();

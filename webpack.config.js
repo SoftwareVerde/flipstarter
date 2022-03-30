@@ -5,7 +5,7 @@ module.exports = {
   mode: "development",
 
   // Add your application's scripts below
-  entry: ["./source.js"],
+  entry: ["./src/shared.js", "./source.js", "./src/web-wallet.js", "./src/websocket.js"],
   output: {
     path: path.join(__dirname, "./static/js/"), // eslint-disable-line
     filename: "application.js"

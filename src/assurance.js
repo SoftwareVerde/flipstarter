@@ -670,7 +670,7 @@ class assuranceContract {
     return libox.Address.fromOutputScript(lockscript);
   }
 
-  getLockscriptFromAddress(address) {
+  static getLockscriptFromAddress(address) {
     // Check if the provided address is properly encoded.
     if (!libox.Address.isCashAddress(address)) {
       // Return false to indicate that we only accept cashaddr encoding.
@@ -704,6 +704,10 @@ class assuranceContract {
       // Return false to indicate that we only accept P2PKH or P2SH types.
       return false;
     }
+  }
+
+  getLockscriptFromAddress(address) {
+    return assuranceContract.getLockscriptFromAddress(address);
   }
 
   static parseKeyHashUnlockScript(unlockScript) {

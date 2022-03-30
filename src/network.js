@@ -18,6 +18,12 @@ module.exports = async function (app) {
   app.electrum.addServer("electron.jochen-hoenicke.de", 51002);
   app.electrum.addServer("electrum.imaginary.cash");
 
+  // Allow unlimited event listeners (i.e. blockchain.scripthash.subscribe)
+  for (let i in app.electrum.clients) {
+    const electrumClient = app.electrum.clients[i].connection;
+    electrumClient.setMaxListeners(0);
+  }
+
   //
   app.debug.struct("Waiting for sufficient connectivity.");
 

@@ -67,6 +67,15 @@ CREATE TABLE IF NOT EXISTS commitments
 	UNIQUE (previous_transaction_hash, previous_transaction_index)
 );
 
+CREATE TABLE IF NOT EXISTS refund_transactions
+(
+	token TEXT NOT NULL,
+	data TEXT,
+	commitment_id INTEGER NOT NULL,
+	PRIMARY KEY (token),
+	FOREIGN KEY (commitment_id) REFERENCES commitments (commitment_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS contributions
 (
 	contribution_id INTEGER NOT NULL,
@@ -79,7 +88,7 @@ CREATE TABLE IF NOT EXISTS contributions
 	FOREIGN KEY (campaign_id) REFERENCES campaigns (campaign_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS contributionCommitments
+CREATE TABLE IF NOT EXISTS contribution_commitments
 (
 	contribution_id INTEGER NOT NULL,
 	commitment_id INTEGER NOT NULL,

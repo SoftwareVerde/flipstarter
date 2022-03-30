@@ -1,0 +1,107 @@
+@font-face {
+  font-family: 'icons';
+  src: url('fonts/icons.woff') format('woff'),
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-message-square:before {
+  content: "\e902";
+}
+.icon-nightlife:before {
+  content: "\e912";
+}
+.icon-help_outline:before {
+  content: "\e911";
+}
+.icon-share:before {
+  content: "\e910";
+}
+.icon-label_outline:before {
+  content: "\e90f";
+}
+.icon-translate:before {
+  content: "\e90d";
+}
+.icon-file_download:before {
+  content: "\e90e";
+}
+.icon-get_app:before {
+  content: "\e90e";
+}
+.icon-info_outline:before {
+  content: "\e90c";
+}
+.icon-face:before {
+  content: "\e90a";
+}
+.icon-code:before {
+  content: "\e909";
+}
+.icon-bookmark_outline:before {
+  content: "\e908";
+}
+.icon-turned_in_not:before {
+  content: "\e908";
+}
+.icon-person_outline:before {
+  content: "\e907";
+}
+.icon-perm_identity:before {
+  content: "\e907";
+}
+.icon-security:before {
+  content: "\e906";
+}
+.icon-access_time:before {
+  content: "\e904";
+}
+.icon-query_builder:before {
+  content: "\e904";
+}
+.icon-schedule:before {
+  content: "\e904";
+}
+.icon-mail_outline:before {
+  content: "\e903";
+}
+.icon-message:before {
+  content: "\e901";
+}
+.icon-warning:before {
+  content: "\e900";
+}
+.icon-report_problem:before {
+  content: "\e900";
+}
+.icon-heart-o:before {
+  content: "\e90b";
+}
+.icon-dollar:before {
+  content: "\e905";
+}
+.icon-usd:before {
+  content: "\e905";
+}
+.icon-bitcoin:before {
+  content: "\e913";
+}
+.icon-btc:before {
+  content: "\e913";
+}
