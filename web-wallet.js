@@ -159,7 +159,7 @@ class Wallet {
         if (! returnAddressString) { return null; }
 
         const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
-        const outputIndexToSpend = transactionToSpend.getOutputIndexMatchingAmount(donationAmount);
+        const outputIndexToSpend = (transactionToSpend.getOutputIndexMatchingAmount(donationAmount) || transactionToSpend.getOutputIndexMatchingAmount(null));
         if (outputIndexToSpend == null) { return null; }
 
         const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);
@@ -232,7 +232,7 @@ class Wallet {
         const wallet = this;
 
         const transactionToSpend = wallet._parseTransactionHex(transactionToSpendHex);
-        const outputIndexToSpend = transactionToSpend.getOutputIndexMatchingAmount(donationAmount);
+        const outputIndexToSpend = (transactionToSpend.getOutputIndexMatchingAmount(donationAmount) || transactionToSpend.getOutputIndexMatchingAmount(null));
         if (outputIndexToSpend == null) { return null; }
 
         const outputToSpend = transactionToSpend.getOutput(outputIndexToSpend);
@@ -295,7 +295,10 @@ class Wallet {
             "data_signature": null
         };
 
-        return window.btoa(JSON.stringify(pledge));
+        return {
+            pledge: window.btoa(JSON.stringify(pledge)),
+            amount: libauth.binToBigIntUint64LE(outputToSpend.satoshis)
+        };
     };
 
     getRefundAddress(transactionHex) {

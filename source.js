@@ -831,6 +831,7 @@ class flipstarter {
       if (wallet._isBound) { return; }
 
       const donationSlider = document.getElementById("donationSlider");
+      const donationAmountButton = document.getElementById("donationAmount");
       const aliasInput = document.getElementById("contributionName");
       const commentInput = document.getElementById("contributionComment");
       const commitmentInput = document.getElementById("commitment");
@@ -855,10 +856,17 @@ class flipstarter {
               const amount = Number(donationSlider.value);
 
               const recipients = window.flipstarter.campaign.recipients;
-              const pledge = wallet.createPledge(transaction, recipients, amount, alias, comment);
+              const pledgeObject = wallet.createPledge(transaction, recipients, amount, alias, comment);
+              const pledge = (pledgeObject ? pledgeObject.pledge : null);
+              const actualPledgedAmount = (pledgeObject ? pledgeObject.amount : null);
 
               commitmentInput.value = pledge;
               if (pledge) {
+                  // Update the app's donation amount to match the amount actually received.
+                  donationSlider.value = actualPledgedAmount;
+                  donationAmountButton.setAttribute("data-satoshis", actualPledgedAmount);
+                  await window.flipstarter.updateContributionInput(null);
+
                   // Force showing the private key...
                   const webWalletContainer = document.getElementById("web-wallet");
                   webWalletContainer.classList.add("force-show");

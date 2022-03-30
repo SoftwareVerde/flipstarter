@@ -508,8 +508,15 @@ const submitContribution = async function (req, res) {
               campaign_id: campaignId,
             };
 
-            // Store the fullfillment in the database.
-            req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
+            try {
+              // Store the fullfillment in the database.
+              req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
+            }
+            catch (exception) {
+              console.log("Campaign completed; error storing fulfillment.");
+              console.log(fullfillmentObject);
+              console.log(exception);
+            }
 
             // Push the fullfillment to the SSE stream.
             req.app.sse.send(fullfillmentObject);
