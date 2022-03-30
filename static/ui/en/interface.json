@@ -23,7 +23,7 @@
   "commentLabel": "Comment (optional)",
   "privateKeyInfo": "Click here to show your web wallet's private key. This key can be used to revoke your pledge and ensures you're the only one in control of your pledge until the campaign completes.",
   "webWalletInfo": "Complete your contribution by either sending BCH to the address below or by using the Flipstarter plugin on your Electrum Cash Wallet.",
-  "revokeInfo": "Keep this transaction somewhere safe; it may be used to revoke your pledge at any time before the campaign completes.",
+  "revokeInfo": "Keep this transaction somewhere safe; it may be used to revoke your pledge at any time before the campaign completes. If the campaign expires, your funds will be automatically returned.",
   "refundAddressInfo": "If you'd like your pledge to be returned to a different address, specify it here.",
   "ecPluginInfo": "To use Electron Cash to make your pledge, follow the steps below.",
   "copyLabel": "1. Copy details",
