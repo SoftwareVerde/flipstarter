@@ -6,7 +6,7 @@ DELETE FROM revocations
 WHERE commitment_id IN (
 	SELECT commitment_id
 	FROM commitments
-	LEFT JOIN contributionCommitments USING (commitment_id)
+	LEFT JOIN contribution_commitments USING (commitment_id)
 	LEFT JOIN contributions USING (contribution_id)
 	WHERE campaign_id = 1);
 
@@ -14,12 +14,12 @@ WHERE commitment_id IN (
 DELETE FROM commitments
 WHERE commitment_id IN (
 	SELECT commitment_id
-	FROM contributionCommitments
+	FROM contribution_commitments
 	LEFT JOIN contributions USING (contribution_id)
 	WHERE campaign_id = 1);
 
 -- Remove all links to the commits for this campaign.
-DELETE FROM contributionCommitments
+DELETE FROM contribution_commitments
 WHERE contribution_id IN (
 	SELECT contribution_id
 	FROM contributions

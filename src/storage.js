@@ -105,6 +105,12 @@ module.exports = function (app) {
         "utf8"
       ).trim()
     ),
+    getRefundTransactions: app.sql.prepare(
+      Filesystem.readFileSync(
+        "sql/get_refund_transactions.sql",
+        "utf8"
+      ).trim()
+    ),
     //
     getContributionByCommitment: app.sql.prepare(
       Filesystem.readFileSync(

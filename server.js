@@ -319,5 +319,35 @@ const setup = async function () {
   );
 };
 
+// Check for expired campaigns and refund transactions...
+(function() {
+    const expiredCampaignIds = [];
+    setInterval(function() {
+        const campaigns = app.queries.listCampaigns.all();
+
+        for (const campaignIndex in campaigns) {
+            const campaign = campaigns[campaignIndex];
+            const campaignId = campaign.campaign_id;
+            const isExpired = (moment().unix() >= campaign.expires);
+
+            if (isExpired) {
+                if (expiredCampaignIds.indexOf(campaignId) >= 0) { continue; } // Already processed.
+                expiredCampaignIds.push(campaignId);
+
+                const refundTransactions = app.queries.getRefundTransactions.all({ campaign_id: campaignId });
+                for (let  i = 0; i < refundTransactions.length; i += 1) {
+                    const refundTransaction = refundTransactions[i];
+                    const transactionHex = refundTransaction.data;
+
+                    if (transactionHex) {
+                        app.electrum.request("blockchain.transaction.broadcast", transactionHex);
+                        console.log("Refunded: " + transactionHex);
+                    }
+                }
+            }
+        }
+    }, 300000);
+})();
+
 // Initialize the server.
 setup();

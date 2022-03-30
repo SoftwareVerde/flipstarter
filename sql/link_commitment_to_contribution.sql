@@ -1,4 +1,4 @@
-INSERT OR ROLLBACK INTO contributionCommitments
+INSERT OR ROLLBACK INTO contribution_commitments
 (
 	commitment_id,
 	contribution_id

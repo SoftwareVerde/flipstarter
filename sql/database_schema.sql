@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS contributions
 	FOREIGN KEY (campaign_id) REFERENCES campaigns (campaign_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS contributionCommitments
+CREATE TABLE IF NOT EXISTS contribution_commitments
 (
 	contribution_id INTEGER NOT NULL,
 	commitment_id INTEGER NOT NULL,
