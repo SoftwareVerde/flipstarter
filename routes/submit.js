@@ -447,7 +447,7 @@ const submitContribution = async function (req, res) {
           commitment_id: commitmentId
         });
 
-        // NOTE: There can technically be multiple refund tokens created, but the web wallet only support one.
+        // NOTE: There can technically be multiple refund tokens created, but the web wallet only supports one.
         refundToken = token;
       }
 
