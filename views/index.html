@@ -227,151 +227,50 @@
       </div>
     </div>
 
-    <div id="web-wallet">
-        <div data-string="webWalletInfo" class="web-wallet-info"></div>
-        <div data-string="privateKeyInfo" class="private-key-button"></div>
-        <div class="private-key"></div>
-        <div class="address"></div>
-    </div>
+    <div class="tabset">
+        <div class="tab-buttons">
+            <div id="web-wallet-button" class="tab-label active">Web Wallet</div>
+            <div id="ec-plugin-button" class="tab-label">EC Plugin</div>
+        </div>
 
-    <div id="ec-plugin-info" data-string="ecPluginInfo"></div>
+        <div class="tab-container">
+            <div id="web-wallet" class="tab active">
+                <div data-string="webWalletInfo" class="web-wallet-info"></div>
+                <div data-string="privateKeyInfo" class="private-key-button"></div>
+                <div class="private-key"></div>
+                <div class="address"></div>
+            </div>
 
-    <div class="col s12 m12 l3" style="margin-top: 0.75rem;">
-      <small
-      style="
-      display: inline-block;
-      width: 100%;
-      text-align: center;
-      "
-      data-string="copyLabel"
-      ></small>
-      <textarea
-      rows="5"
-      id="template"
-      name="template"
-      style="
-      height: 7rem;
-      font-family: monospace;
-      font-size: small;
-      margin: 0;
-      margin-top: 0.5rem;
-      padding: 1rem;
-      background-color: white;
-      "
-      ></textarea>
-      <button
-      id="copyTemplateButton"
-      class="btn waves-effect waves-light green"
-      style="width: 100%;"
-      data-string="copyButton"
-      ></button>
+            <div id="ec-plugin" class="tab">
+                <div id="ec-plugin-info" data-string="ecPluginInfo"></div>
+
+                <div class="plugin-step col s12 m12 l3">
+                    <small data-string="copyLabel"></small>
+                    <textarea rows="5" id="template" name="template"></textarea>
+                    <button id="copyTemplateButton" class="btn waves-effect waves-light green" data-string="copyButton"></button>
+                </div>
+                <div class="plugin-step col s12 m12 l6">
+                    <small data-string="instructionsLabel"></small>
+                    <p id="instructions" data-string="instructions"></p>
+                    <div class="button-container">
+                        <a id="downloadButton" class="btn" href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/ec6b5a7518801c4a278128ac4f296607/flipstarter-1.3.zip">
+                          <i class="icon-download"></i>
+                          <span data-string="downloadText"></span>
+                        </a>
+                        <a id="linkInstructionsButton" class="btn" target="_blank" href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9">
+                            <i class="icon-info"></i>
+                            <span data-string="instructionLink"></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="plugin-step col s12 m12 l3">
+                    <small data-string="commitLabel"></small>
+                    <textarea rows="5" id="commitment" name="commitment" data-placeholder="PasteHere"></textarea>
+                    <button id="commitTransaction" class="btn waves-effect waves-light green" disabled="disabled" data-string="commitButton"></button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col s12 m12 l6" style="margin-top: 0.75rem;">
-      <small
-      style="
-      display: inline-block;
-      width: 100%;
-      text-align: center;
-      "
-      data-string="instructionsLabel"
-      ></small>
-      <p
-      id="instructions"
-      style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: small;
-      height: 7rem;
-      padding: 1rem;
-      margin-bottom: 7px;
-      margin-top: 0.5rem;
-      border: 1px solid rgb(169, 169, 169);
-      "
-      data-string="instructions"
-      ></p>
-      <div
-      style="
-      display: flex;
-      align-items: center;
-      justify-content: space-evenly;
-      "
-      >
-      <a
-      id="downloadButton"
-      class="btn"
-      style="
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      background-color: transparent;
-      color: black;
-      box-shadow: none;
-      "
-      href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/ec6b5a7518801c4a278128ac4f296607/flipstarter-1.3.zip"
-      >
-      <i class="icon-download"></i>
-      <span
-      style="margin-left: 0.25rem;"
-      data-string="downloadText"
-      ></span>
-    </a>
-    <a
-    id="linkInstructionsButton"
-    class="btn"
-    target="_blank"
-    style="
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: transparent;
-    color: black;
-    box-shadow: none;
-    "
-    href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
-    >
-    <i class="icon-info"></i>
-    <span
-    style="margin-left: 0.25rem;"
-    data-string="instructionLink"
-    ></span>
-  </a>
-</div>
-</div>
-<div class="col s12 m12 l3" style="margin-top: 0.75rem;">
-  <small
-  style="
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  "
-  data-string="commitLabel"
-  ></small>
-  <textarea
-  rows="5"
-  id="commitment"
-  name="commitment"
-  data-placeholder="PasteHere"
-  style="
-  height: 7rem;
-  font-family: monospace;
-  font-size: small;
-  margin: 0;
-  margin-top: 0.5rem;
-  padding: 1rem;
-  background-color: white;
-  "
-  ></textarea>
-  <button
-  id="commitTransaction"
-  class="btn waves-effect waves-light green"
-  style="width: 100%;"
-  disabled="disabled"
-  data-string="commitButton"
-  ></button>
-</div>
-</div>
 </div>
 </fieldset>
 
@@ -396,7 +295,7 @@
     style="margin-bottom: 2rem;"
     ></ul>
   </section>
-  
+
   <section>
     <h3 style="float: left;">
       <span class="valign-wrapper" style="float: left;">

@@ -195,6 +195,29 @@ class flipstarter {
     donateButton.addEventListener("click", this.bindWallet);
     donateButton.addEventListener("click", this.toggleDonationSection.bind(this));
 
+    (function() {
+        const webWalletButton = document.getElementById("web-wallet-button");
+        const webWalletContainer = document.getElementById("web-wallet");
+
+        const ecPluginButton = document.getElementById("ec-plugin-button");
+        const ecPluginContainer = document.getElementById("ec-plugin");
+
+        webWalletButton.onclick = function() {
+            webWalletButton.classList.add("active");
+            ecPluginButton.classList.remove("active");
+
+            webWalletContainer.classList.add("active");
+            ecPluginContainer.classList.remove("active");
+        };
+        ecPluginButton.onclick = function() {
+            webWalletButton.classList.remove("active");
+            ecPluginButton.classList.add("active");
+
+            webWalletContainer.classList.remove("active");
+            ecPluginContainer.classList.add("active");
+        };
+    })();
+
     document
       .getElementById("template")
       .addEventListener("click", this.copyTemplate.bind(this));

@@ -426,9 +426,20 @@ hr
     border: 0 !important;
     padding: 0 !important;
 }
-/* Weird hide mechanic to allow web-wallet force show. */
-#donateSection.hidden > div > * {
+
+/* Weird hide mechanic to allow web-wallet private-key force show. */
+#donateSection.hidden #web-wallet:not(.force-show),
+#donateSection.hidden > div > .tabset .tab-buttons,
+#donateSection.hidden > div > :not(.tabset) {
     display: none;
+}
+#donateSection.hidden > div > .tabset .tab-container {
+    min-height: unset;
+    border: unset;
+    background-color: #F0FFF0;
+}
+#donateSection.hidden > div > .tabset {
+    margin-top: unset;
 }
 
 /* Make the range slider handle larger. */
@@ -786,12 +797,90 @@ aside > section > h3
     margin-top: 2em;
 }
 
+#ec-plugin .plugin-step {
+    margin-top: 0.75rem;
+}
+#ec-plugin .plugin-step > small {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+#ec-plugin .plugin-step > textarea {
+    height: 7rem;
+    font-family: monospace;
+    font-size: small;
+    margin: 0;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+}
+#ec-plugin .plugin-step > button {
+    width: 100%;
+}
+#ec-plugin .plugin-step > p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: small;
+    height: 7rem;
+    padding: 1rem;
+    margin-bottom: 7px;
+    margin-top: 0.5rem;
+    border: 1px solid rgb(169, 169, 169);
+}
+#ec-plugin .plugin-step > div.button-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#ec-plugin .plugin-step > div.button-container > .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+    color: black;
+    box-shadow: none;
+}
+#ec-plugin .plugin-step > div.button-container > .btn > span {
+    margin-left: 0.25rem;
+}
+
 #ec-plugin-info {
     margin: auto;
     text-align: center;
     margin-bottom: 1em;
     margin-top: 2em;
     font-style: italic;
-    border-top: solid 1px #96E090;
-    padding-top: 2em;
+}
+
+.tabset {
+    margin-top: 2rem;
+}
+.tabset .tab-buttons {
+    display: flex;
+}
+.tabset .tab-buttons .tab-label {
+    display: inline-block;
+    width: 50%;
+    box-sizing: border-box;
+    border: solid 1px #EEEEEE;
+    text-align: center;
+    padding: 0.5rem;
+    cursor: pointer;
+    background-color: #EEEEEE;
+    border-radius: 5px 5px 0 0;
+}
+.tabset .tab-buttons .tab-label.active {
+    background-color: #FFFFFF;
+    border-bottom: 0;
+}
+.tabset .tab-container {
+    padding: 5px;
+    border: solid 1px #EEEEEE;
+    border-top: 0;
+    min-height: 515px;
+}
+.tabset .tab-container .tab:not(.active) {
+    display: none !important;
 }
