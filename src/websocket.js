@@ -9,6 +9,7 @@
     }
 
     webSocket._onConnectCallbacks = [];
+    webSocket._onDisconnectCallbacks = [];
     webSocket._onMessageCallbacks = [];
 
     webSocket.onopen = function() {
@@ -19,6 +20,16 @@
             }
         }
         webSocket._onConnectCallbacks = [];
+    };
+
+    webSocket.onclose = function() {
+        for (let i in webSocket._onDisconnectCallbacks) {
+            const callback = webSocket._onDisconnectCallbacks[i];
+            if (callback) {
+                callback();
+            }
+        }
+        webSocket._onDisconnectCallbacks = [];
     };
 
     webSocket.onmessage = function(event) {
@@ -43,10 +54,6 @@
         return false;
     };
 
-    webSocket.onclose = function() {
-        console.log("WebSocket closed...");
-    };
-
     webSocket.addMessageReceivedCallback = function(callback) {
         webSocket._onMessageCallbacks.push(callback);
     };
@@ -58,6 +65,16 @@
         }
         else {
             webSocket._onConnectCallbacks.push(callback);
+        }
+    };
+
+    webSocket.addDisconnectCallback = function(callback) {
+        if (webSocket.readyState != WebSocket.OPEN) {
+            webSocket.onclose = null;
+            callback();
+        }
+        else {
+            webSocket._onDisconnectCallbacks.push(callback);
         }
     };
 })();

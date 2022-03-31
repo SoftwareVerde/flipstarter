@@ -23,6 +23,7 @@
   "commentLabel": "Commentario (opcional)",
   "privateKeyInfo": "Haga clic aquí para mostrar la clave privada de su billetera web. Esta clave se puede usar para revocar su compromiso y garantiza que usted es el único que tiene el control de su compromiso hasta que finalice la campaña.",
   "webWalletInfo": "Complete su contribución enviando BCH a la siguiente dirección o usando el complemento Flipstarter en su Electrum Cash Wallet.",
+  "webWalletWarning": "ADVERTENCIA: Wallet no está conectado; no envíe BCH hasta que se restablezca la conectividad.",
   "revokeInfo": "Guarde esta transacción en un lugar seguro; se puede utilizar para revocar su compromiso en cualquier momento antes de que finalice la campaña. Si la campaña caduca, sus fondos se devolverán automáticamente.",
   "refundAddressInfo": "Si desea que su compromiso sea devuelto a una dirección diferente, especifíquelo aquí.",
   "refundAddressWarning": "Esta dirección DEBE cambiarse (o deshabilitarse) si está utilizando una billetera de custodia (es decir, Coinbase).",

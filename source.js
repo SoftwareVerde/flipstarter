@@ -861,10 +861,21 @@ class flipstarter {
 
       const address = wallet.getAddress();
 
+      const toggleConnectivityWarning = function(show) {
+          const webWalletContainer = document.getElementById("web-wallet");
+          const warningView = webWalletContainer.querySelector(".web-wallet-warning");
+          warningView.classList.toggle("hidden", (show ? false : true));
+      };
+
+      window.webSocket.addDisconnectCallback(function() {
+          toggleConnectivityWarning(true);
+      });
       window.webSocket.addConnectCallback(function() {
           window.webSocket.send(JSON.stringify({
               addAddress: address
           }));
+
+          toggleConnectivityWarning(false);
       });
 
       window.webSocket.addMessageReceivedCallback(async function(message) {

@@ -765,6 +765,17 @@ aside > section > h3
     display: none !important;
 }
 
+#web-wallet .web-wallet-warning {
+    border: solid 1px #FEB3B3;
+    background-color: #FFCCCC;
+    margin: 1em;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+#web-wallet .web-wallet-warning.hidden {
+    display: none;
+}
+
 #revokeToken .refund-address {
     display: block;
     text-align: center;
