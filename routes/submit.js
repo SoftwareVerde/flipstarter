@@ -499,8 +499,10 @@ const submitContribution = async function (req, res) {
             rawTransaction.toString("hex")
           );
 
+          const wasSuccess = (Object.keys(broadcastResult).length > 0); // electrum.request returns an empty object upon failure and the txn's hex upon success.
+
           // If we successfully broadcasted the transaction..
-          if (broadcastResult) {
+          if (wasSuccess) {
             // structure a fullfillment object.
             const fullfillmentObject = {
               fullfillment_timestamp: moment().unix(),
@@ -508,15 +510,8 @@ const submitContribution = async function (req, res) {
               campaign_id: campaignId,
             };
 
-            try {
-              // Store the fullfillment in the database.
-              req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
-            }
-            catch (exception) {
-              console.log("Campaign completed; error storing fulfillment.");
-              console.log(fullfillmentObject);
-              console.log(exception);
-            }
+            // Store the fullfillment in the database.
+            req.app.queries.addCampaignFullfillment.run(fullfillmentObject);
 
             // Push the fullfillment to the SSE stream.
             req.app.sse.send(fullfillmentObject);
@@ -525,6 +520,9 @@ const submitContribution = async function (req, res) {
             req.app.debug.action(
               `Fullfilled campaign #${req.params["campaign_id"]} with transaction ${broadcastResult}`
             );
+          }
+          else {
+            console.log("Unable to broadcast fulfillment transaction: " + JSON.stringify(broadcastResult));
           }
         } finally {
           // Unlock the mutex so the next process can continue.
