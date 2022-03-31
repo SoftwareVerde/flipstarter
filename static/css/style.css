@@ -777,6 +777,10 @@ aside > section > h3
 #revokeToken .refund-address.invalid {
     border-color: #FF0000;
 }
+#revokeToken .refund-address.disabled {
+    border-color: #CCCCCC;
+    background-color: #EEEEEE;
+}
 
 #revokeToken .transaction-hex {
     word-wrap: break-word;
@@ -796,6 +800,24 @@ aside > section > h3
     font-style: italic;
     margin-top: 2em;
 }
+#revokeToken .refund-warning {
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+#revokeToken .disable-button {
+    display: block;
+    border: solid 1px #FEB3B3;
+    width: fit-content;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    margin: auto;
+    background-color: #FFCCCC;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
 
 #ec-plugin .plugin-step {
     margin-top: 0.75rem;

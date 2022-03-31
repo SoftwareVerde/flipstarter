@@ -25,6 +25,8 @@
   "webWalletInfo": "通过将 BCH 发送到以下地址或使用 Electrum Cash 钱包上的 Flipstarter 插件来完成您的贡献。",
   "revokeInfo": "将此交易保存在安全的地方； 它可用于在活动结束前的任何时间撤销您的承诺。 如果活动到期，您的资金将自动退回。",
   "refundAddressInfo": "如果您希望将您的承诺退回到其他地址，请在此处指定。",
+  "refundAddressWarning": "如果您使用的是托管钱包（即 Coinbase），则必须更改（或禁用）此地址。",
+  "disableAutoRefund": "禁用自动退款",
   "ecPluginInfo": "要使用 Electron Cash 进行质押，请按照以下步骤操作。",
   "copyLabel": "1. 复制细节",
   "copyButton": "复制细节",

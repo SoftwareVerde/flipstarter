@@ -903,6 +903,19 @@ class flipstarter {
                       const revokeTokenContainer = document.getElementById("revokeToken");
                       const refundAddressInput = revokeTokenContainer.querySelector(".refund-address");
                       const tokenHexContainer = revokeTokenContainer.querySelector(".transaction-hex");
+                      const disableAutoRefundButton = revokeTokenContainer.querySelector(".disable-button");
+
+                      disableAutoRefundButton.onclick = function() {
+                          const refundObject = {
+                              token: refundToken,
+                              transaction: ""
+                          };
+                          webSocket.send(JSON.stringify({ refund: refundObject }));
+
+                          refundAddressInput.value = "";
+                          refundAddressInput.classList.remove("invalid");
+                          refundAddressInput.classList.add("disabled");
+                      };
 
                       const isValidAddress = function(addressString) {
                           return ((typeof libauth.decodeCashAddress(addressString)) !== "string");
@@ -920,6 +933,8 @@ class flipstarter {
                                   transaction: refundTransaction
                               };
                               webSocket.send(JSON.stringify({ refund: refundObject }));
+
+                              refundAddressInput.classList.remove("disabled");
                           }
                           else {
                               refundAddressInput.classList.add("invalid");
