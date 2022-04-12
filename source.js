@@ -842,11 +842,9 @@ class flipstarter {
       wallet._isBound = null;
 
       const address = wallet.getAddress();
-      window.webSocket.addConnectCallback(function() {
-          window.webSocket.send(JSON.stringify({
-              removeAddress: address
-          }));
-      });
+      window.webSocket.send(JSON.stringify({
+          removeAddress: address
+      }));
   }
 
   async bindWallet() {
@@ -970,7 +968,7 @@ class flipstarter {
       });
 
       wallet._isBound = window.setInterval(function() {
-          if (window.webSocket.readyState != window.webSocket.OPEN) { return; }
+          if (! window.webSocket.isConnected()) { return; }
 
           window.webSocket.send(JSON.stringify({
               addAddress: address
