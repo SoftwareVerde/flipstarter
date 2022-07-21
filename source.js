@@ -66,11 +66,19 @@ const SATS_PER_BCH = 100000000;
 
 const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
 
+const sortContributionsMode = {
+  largestFirst: 0,
+  earliestFirst: 1,
+};
+
 //
 class flipstarter {
   constructor() {
     // Set languages in this class
     this.languages = languages;
+
+    // Set contributions list mode of sort
+    this.contributionsListMode = sortContributionsMode.largestFirst;
 
     // Load the initial translation files in the background.
     this.loadTranslation(page_language);
@@ -87,6 +95,9 @@ class flipstarter {
     document
       .getElementById("donateButton")
       .addEventListener("click", this.toggleDonationSection.bind(this));
+    document
+      .getElementById("sortContributorButton")
+      .addEventListener("click", this.toggleContributionListMode.bind(this));
 
     document
       .getElementById("template")
@@ -522,10 +533,10 @@ class flipstarter {
       // Add the copy to the contribution list.
       contributionListElement.appendChild(contributionMessage);
     } else {
-      const contributionArray = Object.values(this.campaign.contributions);
-      const sortedContributions = contributionArray.sort(
-        (a, b) => Number(b.satoshis) - Number(a.satoshis)
-      );
+      // Sort contribution
+      const sortedContributions = this.sortContributionList();
+
+      // Display contributions
       for (const contributionIndex in sortedContributions) {
         //
         const contribution = sortedContributions[contributionIndex];
@@ -540,6 +551,46 @@ class flipstarter {
       }
     }
   }
+
+  sortContributionList() {
+    // Get contribution as Array
+    // By default, contributions are arranged by earliest first
+    const contributionArray = Object.values(this.campaign.contributions);
+
+    // Sort contribution by value if mode by value
+    if(this.contributionsListMode === sortContributionsMode.largestFirst) {
+      contributionArray.sort((a, b) => Number(b.satoshis) - Number(a.satoshis));
+    }
+
+    //
+    return contributionArray;
+  }
+
+  async toggleContributionListMode() {
+    // Select sort label to edit title
+    let sortLabel = document.querySelector("#campaignContributorSortLabel");
+
+    //
+    if(this.contributionsListMode === sortContributionsMode.earliestFirst) {
+      // Edit mode of sort
+      this.contributionsListMode = sortContributionsMode.largestFirst;
+
+      // Edit label title
+      sortLabel.textContent = this.translation.largestFirst;
+      sortLabel.dataset.string = "largestFirst";
+    } else {
+      // Edit mode of sort
+      this.contributionsListMode = sortContributionsMode.earliestFirst;
+
+      // Edit label title
+      sortLabel.textContent = this.translation.earliestFirst;
+      sortLabel.dataset.string = "earliestFirst";
+    }
+
+    //
+    await this.updateContributionList();
+  }
+
 
   async loadCurrencyRates() {
     try {
