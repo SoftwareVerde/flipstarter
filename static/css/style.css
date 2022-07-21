@@ -206,6 +206,11 @@ hr
     overflow: hidden;
 }
 
+.sorting-button {
+	cursor: pointer;
+	user-select: none;
+}
+
 #contributionList
 {
 	margin: 0;
@@ -213,6 +218,7 @@ hr
 	list-style-type: none;
 	list-style-position: inside;
 }
+
 #contributionList > li
 {
 	display: flex;
