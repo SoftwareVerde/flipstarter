@@ -10,7 +10,7 @@ const {
   CashAddressType,
 } = require("@bitauth/libauth");
 
-let WebAssembly = {};
+const WebAssembly = {};
 
 module.exports = {
   async init() {
@@ -55,7 +55,7 @@ module.exports = {
 
     // bitbox.Address.detectAddressType()
     detectAddressType(address) {
-      let decodedAddress = decodeCashAddress(address);
+      const decodedAddress = decodeCashAddress(address);
 
       // If return error msg will be throw
       if(typeof decodedAddress === "string") throw new Error(decodedAddress);

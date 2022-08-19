@@ -29,7 +29,7 @@ class javascriptUtilities {
    */
   static reverseBuf(source) {
     // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
+    const reversed = Buffer.allocUnsafe(source.length);
 
     // Iterate over half of the buffers length, rounded up..
     for (
@@ -152,7 +152,7 @@ const submitContribution = async function (req, res) {
       }
 
       // TODO: do something about the storage stuffies.
-      let contract = new assuranceContract({});
+      const contract = new assuranceContract({});
 
       // Get a list of all recipients for the campaign.
       const recipients = req.app.queries.listRecipientsByCampaign.all({
@@ -179,7 +179,7 @@ const submitContribution = async function (req, res) {
         currentContributionCount
       );
 
-      let newCommitments = [];
+      const newCommitments = [];
       let totalSatoshis = 0;
 
       // For each input committed..
@@ -262,7 +262,7 @@ const submitContribution = async function (req, res) {
         );
 
         //
-        let previousTransactionOutputIndex =
+        const previousTransactionOutputIndex =
           assuranceContract.encodeOutputIndex(
             currentInput.previous_output_index
           );

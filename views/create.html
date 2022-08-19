@@ -102,23 +102,23 @@
                 <div class="input-group mb-3">
                   <input
                     type="text" 
-                    v-validate="{regex : validate.url.regex, required: !recipient.image_file}"
+                    v-validate="{regex : validate.url.regex, required: !recipient.avatar_image}"
                     v-model="recipient.image_url"
                     class="form-control check-url"
                     :data-vv-name="`recipient ${ index + 1 } image URL`" 
                     :id="`image_url[${index}]`"
                     :name="`image_url[${index}]`"
-                    :placeholder="'image : ' + (recipient.image_file.name || 'url')"
+                    :placeholder="'image : ' + (recipient.avatar_image.name || 'url')"
                   >
                   <input
                     type="file"
                     class="d-none"
                     accept=".png,.jpg,.jpeg,.svg"
-                    :id="`image_file[${index}]`"
-                    :name="`image_file[${index}]`"
-                    @change="recipient.image_file = $event.target.files[0]"
+                    :id="`avatar_image[${index}]`"
+                    :name="`avatar_image[${index}]`"
+                    @change="recipient.avatar_image = $event.target.files[0]"
                   />
-                  <label :for="`image_file[${index}]`" class="btn btn-outline-secondary input-group-text px-3" role="button">
+                  <label :for="`avatar_image[${index}]`" class="btn btn-outline-secondary input-group-text px-3" role="button">
                     <img src="/static/img/upload.svg" alt="">
                   </label>
                 </div>
@@ -165,6 +165,32 @@
           </div>
           <button type="button" class="btn btn-primary js-add-recipient mt-3" @click="addRecipient()" :disabled="campaign.recipients.length === 7">Add a recipient</button>
           <!-- /Recipients -->
+          <p class="h4 py-3">Social preview</p>
+          <p> Upload an image to customize your campaign’s social media preview. </p>
+            <div class="social-preview border rounded" :style="{ 'background-image': 'url(' +  socialPreview + ')' }">
+              <label 
+                for="social-preview" 
+                class="btn btn-outline-success social-preview-button"
+              >
+                <span>Upload an image…</span>
+                <img 
+                  @click.prevent="removeSocialPreview"
+                  src="/static/img/cancel.svg"
+                  class="social-preview-remove"
+                  :class="{ show : socialPreview}"
+                  alt=""
+                >
+              </label>
+              <input 
+                type="file"
+                accept=".png,.jpg,.jpeg,.svg"
+                ref="socialPreviewInput"
+                @change="changeSocialPreview"
+                id="social-preview" 
+                name="social-preview" 
+                class="d-none"
+              />
+            </div>
           <hr>
           <!-- Markdown files -->
           <p class="h4">Description</p>

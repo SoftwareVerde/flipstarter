@@ -50,6 +50,10 @@
         "comma-spacing": ["error", { "before": false, "after": true }],
         "computed-property-spacing": ["error", "never"],
         "key-spacing": ["error", { "beforeColon": false, "mode": "minimum" }],
-        "comma-style": ["error", "last"]
+        "comma-style": ["error", "last"],
+        "prefer-const": ["error", {
+            "destructuring": "any",
+            "ignoreReadBeforeAssign": false
+        }]
     }
 }
