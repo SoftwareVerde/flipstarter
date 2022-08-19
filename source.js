@@ -6,7 +6,7 @@ const page_language = document.querySelector("html").lang;
 // Load languages.json
 const languages = require("./static/ui/languages.json");
 // Load the locales we will use.
-for(let lang in languages) {
+for(const lang in languages) {
   require("moment/locale/" + languages[lang].momentLocales + ".js");
 }
 // Load the marked library to parse markdown text,
@@ -138,8 +138,8 @@ class flipstarter {
     await this.loadCurrencyRates();
 
     // Fetch the campaign information from the backend.
-    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
-    let fundraiser = await response.json();
+    const response = await fetch(`/campaign/${CAMPAIGN_ID}`);
+    const fundraiser = await response.json();
 
     this.campaign = fundraiser.campaign;
     this.campaign.recipients = fundraiser.recipients;
@@ -168,7 +168,7 @@ class flipstarter {
 
 
     for (const lang in available_languages) {
-      let { buttonColor } = available_languages[lang];
+      const { buttonColor } = available_languages[lang];
       document.getElementById("languageList").innerHTML += `
       <li>
         <a
@@ -204,7 +204,7 @@ class flipstarter {
     this.updateCampaignProgressCounter();
 
     // Add track delivery url
-    let track_delivery = document.querySelector("#track-delivery");
+    const track_delivery = document.querySelector("#track-delivery");
     track_delivery.textContent = this.campaign.track_name;
     track_delivery.href = this.campaign.track_url;
 
@@ -615,7 +615,7 @@ class flipstarter {
     document.getElementById("languageSelector").className = "fixed-action-btn";
 
     // Set url from locale
-    let url = "/" + locale;
+    const url = "/" + locale;
 
 
     // Edit url state
@@ -918,7 +918,7 @@ class flipstarter {
     // If the user wants to donate some satoshis..
     if (satoshis) {
       // Assemble the request object.
-      let requestObject = {
+      const requestObject = {
         outputs: [],
         data: {
           alias: document.getElementById("contributionName").value,
@@ -1309,7 +1309,7 @@ window.flipstarter = new flipstarter();
 // Function that can be used to cause celebratory effects.
 const celebration = function (volume = 0.11) {
   // Let the confetti burst in like fireworks!
-  let fireworks = function () {
+  const fireworks = function () {
     // Left side of the screen.
     const leftConfetti = {
       particleCount: 50,

@@ -1,11 +1,12 @@
 /* global Vue VeeValidate EasyMDE marked bchaddr */
 async function init() {
-  let data = {
+  const data = {
     languages: {},
     languageTap: 0,
     modal: false,
     mounted: true,
     error: false,
+    socialPreview: "",
     validate: {
       url: {
         regex:
@@ -49,7 +50,7 @@ async function init() {
     },
   };
 
-  let methods = {
+  const methods = {
     activeLanguage(index) {
       this.languageTap = index;
     },
@@ -63,11 +64,11 @@ async function init() {
       }
     },
     addRecipient() {
-      let recipients = this.campaign.recipients;
+      const recipients = this.campaign.recipients;
       recipients.push({
         goal: 0,
         image_url: "",
-        image_file: "",
+        avatar_image: "",
         name: "",
         website: "",
         address: "",
@@ -75,7 +76,7 @@ async function init() {
       this.campaign.recipients = recipients;
     },
     isValidAddress(address) {
-      let isValidAddress = bchaddr.isValidAddress(address);
+      const isValidAddress = bchaddr.isValidAddress(address);
       return isValidAddress && !bchaddr.isLegacyAddress(address);
     },
     changeMainLanguage(event, lang) {
@@ -85,6 +86,20 @@ async function init() {
         // by default we set english default language
         this.campaign.default_language = "EN";
       }
+    },
+    changeSocialPreview($event) {
+      //
+      const file = $event.target.files[0];
+
+      //
+      this.socialPreview = URL.createObjectURL(file);
+    },
+    removeSocialPreview() {
+      // Remove file from file input
+      this.$refs.socialPreviewInput.value = "";
+
+      // Remove image from app
+      this.socialPreview = "";
     }
   };
 
@@ -99,7 +114,7 @@ async function init() {
   VeeValidate.Validator.extend("cashAddress", {
     getMessage: (title) => "The " + title + " is not correct.",
     validate(address) {
-      let isValidAddress = bchaddr.isValidAddress(address);
+      const isValidAddress = bchaddr.isValidAddress(address);
       return isValidAddress && !bchaddr.isLegacyAddress(address);
     },
   });
@@ -108,24 +123,24 @@ async function init() {
     getMessage: () => "The date range is not correct.",
     validate(date, arg) {
       if(date) {
-        let startElm = window.vue.$refs[arg.ref];
-        let startDate = new Date(startElm.value);
-        let endDate = new Date(date);
+        const startElm = window.vue.$refs[arg.ref];
+        const startDate = new Date(startElm.value);
+        const endDate = new Date(date);
         return startDate < endDate;
       }
       return false;
     },
   });
 
-  let app = new Vue({
+  const app = new Vue({
     el: "#app",
     async mounted() {
       this.addRecipient();
-      let req = await fetch("/static/ui/languages.json");
-      let languages = await req.json();
+      const req = await fetch("/static/ui/languages.json");
+      const languages = await req.json();
 
       /* upper key languages */
-      for (let key in languages) {
+      for (const key in languages) {
         languages[key].abstract = "";
         languages[key].proposal = "";
         this.$set(this.languages, key.toUpperCase(), languages[key]);

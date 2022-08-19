@@ -14,7 +14,7 @@ class javascriptUtilities {
    */
   static reverseBuf(source) {
     // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
+    const reversed = Buffer.allocUnsafe(source.length);
 
     // Iterate over half of the buffers length, rounded up..
     for (
@@ -297,7 +297,7 @@ const setup = async function () {
   );
 
   // Store verification promises to allow parallellization.
-  let verificationPromises = [];
+  const verificationPromises = [];
 
   // Check each contributions commitment..
   for (const contributionIndex in unverifiedContributions) {

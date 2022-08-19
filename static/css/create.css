@@ -6,6 +6,48 @@
   background-repeat: no-repeat;
 }
 
+.social-preview {
+  transition: background-image 1s;
+  width: 100%;
+  margin: auto;
+  max-width: 640px;
+  height: 320px;
+  object-fit: cover;
+  object-position: center;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+}
+
+.social-preview .social-preview-button {
+  position: absolute;
+  display: flex;
+  padding: 0;
+  margin: 15px;
+  bottom: 0;
+  background-color: white;
+  align-items: center;
+}
+
+.social-preview .social-preview-button > * {
+  padding: 7px;
+}
+
+.social-preview .social-preview-button .social-preview-remove {
+  opacity: 0;
+  transition: opacity .8s;
+}
+
+.social-preview .social-preview-button .social-preview-remove.show {
+  opacity: 1;
+  transition: opacity .8s;
+}
+
+.btn-outline-success:hover {
+  color: #198754;
+}
+
 .nav-link {
   color: #000;
 }
