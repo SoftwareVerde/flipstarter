@@ -568,7 +568,7 @@ class flipstarter {
 
   async toggleContributionListMode() {
     // Select sort label to edit title
-    let sortLabel = document.querySelector("#campaignContributorSortLabel");
+    const sortLabel = document.querySelector("#campaignContributorSortLabel");
 
     //
     if(this.contributionsListMode === sortContributionsMode.earliestFirst) {
