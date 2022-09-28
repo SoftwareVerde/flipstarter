@@ -130,7 +130,7 @@ sudo apt-get install python-certbot-nginx
 sudo certbot --nginx -d yourdomain.com
 ```
 
-Make sure to replace `yourdomain.com` with your own domain or subdomain.  
+Make sure to replace `yourdomain.com` with your own domain or subdomain.
 Fill in the information, and select `2` when asked if you want HTTP traffic redirected to HTTPS.
 
 Try reloading your campaign. Your browser should automatically show that the connection to the website is secure.
@@ -140,4 +140,7 @@ Try reloading your campaign. Your browser should automatically show that the con
 1. Install Nginx, Apache or similar software.
 2. Run the Flipstarter Docker container on an available port - for example port 3000 (`docker run -d --restart always --name flipstarter -v flipstarter:/app/static/campaigns -p 3000:3000 flipstarter/flipstarter`).
 3. Create a reverse proxy to serve port 3000 via Nginx/Apache.
-4. Install [certbot](https://certbot.eff.org) and run it according to your OS and web server.
+4. Ensure that the reverse proxy is configured to handle websocket (WSS) requests as well.
+    * [Nginx instructions](https://www.linkedin.com/pulse/how-use-nginx-reverse-proxy-https-wss-self-signed-ramos-da-silva/)
+    * [Apache instructions](https://httpd.apache.org/docs/2.4/mod/mod_proxy_wstunnel.html)
+5. Install [certbot](https://certbot.eff.org) and run it according to your OS and web server.
