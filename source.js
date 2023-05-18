@@ -341,6 +341,9 @@ class flipstarter {
       if (eventData.fullfillment_transaction) {
         // Only trigger celebrations for the campaign we're actively working on.
         if (eventData.campaign_id === CAMPAIGN_ID) {
+          const wallet = window.Wallet.instance;
+          wallet.clearPrivateKey();
+
           // Trigger celebration.
           celebration(0.11);
 
@@ -858,6 +861,14 @@ class flipstarter {
       const commitmentInput = document.getElementById("commitment");
 
       const address = wallet.getAddress();
+
+      window.addEventListener("beforeunload", function(event) {
+          if (! wallet._isBound) { return; }
+          const confirmationMessage = "Be sure you've saved your private key somewhere; if you've sent money to this wallet and leave the page, your funds will be lost.";
+
+          (event || window.event).returnValue = confirmationMessage;
+          return confirmationMessage;
+      });
 
       const toggleConnectivityWarning = function(show) {
           const webWalletContainer = document.getElementById("web-wallet");
