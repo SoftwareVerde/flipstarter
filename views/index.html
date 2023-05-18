@@ -55,6 +55,7 @@
   <link href="/static/css/materialize.min.css" rel="stylesheet">
   <link href="/static/css/icons.css" rel="stylesheet">
   <link href="/static/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/github-markdown-css@5.1.0/github-markdown-light.css">
 
   <!-- Website metadata -->
   <title> <!-- campaign.title --> </title>
@@ -72,6 +73,7 @@
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.flipstarter.cash/">
+  <meta property="og:image" content="<!-- social_preview -->">
   <meta property="og:article:section" content="Technology">
   <meta property="og:article:tag" content="Bitcoin">
   <meta property="og:article:tag" content="Bitcoin Cash">
@@ -126,7 +128,7 @@
         </section>
 
         <!-- Campaign heading -->
-        <header id="campaignAbstract"></header>
+        <header id="campaignAbstract" class="markdown-body"></header>
 
         <!-- Campaign donation form -->
         <fieldset id="donateField">
@@ -274,11 +276,117 @@
             </div>
         </div>
     </div>
+    <div class="col s12 m12 l6" style="margin-top: 0.75rem;">
+      <small
+      style="
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      "
+      data-string="instructionsLabel"
+      ></small>
+      <p
+      id="instructions"
+      style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: small;
+      height: 7rem;
+      padding: 1rem;
+      margin-bottom: 7px;
+      margin-top: 0.5rem;
+      border: 1px solid rgb(169, 169, 169);
+      "
+      data-string="instructions"
+      ></p>
+      <div
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      "
+      >
+      <a
+      id="downloadButton"
+      class="btn"
+      style="
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background-color: transparent;
+      color: black;
+      box-shadow: none;
+      "
+      href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/b5300ea76722e60d6943521d3183b046/flipstarter-1.4.zip"
+      >
+      <i class="icon-download"></i>
+      <span
+      style="margin-left: 0.25rem;"
+      data-string="downloadText"
+      ></span>
+    </a>
+    <a
+    id="linkInstructionsButton"
+    class="btn"
+    target="_blank"
+    style="
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+    color: black;
+    box-shadow: none;
+    "
+    href="https://read.cash/@flipstarter/how-to-support-a-flipstarter-campaign-f27240d9"
+    >
+    <i class="icon-info"></i>
+    <span
+    style="margin-left: 0.25rem;"
+    data-string="instructionLink"
+    ></span>
+  </a>
 </div>
-</fieldset>
+</div>
+<div class="col s12 m12 l3" style="margin-top: 0.75rem;">
+  <small
+  style="
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  "
+  data-string="commitLabel"
+  ></small>
+  <textarea
+  rows="5"
+  id="commitment"
+  name="commitment"
+  data-placeholder="PasteHere"
+  style="
+  height: 7rem;
+  font-family: monospace;
+  font-size: small;
+  margin: 0;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+  "
+  ></textarea>
+  <button
+  id="commitTransaction"
+  class="btn waves-effect waves-light green"
+  style="width: 100%;"
+  disabled="disabled"
+  data-string="commitButton"
+  ></button>
+</div>
+</div>
+</div>
+        </fieldset>
 
-<!-- Campaign details. -->
-<section id="campaignDetails" class="row"></section>
+        <!-- Campaign details. -->
+        <section id="campaignDetails" class="row markdown-body"></section>
 </article>
 
 <!-- Campaign sidebar -->
@@ -311,11 +419,19 @@
   </section>
 
   <section>
-    <h3 style="float: left;">
-      <span class="valign-wrapper" style="float: left;">
+    <h3 class="valign-wrapper">
+      <span class="valign-wrapper">
         <i class="icon-favorite_border"></i>
         <b id="campaignContributorCount">0</b>
         <span data-string="contributorsLabel"></span>
+      </span>
+      <span 
+        style="margin-left: auto;"
+        class="valign-wrapper sorting-button" 
+        id="sortContributorButton"
+      >
+        <span id="campaignContributorSortLabel" data-string="largestFirst"></span>
+        <img src="/static/img/sort.svg" alt="">
       </span>
     </h3>
     <hr>

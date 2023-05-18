@@ -8,7 +8,7 @@ const page_language = document.querySelector("html").lang;
 // Load languages.json
 const languages = require("./static/ui/languages.json");
 // Load the locales we will use.
-for(let lang in languages) {
+for(const lang in languages) {
   require("moment/locale/" + languages[lang].momentLocales + ".js");
 }
 // Load the marked library to parse markdown text,
@@ -25,11 +25,19 @@ const confetti = require("canvas-confetti").default;
 
 const CAMPAIGN_ID = Number(window.location.hash.slice(1) || 1);
 
+const sortContributionsMode = {
+  largestFirst: 0,
+  earliestFirst: 1,
+};
+
 //
 class flipstarter {
   constructor() {
     // Set languages in this class
     this.languages = languages;
+
+    // Set contributions list mode of sort
+    this.contributionsListMode = sortContributionsMode.largestFirst;
 
     // Load the initial translation files in the background.
     this.loadTranslation(page_language);
@@ -41,15 +49,12 @@ class flipstarter {
   async initialize() {
     const _ = this;
 
-    // Wait for translations to finish loading..
-    await this.translationLoadingPromise;
-
     // Wait for currency rates to be loaded..
     await this.loadCurrencyRates();
 
     // Fetch the campaign information from the backend.
-    let response = await fetch(`/campaign/${CAMPAIGN_ID}`);
-    let fundraiser = await response.json();
+    let campaignResponse = await fetch(`/campaign/${CAMPAIGN_ID}`);
+    let fundraiser = await campaignResponse.json();
 
     this.campaign = fundraiser.campaign;
     this.campaign.recipients = fundraiser.recipients;
@@ -97,36 +102,6 @@ class flipstarter {
     }
     else {
       await this.updateTranslation(page_language);
-    }
-
-    // Apply website translation (or load website content).
-    for (const lang in available_languages) {
-      let { buttonColor } = available_languages[lang];
-      document.getElementById("languageList").innerHTML += `
-      <li>
-        <a
-        class="btn-floating"
-        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
-        id="translate-${lang}">
-          ${lang}
-        </a>
-      </li>
-      `;
-    }
-    for (const lang in available_languages) {
-      document
-        .getElementById("translate-" + lang)
-        .addEventListener(
-          "click",
-          () => {
-            localStorage.setItem("language", lang);
-            this.updateTranslation.bind(
-              this,
-              lang,
-              available_languages[lang].name
-            )();
-          }
-        );
     }
 
     // Attach event handlers.
@@ -219,6 +194,10 @@ class flipstarter {
     })();
 
     document
+      .getElementById("sortContributorButton")
+      .addEventListener("click", this.toggleContributionListMode.bind(this));
+
+    document
       .getElementById("template")
       .addEventListener("click", this.copyTemplate.bind(this));
     document
@@ -250,6 +229,45 @@ class flipstarter {
       .getElementById("commitment")
       .addEventListener("keyup", this.updateCommitButton.bind(this));
 
+    // Wait for translations to finish loading..
+    await this.translationLoadingPromise;
+
+    // Add languages data to campaign languages
+    this.campaign.available_languages.split(",").forEach(
+      (lang) => {
+        available_languages[lang] = this.languages[lang];
+      }
+    );
+
+    for (const lang in available_languages) {
+      const { buttonColor } = available_languages[lang];
+      document.getElementById("languageList").innerHTML += `
+      <li>
+        <a
+        class="btn-floating"
+        style="text-align: center; background: ${buttonColor || "#7b1fa2"};"
+        id="translate-${lang}">
+          ${lang}
+        </a>
+      </li>
+      `;
+    }
+    for (const lang in available_languages) {
+      document
+        .getElementById("translate-" + lang)
+        .addEventListener(
+          "click",
+          () => {
+            localStorage.setItem("language", lang);
+            this.updateTranslation.bind(
+              this,
+              lang,
+              available_languages[lang].name
+            )();
+          }
+        );
+    }
+
     // Update the campaign status and timer.
     this.updateTimerPresentation();
 
@@ -258,7 +276,7 @@ class flipstarter {
     this.updateCampaignProgressCounter();
 
     // Add track delivery url
-    let track_delivery = document.querySelector("#track-delivery");
+    const track_delivery = document.querySelector("#track-delivery");
     track_delivery.textContent = this.campaign.track_name;
     track_delivery.href = this.campaign.track_url;
 
@@ -594,10 +612,10 @@ class flipstarter {
       // Add the copy to the contribution list.
       contributionListElement.appendChild(contributionMessage);
     } else {
-      const contributionArray = Object.values(this.campaign.contributions);
-      const sortedContributions = contributionArray.sort(
-        (a, b) => Number(b.satoshis) - Number(a.satoshis)
-      );
+      // Sort contribution
+      const sortedContributions = this.sortContributionList();
+
+      // Display contributions
       for (const contributionIndex in sortedContributions) {
         //
         const contribution = sortedContributions[contributionIndex];
@@ -612,6 +630,46 @@ class flipstarter {
       }
     }
   }
+
+  sortContributionList() {
+    // Get contribution as Array
+    // By default, contributions are arranged by earliest first
+    const contributionArray = Object.values(this.campaign.contributions);
+
+    // Sort contribution by value if mode by value
+    if(this.contributionsListMode === sortContributionsMode.largestFirst) {
+      contributionArray.sort((a, b) => Number(b.satoshis) - Number(a.satoshis));
+    }
+
+    //
+    return contributionArray;
+  }
+
+  async toggleContributionListMode() {
+    // Select sort label to edit title
+    const sortLabel = document.querySelector("#campaignContributorSortLabel");
+
+    //
+    if(this.contributionsListMode === sortContributionsMode.earliestFirst) {
+      // Edit mode of sort
+      this.contributionsListMode = sortContributionsMode.largestFirst;
+
+      // Edit label title
+      sortLabel.textContent = this.translation.largestFirst;
+      sortLabel.dataset.string = "largestFirst";
+    } else {
+      // Edit mode of sort
+      this.contributionsListMode = sortContributionsMode.earliestFirst;
+
+      // Edit label title
+      sortLabel.textContent = this.translation.earliestFirst;
+      sortLabel.dataset.string = "earliestFirst";
+    }
+
+    //
+    await this.updateContributionList();
+  }
+
 
   async loadCurrencyRates() {
     try {
@@ -636,7 +694,7 @@ class flipstarter {
     document.getElementById("languageSelector").className = "fixed-action-btn";
 
     // Set url from locale
-    let url = "/" + locale;
+    const url = "/" + locale;
 
 
     // Edit url state
@@ -736,10 +794,10 @@ class flipstarter {
 
     // Print out the campaign texts.
     document.getElementById("campaignAbstract").innerHTML = DOMPurify.sanitize(
-      marked(campaignIntro)
+      marked.parse(campaignIntro)
     );
     document.getElementById("campaignDetails").innerHTML = DOMPurify.sanitize(
-      marked(campaignDetail)
+      marked.parse(campaignDetail)
     );
 
     // Parse the interface translation.
@@ -1124,7 +1182,7 @@ class flipstarter {
     // If the user wants to donate some satoshis..
     if (satoshis) {
       // Assemble the request object.
-      let requestObject = {
+      const requestObject = {
         outputs: [],
         data: {
           alias: document.getElementById("contributionName").value,
@@ -1488,7 +1546,7 @@ window.flipstarter = new flipstarter();
 // Function that can be used to cause celebratory effects.
 const celebration = function (volume = 0.11) {
   // Let the confetti burst in like fireworks!
-  let fireworks = function () {
+  const fireworks = function () {
     // Left side of the screen.
     const leftConfetti = {
       particleCount: 50,

@@ -85,56 +85,6 @@ hr
 	background-color: lightgrey;
 }
 
-#campaign h1,
-#campaign h2,
-#campaign h3
-{
-	text-transform: uppercase;
-	font-weight: bold;
-	margin-top: 1.25rem;
-	margin-bottom: 0;
-}
-
-#campaign h1
-{
-	text-align: left;
-	font-size: 1.40rem;
-	color: rgba(0, 0, 0, 0.90);
-}
-
-#campaign h2
-{
-	font-size: 1.10rem;
-	color: rgba(0, 0, 0, 0.80);
-}
-
-#campaign h3
-{
-	font-size: 0.75rem;
-	color: rgba(0, 0, 0, 0.60);
-}
-
-#campaign p
-{
-	font-size: 1.00rem;
-	color: rgba(0, 0, 0, 0.70);
-}
-
-#campaign ul,
-#campaign ol
-{
-	margin-left: 0rem;
-}
-
-#campaign ul > li,
-#campaign ol > li
-{
-	color: rgba(0, 0, 0, 0.70);
-	font-size: 1rem;
-	list-style-type: disc;
-	list-style-position: inside;
-}
-
 #recipientList
 {
 	margin: 0;
@@ -209,6 +159,19 @@ hr
 	box-shadow: inset 0rem 0.1rem 0.2rem rgba(0, 0, 0, 0.31);
 }
 
+#track-delivery {
+	display: block;
+    margin-bottom: 2em;
+    font-size: 1.4em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.sorting-button {
+	cursor: pointer;
+	user-select: none;
+}
+
 #contributionList
 {
 	margin: 0;
@@ -216,6 +179,7 @@ hr
 	list-style-type: none;
 	list-style-position: inside;
 }
+
 #contributionList > li
 {
 	display: flex;
@@ -344,7 +308,7 @@ hr
 	background-color: honeydew;
 	border-radius: 0.25rem;
 	padding: 1em;
-	margin: 0;
+	margin: 5px 0;
 	border: 1px solid rgba(0, 0, 0, 0.31);
 }
 
@@ -520,7 +484,7 @@ input[type=range]::-moz-range-thumb
 	display: inline-block;
 	position: relative;
 	top: 0.75rem;
-	height: 5.25rem;'
+	height: 5.25rem;
 }
 
 #header > p

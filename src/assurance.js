@@ -1,59 +1,6 @@
 // Load the libox file.
 const libox = require("./libox.js");
 
-class javascriptUtilities {
-  /**
-   * Reverses a Buffers content
-   *
-   * @param source   the Buffer to reverse
-   *
-   * @returns a new Buffer with the contents reversed.
-   */
-  static reverseBuf(source) {
-    // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
-
-    // Iterate over half of the buffers length, rounded up..
-    for (
-      let lowIndex = 0, highIndex = source.length - 1;
-      lowIndex <= highIndex;
-      lowIndex += 1, highIndex -= 1
-    ) {
-      // .. and swap each position from the beggining to the end.
-      reversed[lowIndex] = source[highIndex];
-      reversed[highIndex] = source[lowIndex];
-    }
-
-    // Return the reversed buffer.
-    return reversed;
-  }
-
-  /**
-   * Utility function that can be used to restore Buffers from JSON.
-   *
-   * @param k   key part of a key-value pair.
-   * @param v   value part of a key-value pair.
-   *
-   * @returns a Buffer restored from the `v.data` field, or the `v` value.
-   */
-  static bufferReviver(k, v) {
-    // Check if the data might be a buffer..
-    let condition =
-      v !== null &&
-      typeof v === "object" &&
-      "type" in v &&
-      v.type === "Buffer" &&
-      "data" in v &&
-      Array.isArray(v.data);
-
-    // Determine what to return based on condition.
-    let result = condition ? new Buffer(v.data) : v;
-
-    // Return the parsed content.
-    return result;
-  }
-}
-
 class bitcoinCashUtilities {
   /**
    * Helper function that takes an integer and encodes it as a buffer according to
@@ -104,8 +51,8 @@ class bitcoinCashUtilities {
    * @returns a Buffer with the content encoded as a varBuf.
    */
   static varBuf(input) {
-    let prependLength = bitcoinCashUtilities.varInt(input.length);
-    let result = Buffer.concat([prependLength, input]);
+    const prependLength = bitcoinCashUtilities.varInt(input.length);
+    const result = Buffer.concat([prependLength, input]);
 
     // Return the variable buffer encoded data.
     return result;
@@ -240,7 +187,7 @@ class assuranceContract {
   }
 
   static encodeOutputIndex(index) {
-    let outputIndex = Buffer.alloc(4);
+    const outputIndex = Buffer.alloc(4);
 
     outputIndex.writeUInt32LE(index);
 
@@ -276,11 +223,11 @@ class assuranceContract {
     }
 
     // Allocate 8 bytes.
-    let value = Buffer.alloc(8);
+    const value = Buffer.alloc(8);
 
     // Split the number into high and low bits.
-    let highValue = Math.floor(satoshis / Math.pow(2, 32));
-    let lowValue = satoshis % Math.pow(2, 32);
+    const highValue = Math.floor(satoshis / Math.pow(2, 32));
+    const lowValue = satoshis % Math.pow(2, 32);
 
     // Write the satoshi number to the buffer in 64bit.
     value.writeUInt32LE(highValue, 4);
@@ -297,8 +244,8 @@ class assuranceContract {
     // TODO: Properly validate and error check.
 
     // Parhse the high and low value sets.
-    let highValue = value.readUInt32LE(4);
-    let lowValue = value.readUInt32LE(0);
+    const highValue = value.readUInt32LE(4);
+    const lowValue = value.readUInt32LE(0);
 
     // Return the decoded value.
     return highValue * Math.pow(2, 32) + lowValue;
@@ -384,7 +331,7 @@ class assuranceContract {
     inputLockScript
   ) {
     // Initialize an empty array of outpoints.
-    let transactionOutpoints = [];
+    const transactionOutpoints = [];
 
     // For each output in the current contract..
     for (const currentOutput in this.outputs) {
@@ -478,7 +425,7 @@ class assuranceContract {
   }
 
   serializeOutputs() {
-    let outputBuffers = [];
+    const outputBuffers = [];
 
     for (const currentOutput in this.outputs) {
       const output = this.outputs[currentOutput];
@@ -498,7 +445,7 @@ class assuranceContract {
   }
 
   serializeCommitments() {
-    let commitmentBuffers = [];
+    const commitmentBuffers = [];
 
     for (const currentInput in this.inputs) {
       const commitment = this.inputs[currentInput];
@@ -529,16 +476,16 @@ class assuranceContract {
     );
 
     //
-    let previousTransactionOutputIndex = Buffer.allocUnsafe(4);
+    const previousTransactionOutputIndex = Buffer.allocUnsafe(4);
     previousTransactionOutputIndex.writeUInt32LE(
       commitment.previousTransactionOutputIndex
     );
 
     //
-    let unlockScript = Buffer.from(commitment.unlockScript, "hex");
+    const unlockScript = Buffer.from(commitment.unlockScript, "hex");
 
     //
-    let sequenceNumber = Buffer.from("ffffffff", "hex");
+    const sequenceNumber = Buffer.from("ffffffff", "hex");
 
     //
     return this.serializeInput(
@@ -566,7 +513,7 @@ class assuranceContract {
     sequenceNumber
   ) {
     // Create an unlock script length statement.
-    let unlockScriptLength = bitcoinCashUtilities.varInt(
+    const unlockScriptLength = bitcoinCashUtilities.varInt(
       unlockScript.byteLength
     );
 
@@ -599,7 +546,7 @@ class assuranceContract {
     const lockscript = this.getLockscriptFromAddress(address);
 
     // Declare a storage for the value.
-    let value = Buffer.alloc(8);
+    const value = Buffer.alloc(8);
 
     // Write the value to to the storage.
     // FIXME: This should be 64-bit, but due to javascript limitations and webpacks buffer implementation we don't have the 64bit function available.
@@ -629,7 +576,7 @@ class assuranceContract {
     requestData = {}
   ) {
     // Assemble the request object.
-    let requestObject = {
+    const requestObject = {
       outputs: [],
       data: requestData,
       donation: { amount: Number(requestSatoshis) },

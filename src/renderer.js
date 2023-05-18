@@ -4,7 +4,7 @@ const fs = require("fs");
 function view(templateName, res, replaces = {}) {
   // Read from template file
   let content = fs.readFileSync("./views/" + templateName).toString();
-  for (let key in replaces) {
+  for (const key in replaces) {
     content = content.split(key).join(replaces[key]);
   }
 

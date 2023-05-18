@@ -32,6 +32,7 @@
     "momentLocales": "ar",
     "currency": "USD",
     "unicode": "🇸🇦",
-    "buttonColor": "#2196F3"
+    "buttonColor": "#2196F3",
+    "rtl": true
   }
 }

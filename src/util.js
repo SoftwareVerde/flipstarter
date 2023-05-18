@@ -13,7 +13,7 @@ class javascriptUtilities {
    */
   static reverseBuf(source) {
     // Allocate space for the reversed buffer.
-    let reversed = Buffer.allocUnsafe(source.length);
+    const reversed = Buffer.allocUnsafe(source.length);
 
     // Iterate over half of the buffers length, rounded up..
     for (
@@ -28,6 +28,31 @@ class javascriptUtilities {
 
     // Return the reversed buffer.
     return reversed;
+  }
+
+  /**
+   * Utility function that can be used to restore Buffers from JSON.
+   *
+   * @param k   key part of a key-value pair.
+   * @param v   value part of a key-value pair.
+   *
+   * @returns a Buffer restored from the `v.data` field, or the `v` value.
+   */
+  static bufferReviver(k, v) {
+    // Check if the data might be a buffer..
+    const condition =
+      v !== null &&
+      typeof v === "object" &&
+      "type" in v &&
+      v.type === "Buffer" &&
+      "data" in v &&
+      Array.isArray(v.data);
+
+    // Determine what to return based on condition.
+    const result = condition ? new Buffer(v.data) : v;
+
+    // Return the parsed content.
+    return result;
   }
 }
 
