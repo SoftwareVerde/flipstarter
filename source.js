@@ -359,9 +359,6 @@ class flipstarter {
       if (eventData.fullfillment_transaction) {
         // Only trigger celebrations for the campaign we're actively working on.
         if (eventData.campaign_id === CAMPAIGN_ID) {
-          const wallet = window.Wallet.instance;
-          wallet.clearPrivateKey();
-
           // Trigger celebration.
           celebration(0.11);
 
@@ -1414,6 +1411,9 @@ class flipstarter {
           `<br/><qoute>${errorMessage}</qoute>`
       );
     } else {
+      const wallet = window.Wallet.instance;
+      wallet.clearStoredPrivateKey();
+
       // Reset slider amount.
       document.getElementById("donationSlider").value = 0;
 

@@ -1,5 +1,6 @@
 // Load the libox file.
 const libox = require("./libox.js");
+const javascriptUtilities = require("./util.js");
 
 class bitcoinCashUtilities {
   /**

@@ -1,11 +1,11 @@
 const buffer = require("buffer/").Buffer;
-const libauth = require("@bitauth/libauth");
+// const libauth = require("./libauth.js");
 const contract = require("./assurance").Contract;
 const QrCode = require("./qrcode.js");
 
 // Global exports...
 window.Buffer = buffer;
-window.libauth = libauth;
+// window.libauth = libauth;
 
 class Wallet {
     static async create() {
@@ -143,9 +143,7 @@ class Wallet {
         }
     }
 
-    clearPrivateKey() {
-        this._privateKey = null;
-
+    clearStoredPrivateKey() {
         var localStorage = window.localStorage;
         localStorage.removeItem("KEY");
     }
