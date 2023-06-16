@@ -6,7 +6,7 @@ const languages = require("../static/ui/languages.json");
 
 const renderer = require("../src/renderer.js");
 const fs = require("fs");
-const marked = require("marked");
+const { marked } = require("marked");
 
 // Wrap the campaign request in an async function.
 const home = async function (req, res) {
@@ -40,19 +40,20 @@ const home = async function (req, res) {
   }
 
   // Read abstract from page languages to add it in description
-  let descriptionFile = fs.readFileSync("./static/campaigns/1/" + lang + "/abstract.md");
+  const descriptionFile = fs.readFileSync("./static/campaigns/1/" + lang + "/abstract.md");
 
   // Convert file to String
-  let description = descriptionFile.toString();
+  const description = descriptionFile.toString();
 
   // Render HTML
   renderer.view("index.html", res, {
     "<!-- campaign.title -->": campaign.title,
     // Marked and remove html tags
-    "<!-- campaign.description -->": marked(description)
+    "<!-- campaign.description -->": marked.parse(description)
       .replace(/<[^>]*>?/gm, "")
       .trim(),
-    "<!-- campaign.lang -->": lang
+    "<!-- campaign.lang -->": lang,
+    "<!-- social_preview -->": campaign.social_preview
   });
 
   res.end();
@@ -64,7 +65,7 @@ const home = async function (req, res) {
 router.get("/", home);
 
 // Support /:lang of flipstarter languages
-for (let lang in languages) {
+for (const lang in languages) {
   router.get("/" + lang, home);
 }
 

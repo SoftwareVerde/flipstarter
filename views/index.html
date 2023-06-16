@@ -55,6 +55,7 @@
   <link href="/static/css/materialize.min.css" rel="stylesheet">
   <link href="/static/css/icons.css" rel="stylesheet">
   <link href="/static/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/github-markdown-css@5.1.0/github-markdown-light.css">
 
   <!-- Website metadata -->
   <title> <!-- campaign.title --> </title>
@@ -72,6 +73,7 @@
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.flipstarter.cash/">
+  <meta property="og:image" content="<!-- social_preview -->">
   <meta property="og:article:section" content="Technology">
   <meta property="og:article:tag" content="Bitcoin">
   <meta property="og:article:tag" content="Bitcoin Cash">
@@ -126,7 +128,7 @@
         </section>
 
         <!-- Campaign heading -->
-        <header id="campaignAbstract"></header>
+        <header id="campaignAbstract" class="markdown-body"></header>
 
         <!-- Campaign donation form -->
         <fieldset id="donateField">
@@ -256,7 +258,7 @@
                     <small data-string="instructionsLabel"></small>
                     <p id="instructions" data-string="instructions"></p>
                     <div class="button-container">
-                        <a id="downloadButton" class="btn" href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/ec6b5a7518801c4a278128ac4f296607/flipstarter-1.3.zip">
+                        <a id="downloadButton" class="btn" href="https://gitlab.com/flipstarter/flipstarter-electron-cash/uploads/ec6b5a7518801c4a278128ac4f296607/flipstarter-1.4.zip">
                           <i class="icon-download"></i>
                           <span data-string="downloadText"></span>
                         </a>
@@ -275,10 +277,10 @@
         </div>
     </div>
 </div>
-</fieldset>
+        </fieldset>
 
-<!-- Campaign details. -->
-<section id="campaignDetails" class="row"></section>
+        <!-- Campaign details. -->
+        <section id="campaignDetails" class="row markdown-body"></section>
 </article>
 
 <!-- Campaign sidebar -->
@@ -311,11 +313,19 @@
   </section>
 
   <section>
-    <h3 style="float: left;">
-      <span class="valign-wrapper" style="float: left;">
+    <h3 class="valign-wrapper">
+      <span class="valign-wrapper">
         <i class="icon-favorite_border"></i>
         <b id="campaignContributorCount">0</b>
         <span data-string="contributorsLabel"></span>
+      </span>
+      <span 
+        style="margin-left: auto;"
+        class="valign-wrapper sorting-button" 
+        id="sortContributorButton"
+      >
+        <span id="campaignContributorSortLabel" data-string="largestFirst"></span>
+        <img src="/static/img/sort.svg" alt="">
       </span>
     </h3>
     <hr>
@@ -425,6 +435,7 @@ style="display: flex; justify-content: center; text-align: left;"
 </template>
 
 <!-- Load the javascript as the last step to ensure fastest load time. -->
+<script src="/static/js/libauth.js"></script>
 <script src="/static/js/application.js"></script>
 
 <!-- -->

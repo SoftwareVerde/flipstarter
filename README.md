@@ -15,6 +15,16 @@ Note: Although this repository is called "backend", it currently contains both t
 The code for the Electron Cash plugin is [here](https://gitlab.com/flipstarter/flipstarter-electron-cash).
 
 
+## Forks and the Flipstarter Name/Logo
+
+For any fork that puts funding campaigns into the hands of users, it is important for them to understand where their tools are coming from.
+Therefore, besides the MIT rules as usual:
+
+- Wherever users can see the name of the project, please use a name different from "Flipstarter". At a minimum, please attach a prefix/suffix to "Flipstarter" or attach a word before/after "Flipstarter".
+- Wherever users can see the logo of the project, please use a logo different from the Flipstarter logo. At a minimum, please significantly change the color scheme of the Flipstarter logo.
+- We would be happy if you include "Powered by Flipstarter" with or without the Flipstarter logo.
+
+
 ## Development
 
 ### Run the NodeJS development server

@@ -11,6 +11,10 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/static/css/create.css">
 
+  <!-- Markdown editor CSS-->
+  <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/github-markdown-css@5.1.0/github-markdown-light.css">
+
   <title>Create a campaign</title>
 </head>
 
@@ -98,23 +102,23 @@
                 <div class="input-group mb-3">
                   <input
                     type="text" 
-                    v-validate="{regex : validate.url.regex, required: !recipient.image_file}"
+                    v-validate="{regex : validate.url.regex, required: !recipient.avatar_image}"
                     v-model="recipient.image_url"
                     class="form-control check-url"
                     :data-vv-name="`recipient ${ index + 1 } image URL`" 
                     :id="`image_url[${index}]`"
                     :name="`image_url[${index}]`"
-                    :placeholder="'image : ' + (recipient.image_file.name || 'url')"
+                    :placeholder="'image : ' + (recipient.avatar_image.name || 'url')"
                   >
                   <input
                     type="file"
                     class="d-none"
                     accept=".png,.jpg,.jpeg,.svg"
-                    :id="`image_file[${index}]`"
-                    :name="`image_file[${index}]`"
-                    @change="recipient.image_file = $event.target.files[0]"
+                    :id="`avatar_image[${index}]`"
+                    :name="`avatar_image[${index}]`"
+                    @change="recipient.avatar_image = $event.target.files[0]"
                   />
-                  <label :for="`image_file[${index}]`" class="btn btn-outline-secondary input-group-text px-3" role="button">
+                  <label :for="`avatar_image[${index}]`" class="btn btn-outline-secondary input-group-text px-3" role="button">
                     <img src="/static/img/upload.svg" alt="">
                   </label>
                 </div>
@@ -161,6 +165,32 @@
           </div>
           <button type="button" class="btn btn-primary js-add-recipient mt-3" @click="addRecipient()" :disabled="campaign.recipients.length === 7">Add a recipient</button>
           <!-- /Recipients -->
+          <p class="h4 py-3">Social preview</p>
+          <p> Upload an image to customize your campaign’s social media preview. </p>
+            <div class="social-preview border rounded" :style="{ 'background-image': 'url(' +  socialPreview + ')' }">
+              <label 
+                for="social-preview" 
+                class="btn btn-outline-success social-preview-button"
+              >
+                <span>Upload an image…</span>
+                <img 
+                  @click.prevent="removeSocialPreview"
+                  src="/static/img/cancel.svg"
+                  class="social-preview-remove"
+                  :class="{ show : socialPreview}"
+                  alt=""
+                >
+              </label>
+              <input 
+                type="file"
+                accept=".png,.jpg,.jpeg,.svg"
+                ref="socialPreviewInput"
+                @change="changeSocialPreview"
+                id="social-preview" 
+                name="social-preview" 
+                class="d-none"
+              />
+            </div>
           <hr>
           <!-- Markdown files -->
           <p class="h4">Description</p>
@@ -207,31 +237,35 @@
                   <div v-show="languageTap === index">
                     <div class="form-group">
                       <label :for="'abstract' + lang">Project Abstract <small>(Markdown Format Supported)</small></label>
-                      <textarea 
-                        v-validate="{required : !!(campaign.default_language == lang || language.proposal)}" 
-                        :data-vv-name="`${language.name} abstract`" 
-                        class="form-control" 
-                        :id="'abstract' + lang" 
-                        :name="'abstract' + lang" 
+                      <textarea
+                        v-easymde
+                        v-validate="{ required : campaign.default_language === lang || language.proposal !== '' }" 
+                        :data-vv-name="`${language.name} abstract`"
+                        class="form-control"
+                        :id="'abstract' + lang"
+                        :name="'abstract' + lang"
                         rows="4"
                         v-model="language.abstract"
+                        :data-rtl="language.rtl"
                       ></textarea>
                     </div>
                     <div class="form-group">
                       <label :for="'proposal' + lang">Project Proposal <small>(Markdown Format Supported)</small></label>
-                      <textarea 
-                        class="form-control" 
-                        :id="'proposal' + lang" 
-                        :name="'proposal' + lang" 
+                      <textarea
+                        v-easymde
+                        class="form-control"
+                        :id="'proposal' + lang"
+                        :name="'proposal' + lang"
                         rows="4"
                         v-model="language.proposal"
+                        :data-rtl="language.rtl"
                       ></textarea>
                     </div>
                     <input
                       type="checkbox"
                       :id="'default_language-' + lang"
                       @input="changeMainLanguage($event , lang)" 
-                      :checked="campaign.default_language == lang"
+                      :checked="campaign.default_language === lang"
                     >
                     <label :for="'default_language-' + lang">default language</label>
                   </div>
@@ -271,7 +305,9 @@
   <script src="https://unpkg.com/vee-validate@2.2.15/dist/vee-validate.js" integrity="sha384-7tFZHb5ob32ZwSaEC/CFJ1xYjmezMB2mJdGpNYo33iPRDAAuRLnDh1DRX0xs6hZt" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js" integrity="sha384-ULpZhk1pvhc/UK5ktA9kwb2guy9ovNSTyxPNHANnA35YjBQgdwI+AhLkixDvdlw4" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.9/dist/bchaddrjs-0.4.9.min.js" integrity="sha384-C/wey7b4Ij3srh947CFzL96lH77IJNCONg6vahijvotBrYMo+yb0rMNOTMrIaT5l" crossorigin="anonymous"></script>
-  <script src="/static/js/create.js"></script>
+  <script src="https://unpkg.com/marked@4.0.9/marked.min.js"></script>
+  <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
+  <script src="/static/js/create.js"></script>
 </body>
 </html>

@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS campaigns
 	default_language TEXT NOT NULL,
 	available_languages TEXT NOT NULL,
 	track_url TEXT NOT NULL,
+	social_preview TEXT,
 	starts INTEGER NOT NULL,
 	expires INTEGER NOT NULL,
 	PRIMARY KEY (campaign_id)

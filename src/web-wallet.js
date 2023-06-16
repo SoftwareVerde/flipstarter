@@ -1,11 +1,11 @@
 const buffer = require("buffer/").Buffer;
-const libauth = require("@bitauth/libauth");
+// const libauth = require("./libauth.js");
 const contract = require("./assurance").Contract;
 const QrCode = require("./qrcode.js");
 
 // Global exports...
 window.Buffer = buffer;
-window.libauth = libauth;
+// window.libauth = libauth;
 
 class Wallet {
     static async create() {
@@ -118,12 +118,34 @@ class Wallet {
         };
     }
 
+    _savePrivateKey() {
+        var localStorage = window.localStorage;
+        localStorage.setItem("KEY", Wallet.toHexString(this._privateKey));
+    }
+
+    _loadPrivateKey() {
+        var localStorage = window.localStorage;
+        var keyHexString = localStorage.getItem("KEY");
+        if (keyHexString != null) {
+            this._privateKey = Wallet.fromHexString(keyHexString);
+        }
+    }
+
     constructor(crypto) {
         this._crypto = crypto;
 
-        this._privateKey = libauth.generatePrivateKey(function() {
-            return window.crypto.getRandomValues(new Uint8Array(32));
-        });
+        this._loadPrivateKey();
+        if (this._privateKey == null) {
+            this._privateKey = libauth.generatePrivateKey(function() {
+                return window.crypto.getRandomValues(new Uint8Array(32));
+            });
+            this._savePrivateKey();
+        }
+    }
+
+    clearStoredPrivateKey() {
+        var localStorage = window.localStorage;
+        localStorage.removeItem("KEY");
     }
 
     getPrivateKey() {

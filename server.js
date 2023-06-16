@@ -282,7 +282,7 @@ const setup = async function () {
   );
 
   // Store verification promises to allow parallellization.
-  let verificationPromises = [];
+  const verificationPromises = [];
 
   // Check each contributions commitment..
   for (const contributionIndex in unverifiedContributions) {

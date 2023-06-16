@@ -20,6 +20,8 @@ const moment = require("moment");
 // Enable support for assurance contracts.
 const assuranceContract = require("../src/assurance.js").Contract;
 
+const SATS_PER_BCH = 100000000;
+
 const calculateMinerFee = function (RECIPIENT_COUNT, CONTRIBUTION_COUNT) {
   // Aim for two satoshis per byte to get a clear margin for error and priority on fullfillment.
   const TARGET_FEE_RATE = 2;
@@ -127,7 +129,7 @@ const submitContribution = async function (req, res) {
       }
 
       // TODO: do something about the storage stuffies.
-      let contract = new assuranceContract({});
+      const contract = new assuranceContract({});
 
       // Get a list of all recipients for the campaign.
       const recipients = req.app.queries.listRecipientsByCampaign.all({
@@ -163,7 +165,7 @@ const submitContribution = async function (req, res) {
         );
       };
 
-      let newCommitments = [];
+      const newCommitments = [];
       let totalSatoshis = 0;
 
       let refundToken = null;
@@ -248,7 +250,7 @@ const submitContribution = async function (req, res) {
         );
 
         //
-        let previousTransactionOutputIndex =
+        const previousTransactionOutputIndex =
           assuranceContract.encodeOutputIndex(
             currentInput.previous_output_index
           );
