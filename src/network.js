@@ -13,9 +13,6 @@ module.exports = async function (app) {
 
   // Add some servers to the cluster.
   app.electrum.addServer("bch.imaginary.cash");
-  app.electrum.addServer("electroncash.de");
-  app.electrum.addServer("electroncash.dk");
-  app.electrum.addServer("electron.jochen-hoenicke.de", 51002);
   app.electrum.addServer("electrum.imaginary.cash");
 
   // Allow unlimited event listeners (i.e. blockchain.scripthash.subscribe)
